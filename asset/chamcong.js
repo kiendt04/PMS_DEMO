@@ -106,9 +106,10 @@
     months.forEach(m => h1.push({label: MONTH_LBL[m], colspan: subCols.length}));
     h1.push({label: `Tong hop Q${q}`, colspan: 1});
 
-    const h2 = ['STT','Ho va ten','So TK'];
+    // h2: empty string cho cot fixed va total → Handsontable se tu rowspan 2 rows
+    const h2 = ['', '', ''];
     months.forEach(() => subCols.forEach(sc => h2.push(sc)));
-    h2.push('Tong');
+    h2.push('');
 
     return [h1, h2];
   }
@@ -125,10 +126,10 @@
     let ci = FIXED;
     months.forEach(() => {
       subCols.forEach(() => {
-        cols.push({data:ci++, type:'numeric', width:40, className:'htCenter htMiddle'});
+        cols.push({data:ci++, type:'numeric', width:42, className:'htCenter htMiddle'});
       });
     });
-    cols.push({data:ci, readOnly:true, type:'numeric', width:52, className:'htCenter htMiddle cc-total'});
+    cols.push({data:ci, readOnly:true, type:'numeric', width:58, className:'htCenter htMiddle cc-total'});
     return cols;
   }
 
@@ -166,39 +167,42 @@
     container.style.height = containerH + 'px';
 
     hotInstance = new Handsontable(container, {
-      data:           data,
-      nestedHeaders:  headers,
-      columns:        cols,
-      rowHeaders:     false,
+      data:              data,
+      nestedHeaders:     headers,
+      columns:           cols,
+      rowHeaders:        false,
       fixedColumnsStart: FIXED,
-      height:         containerH,
-      width:          '100%',
-      stretchH:       'none',
-      autoColumnSize: false,
-      mergeCells:     merges,
-      licenseKey:     'non-commercial-and-evaluation',
-      renderAllRows:  false,
+      height:            containerH,
+      width:             '100%',
+      stretchH:          'none',
+      autoColumnSize:    false,
+      mergeCells:        merges,
+      licenseKey:        'non-commercial-and-evaluation',
+      rowHeights:        26,
+      viewportRowRenderingOffset: 40,
 
       cells(row) {
         if (deptRowSet.has(row)) {
           return {
             readOnly: true,
-            renderer: function(inst, td, r, c) {
+            renderer(inst, td, r, c) {
+              td.innerHTML = '';
+              td.style.background    = '#DBEAFE';
+              td.style.borderBottom  = '1px solid #93C5FD';
+              td.style.borderRight   = '1px solid #BFDBFE';
+              td.style.height        = '26px';
               if (c === 0) {
-                td.innerHTML = '';
-                td.style.cssText = 'background:#DBEAFE;color:#1E40AF;font-weight:700;font-size:12px;padding:5px 8px;border-bottom:1px solid #BFDBFE;border-right:1px solid #E2E8F0;';
+                // Sau merge col=0 la cell hien thi text
+                td.style.color      = '#1E40AF';
+                td.style.fontWeight = '700';
+                td.style.fontSize   = '12px';
+                td.style.padding    = '0 8px';
                 td.textContent = inst.getDataAtCell(r, 1) || '';
-              } else {
-                td.innerHTML = '';
-                td.style.cssText = 'background:#DBEAFE;border-bottom:1px solid #BFDBFE;border-right:1px solid #E2E8F0;';
               }
             }
           };
         }
-        if (row % 2 === 0) {
-          return { className: 'cc-even-row' };
-        }
-        return {};
+        return row % 2 !== 0 ? {} : { className: 'cc-even-row' };
       },
 
       afterChange(changes) {
