@@ -698,7 +698,7 @@
 <script>
   /* ─── Auto-redirect nếu đã đăng nhập ─── */
   if (sessionStorage.getItem('pms_user')) {
-    window.location.replace('../payroll.html');
+    window.location.replace('dashboard.html');
   }
 
   /* ─── Helpers ─── */
@@ -741,7 +741,7 @@
         btn.querySelector('.btn-text').textContent = 'Thành công ✓';
         // Lưu session và chuyển sang dashboard
         sessionStorage.setItem('pms_user', JSON.stringify({ name: u, role: 'admin' }));
-        setTimeout(() => { window.location.href = '../payroll.html'; }, 900);
+        setTimeout(() => { window.location.href = 'dashboard.html'; }, 900);
       } else {
         showErr('Tên đăng nhập hoặc mật khẩu không đúng.');
         btn.disabled = false;

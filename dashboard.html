@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="vi">
 <head>
   <meta charset="UTF-8" />
@@ -219,12 +219,68 @@
         </div>
       </div>
 
+      <!-- ══ CHẤM CÔNG ══ -->
       <div class="page-section fade-in" id="page-chamcong">
-        <div class="section-header"><div class="section-title">Chấm công</div><button class="btn-outline">Xuất báo cáo</button></div>
-        <div class="placeholder">
-          <svg viewBox="0 0 40 40" fill="none"><circle cx="20" cy="20" r="15" stroke="currentColor" stroke-width="2"/><path d="M20 10v10l6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-          <p>Dữ liệu chấm công sẽ hiển thị tại đây</p>
+
+        <!-- Page header -->
+        <div class="cat-header">
+          <div class="cat-header-left">
+            <div class="cat-icon-wrap" style="background:#FEF3E2;color:#B45309">
+              <svg viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="1.6"/><path d="M10 6v4l3 3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+            </div>
+            <div>
+              <div class="cat-title">Quản lý chấm công</div>
+              <div class="cat-sub">Theo dõi chấm công theo quý, phân theo phòng ban</div>
+            </div>
+          </div>
+          <button class="btn-cat-add" style="background:linear-gradient(135deg,#22c97b,#15a25e);box-shadow:0 2px 10px rgba(21,162,94,.3)" id="ccExcel">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 10v2h10v-2M7 2v7M4 6l3 3 3-3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Xuất Excel
+          </button>
         </div>
+
+        <!-- Filter bar -->
+        <div class="cc-filterbar">
+          <div class="cc-filter-group">
+            <label>Chọn quý</label>
+            <select id="ccQuy" class="cc-select">
+              <option value="1">Quý 1</option>
+              <option value="2" selected>Quý 2</option>
+              <option value="3">Quý 3</option>
+              <option value="4">Quý 4</option>
+            </select>
+          </div>
+          <div class="cc-filter-group">
+            <label>Chọn năm</label>
+            <select id="ccNam" class="cc-select"></select>
+          </div>
+          <div class="cc-filter-group">
+            <label>Loại công</label>
+            <div class="cc-radio-group">
+              <label class="cc-radio">
+                <input type="radio" name="ccLoai" value="thoi-gian" checked />
+                <span class="cc-radio-dot"></span> Thời gian
+              </label>
+              <label class="cc-radio">
+                <input type="radio" name="ccLoai" value="ca-dem" />
+                <span class="cc-radio-dot"></span> Ca đếm
+              </label>
+              <label class="cc-radio">
+                <input type="radio" name="ccLoai" value="them-gio" />
+                <span class="cc-radio-dot"></span> Thêm giờ
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Table -->
+        <div class="cc-table-wrap">
+          <table class="cc-table">
+            <thead id="ccThead"></thead>
+            <tbody id="ccTbody"></tbody>
+          </table>
+        </div>
+
       </div>
 
       <div class="page-section fade-in" id="page-thưởng">
@@ -501,5 +557,6 @@
 <script src="asset/dashboard.js"></script>
 <script src="asset/khoi-phong-ban.js"></script>
 <script src="asset/phong-ban.js"></script>
+<script src="asset/chamcong.js"></script>
 </body>
 </html>

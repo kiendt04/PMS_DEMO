@@ -1064,3 +1064,203 @@ tbody tr:hover td { background: #FAFAFA; }
   font-size: 13.5px; color: #6B7280; text-align: center;
   line-height: 1.6; margin-bottom: 1.5rem;
 }
+
+/* ═══════════════════════════════════════
+   CHAM CONG – ATTENDANCE MODULE
+   ═══════════════════════════════════════ */
+
+/* ── Filter bar ── */
+.cc-filterbar {
+  display: flex;
+  align-items: flex-end;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin-bottom: 1.25rem;
+  background: #fff;
+  border: 1.5px solid #E5E7EB;
+  border-radius: 12px;
+  padding: 14px 18px;
+  box-shadow: 0 1px 4px rgba(0,0,0,.04);
+}
+
+.cc-filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.cc-filter-group label {
+  font-size: 11px;
+  font-weight: 600;
+  color: #6B7280;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+}
+
+.cc-select {
+  height: 36px;
+  padding: 0 12px;
+  font-size: 13.5px;
+  font-family: inherit;
+  border: 1.5px solid #E5E7EB;
+  border-radius: 9px;
+  background: #FAFAFA;
+  color: #111827;
+  outline: none;
+  cursor: pointer;
+  min-width: 120px;
+  transition: border-color .15s, box-shadow .15s;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%239CA3AF' stroke-width='1.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  padding-right: 30px;
+}
+.cc-select:focus {
+  border-color: #378ADD;
+  background-color: #fff;
+  box-shadow: 0 0 0 3px rgba(55,138,221,.1);
+}
+
+.cc-radio-group {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  height: 36px;
+}
+.cc-radio {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 13.5px;
+  color: #374151;
+  cursor: pointer;
+  user-select: none;
+}
+.cc-radio input[type=radio] { display: none; }
+.cc-radio-dot {
+  width: 16px; height: 16px;
+  border: 1.8px solid #CBD5E1;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  transition: border-color .15s;
+  flex-shrink: 0;
+}
+.cc-radio input[type=radio]:checked ~ .cc-radio-dot {
+  border-color: #185FA5;
+}
+.cc-radio input[type=radio]:checked ~ .cc-radio-dot::after {
+  content: '';
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: #185FA5;
+}
+
+/* ── Table container ── */
+.cc-table-wrap {
+  background: #fff;
+  border: 1.5px solid #E5E7EB;
+  border-radius: 14px;
+  overflow: auto;
+  box-shadow: 0 1px 6px rgba(0,0,0,.04);
+  max-height: calc(100vh - 280px);
+}
+
+/* ── Table ── */
+.cc-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12.5px;
+}
+
+/* Sticky header */
+.cc-table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: #F0F7FF;
+  white-space: nowrap;
+  border-bottom: 2px solid #BFDBFE;
+  padding: 8px 6px;
+  text-align: center;
+  font-size: 11.5px;
+  font-weight: 700;
+  color: #1E40AF;
+  letter-spacing: .04em;
+}
+
+/* Sticky first 3 columns */
+.cc-th-fixed, .cc-table tbody td:nth-child(1),
+.cc-table tbody td:nth-child(2),
+.cc-table tbody td:nth-child(3) {
+  position: sticky;
+  background: inherit;
+  z-index: 5;
+}
+.cc-th-stt, .cc-table tbody td:nth-child(1)  { left: 0;   min-width: 44px; max-width: 44px; text-align: center; }
+.cc-th-name, .cc-table tbody td:nth-child(2) { left: 44px;  min-width: 160px; text-align: left; }
+.cc-th-stk, .cc-table tbody td:nth-child(3)  { left: 204px; min-width: 130px; text-align: left; }
+
+.cc-th-fixed {
+  z-index: 15 !important;
+  background: #F0F7FF !important;
+}
+
+/* Month / quarter header */
+.cc-th-month {
+  background: #EBF4FF;
+  color: #1D4ED8;
+  border-left: 1px solid #BFDBFE;
+}
+.cc-th-quarter {
+  background: #FEF3E2;
+  color: #92400E;
+  border-left: 2px solid #FCD34D;
+}
+.cc-th-col {
+  background: #F9FAFB;
+  color: #4B5563;
+  font-weight: 600;
+  font-size: 10.5px;
+  border-left: 1px solid #F3F4F6;
+  min-width: 34px;
+}
+.cc-last { border-right: none; }
+
+/* Body rows */
+.cc-data-row td {
+  padding: 7px 6px;
+  border-bottom: 1px solid #F3F4F6;
+  text-align: center;
+  color: #374151;
+}
+.cc-data-row:hover td { background: #F0F9FF; }
+
+.cc-td-stt  { color: #9CA3AF !important; font-size: 11.5px; }
+.cc-td-name { text-align: left !important; font-weight: 500; color: #111827 !important; }
+.cc-td-stk  { text-align: left !important; color: #6B7280 !important; font-size: 12px; }
+.cc-td-val  { color: #185FA5; font-weight: 600; }
+.cc-td-empty { color: #E5E7EB; }
+.cc-td-total {
+  font-weight: 700;
+  color: #1A9E78;
+  border-left: 2px solid #D1FAE5;
+}
+.cc-td-pct  { color: #6B7280; font-size: 11.5px; }
+
+/* Department row */
+.cc-dept-row td {
+  background: #F8FAFF;
+  color: #1D4ED8;
+  font-weight: 700;
+  font-size: 12px;
+  padding: 7px 10px;
+  border-bottom: 1px solid #DBEAFE;
+  border-top: 1px solid #DBEAFE;
+  letter-spacing: .02em;
+}
+
+/* Scrollbar styling */
+.cc-table-wrap::-webkit-scrollbar { width: 6px; height: 6px; }
+.cc-table-wrap::-webkit-scrollbar-track { background: #F3F4F6; }
+.cc-table-wrap::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 3px; }
+.cc-table-wrap::-webkit-scrollbar-thumb:hover { background: #94A3B8; }
