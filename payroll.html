@@ -1,0 +1,1315 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PayrollPro - Hệ thống quản lý lương</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #F0EFE9;
+      min-height: 100vh;
+      color: #1a1a1a;
+    }
+
+    /* ─── LOGIN PAGE ─── */
+    #loginPage {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 1rem;
+      background: #F0EFE9;
+    }
+
+    .login-card {
+      background: #fff;
+      border: 1px solid rgba(0,0,0,0.09);
+      border-radius: 16px;
+      padding: 2.25rem 2.5rem;
+      width: 100%;
+      max-width: 400px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.07);
+    }
+
+    .logo-row {
+      display: flex; align-items: center; gap: 10px;
+      margin-bottom: 2rem;
+    }
+
+    .logo-icon {
+      width: 38px; height: 38px;
+      background: #185FA5;
+      border-radius: 9px;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .logo-icon svg { width: 22px; height: 22px; }
+    .logo-name { font-size: 15px; font-weight: 600; }
+    .logo-tagline { font-size: 11.5px; color: #888; }
+
+    .login-title { font-size: 21px; font-weight: 600; margin-bottom: 4px; }
+    .login-sub { font-size: 13px; color: #666; margin-bottom: 1.75rem; }
+
+    .field { margin-bottom: 1rem; }
+    .field label { display: block; font-size: 12.5px; font-weight: 500; color: #444; margin-bottom: 6px; }
+
+    .field input[type=text],
+    .field input[type=password] {
+      width: 100%; height: 40px; padding: 0 12px;
+      font-size: 14px;
+      border: 1px solid #ddd; border-radius: 8px;
+      background: #fff; color: #1a1a1a; outline: none;
+      transition: border-color .15s, box-shadow .15s;
+    }
+
+    .field input:focus {
+      border-color: #378ADD;
+      box-shadow: 0 0 0 3px rgba(55,138,221,.13);
+    }
+
+    .pw-wrap { position: relative; }
+    .pw-toggle {
+      position: absolute; right: 10px; top: 50%; transform: translateY(-50%);
+      background: none; border: none; cursor: pointer; padding: 4px;
+      color: #aaa; display: flex; align-items: center; transition: color .15s;
+    }
+    .pw-toggle:hover { color: #555; }
+
+    .row-opts {
+      display: flex; justify-content: space-between; align-items: center;
+      margin: .5rem 0 1.5rem;
+    }
+
+    .remember { display: flex; align-items: center; gap: 6px; font-size: 13px; color: #555; cursor: pointer; }
+    .remember input { width: 14px; height: 14px; accent-color: #185FA5; }
+    .forgot { font-size: 13px; color: #185FA5; text-decoration: none; }
+    .forgot:hover { text-decoration: underline; }
+
+    .btn-primary {
+      width: 100%; height: 42px;
+      background: #185FA5; color: #fff;
+      border: none; border-radius: 8px;
+      font-size: 14px; font-weight: 500;
+      cursor: pointer; transition: background .15s, transform .1s;
+    }
+    .btn-primary:hover { background: #0C447C; }
+    .btn-primary:active { transform: scale(.98); }
+    .btn-primary:disabled { background: #93b9d8; cursor: not-allowed; }
+
+    .divider {
+      display: flex; align-items: center; gap: 10px;
+      margin: 1.25rem 0; font-size: 12px; color: #bbb;
+    }
+    .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: #eee; }
+
+    .btn-sso {
+      width: 100%; height: 40px; background: none;
+      border: 1px solid #ddd; border-radius: 8px;
+      font-size: 13px; color: #555; cursor: pointer;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      transition: background .15s, border-color .15s;
+    }
+    .btn-sso:hover { background: #f7f7f7; border-color: #bbb; }
+
+    .alert {
+      font-size: 12.5px; border-radius: 8px;
+      padding: 9px 12px; margin-bottom: 1rem; display: none;
+    }
+    .alert-error   { color: #a32d2d; background: #FCEBEB; border: 1px solid #f09595; }
+    .alert-success { color: #3B6D11; background: #EAF3DE; border: 1px solid #97C459; }
+
+    /* ─── DASHBOARD LAYOUT ─── */
+    #dashPage { display: none; min-height: 100vh; flex-direction: row; }
+
+    /* Sidebar */
+    .sidebar {
+      width: 240px; min-height: 100vh;
+      background: #13293D;
+      display: flex; flex-direction: column;
+      flex-shrink: 0;
+      position: fixed; top: 0; left: 0; bottom: 0;
+      z-index: 100;
+    }
+
+    .sidebar-logo {
+      display: flex; align-items: center; gap: 10px;
+      padding: 1.5rem 1.25rem 1.25rem;
+      border-bottom: 1px solid rgba(255,255,255,.07);
+    }
+
+    .sidebar-logo-icon {
+      width: 34px; height: 34px; background: #185FA5;
+      border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .sidebar-logo-icon svg { width: 20px; height: 20px; }
+    .sidebar-logo-name { font-size: 14px; font-weight: 600; color: #fff; }
+    .sidebar-logo-tagline { font-size: 10.5px; color: rgba(255,255,255,.45); }
+
+    .sidebar-section { padding: .75rem 1rem .25rem; font-size: 10px; font-weight: 600; color: rgba(255,255,255,.3); letter-spacing: .08em; text-transform: uppercase; }
+
+    .nav-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: .6rem 1.25rem;
+      font-size: 13.5px; color: rgba(255,255,255,.65);
+      cursor: pointer; border-radius: 0;
+      transition: background .15s, color .15s;
+      margin: 1px 0;
+      border-left: 3px solid transparent;
+      user-select: none;
+    }
+    .nav-item:hover { background: rgba(255,255,255,.06); color: rgba(255,255,255,.9); }
+    .nav-item.active {
+      background: rgba(55,138,221,.18);
+      color: #fff;
+      border-left-color: #378ADD;
+      font-weight: 500;
+    }
+    .nav-item svg { width: 16px; height: 16px; flex-shrink: 0; opacity: .8; }
+    .nav-item.active svg { opacity: 1; }
+
+    .nav-badge {
+      margin-left: auto;
+      background: #E24B4A; color: #fff;
+      font-size: 10px; font-weight: 600;
+      padding: 1px 6px; border-radius: 10px;
+    }
+
+    .sidebar-bottom {
+      margin-top: auto;
+      border-top: 1px solid rgba(255,255,255,.07);
+      padding: 1rem 1.25rem;
+    }
+
+    .user-row { display: flex; align-items: center; gap: 10px; }
+    .user-avatar {
+      width: 32px; height: 32px; border-radius: 50%;
+      background: #185FA5;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px; font-weight: 600; color: #fff; flex-shrink: 0;
+    }
+    .user-name { font-size: 13px; font-weight: 500; color: #fff; }
+    .user-role { font-size: 11px; color: rgba(255,255,255,.4); }
+    .btn-logout {
+      margin-left: auto; background: none; border: none;
+      cursor: pointer; color: rgba(255,255,255,.4);
+      padding: 4px; display: flex; align-items: center;
+      transition: color .15s;
+    }
+    .btn-logout:hover { color: #E24B4A; }
+
+    /* Main content */
+    .main {
+      margin-left: 240px;
+      flex: 1; min-height: 100vh;
+      display: flex; flex-direction: column;
+    }
+
+    .topbar {
+      height: 56px; background: #fff;
+      border-bottom: 1px solid #eee;
+      display: flex; align-items: center;
+      padding: 0 1.75rem;
+      gap: 12px;
+      position: sticky; top: 0; z-index: 50;
+    }
+
+    .topbar-title { font-size: 16px; font-weight: 600; flex: 1; }
+    .topbar-date { font-size: 12.5px; color: #888; }
+
+    .btn-icon {
+      width: 34px; height: 34px; border-radius: 8px;
+      border: 1px solid #eee; background: none; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      color: #666; transition: background .15s;
+    }
+    .btn-icon:hover { background: #f5f5f5; }
+
+    .notif-wrap { position: relative; }
+    .notif-dot {
+      position: absolute; top: 6px; right: 6px;
+      width: 7px; height: 7px; border-radius: 50%;
+      background: #E24B4A; border: 1.5px solid #fff;
+    }
+
+    .content { padding: 1.75rem; flex: 1; }
+
+    /* Stat cards */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 14px;
+      margin-bottom: 1.75rem;
+    }
+
+    .stat-card {
+      background: #fff;
+      border: 1px solid #eee;
+      border-radius: 12px;
+      padding: 1.1rem 1.25rem;
+    }
+
+    .stat-label { font-size: 12px; color: #888; margin-bottom: 6px; display: flex; align-items: center; gap: 6px; }
+    .stat-label svg { width: 14px; height: 14px; }
+    .stat-value { font-size: 22px; font-weight: 600; color: #1a1a1a; margin-bottom: 2px; }
+    .stat-sub { font-size: 11.5px; color: #aaa; }
+    .stat-up { color: #3B6D11; font-size: 11.5px; }
+    .stat-down { color: #a32d2d; font-size: 11.5px; }
+
+    /* Section header */
+    .section-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 1rem;
+    }
+    .section-title { font-size: 15px; font-weight: 600; }
+
+    .btn-outline {
+      height: 32px; padding: 0 14px;
+      border: 1px solid #ddd; border-radius: 7px;
+      background: none; font-size: 12.5px; color: #555;
+      cursor: pointer; transition: background .15s;
+    }
+    .btn-outline:hover { background: #f5f5f5; }
+
+    /* Table */
+    .table-card {
+      background: #fff; border: 1px solid #eee;
+      border-radius: 12px; overflow: hidden;
+      margin-bottom: 1.75rem;
+    }
+
+    table { width: 100%; border-collapse: collapse; }
+    thead th {
+      padding: 10px 16px; text-align: left;
+      font-size: 11.5px; font-weight: 600; color: #888;
+      background: #FAFAFA; border-bottom: 1px solid #eee;
+      text-transform: uppercase; letter-spacing: .04em;
+    }
+    tbody td { padding: 11px 16px; font-size: 13.5px; border-bottom: 1px solid #f3f3f3; }
+    tbody tr:last-child td { border-bottom: none; }
+    tbody tr:hover td { background: #FAFAFA; }
+
+    .badge {
+      display: inline-block;
+      padding: 2px 10px; border-radius: 20px;
+      font-size: 11.5px; font-weight: 500;
+    }
+    .badge-green  { background: #EAF3DE; color: #3B6D11; }
+    .badge-amber  { background: #FAEEDA; color: #854F0B; }
+    .badge-red    { background: #FCEBEB; color: #a32d2d; }
+    .badge-blue   { background: #E6F1FB; color: #185FA5; }
+
+    /* Charts row */
+    .charts-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin-bottom: 1.75rem;
+    }
+
+    .chart-card {
+      background: #fff; border: 1px solid #eee;
+      border-radius: 12px; padding: 1.25rem;
+    }
+
+    .chart-title { font-size: 13.5px; font-weight: 600; margin-bottom: 1rem; }
+
+    .bar-chart { display: flex; align-items: flex-end; gap: 8px; height: 100px; }
+    .bar-col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+    .bar {
+      width: 100%; border-radius: 4px 4px 0 0;
+      background: #B5D4F4; transition: background .2s;
+      cursor: pointer;
+    }
+    .bar:hover { background: #185FA5; }
+    .bar.highlight { background: #185FA5; }
+    .bar-label { font-size: 10px; color: #aaa; }
+
+    .donut-wrap { display: flex; align-items: center; gap: 1.25rem; }
+    .donut-legend { flex: 1; }
+    .legend-item { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; font-size: 12.5px; }
+    .legend-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+
+    /* Page sections */
+    .page-section { display: none; }
+    .page-section.active { display: block; }
+
+    /* Placeholder pages */
+    .placeholder {
+      background: #fff; border: 1px solid #eee; border-radius: 12px;
+      padding: 3rem 2rem; text-align: center; color: #aaa;
+    }
+    .placeholder svg { width: 40px; height: 40px; margin: 0 auto 12px; display: block; opacity: .35; }
+    .placeholder p { font-size: 14px; }
+
+    /* Animations */
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+    .fade-in { animation: fadeIn .25s ease; }
+    @keyframes slideIn { from { opacity: 0; transform: translateX(-10px); } to { opacity: 1; transform: translateX(0); } }
+
+    /* ─── DANH MỤC KHỐI PHÒNG BAN ─── */
+    .toolbar {
+      display: flex; align-items: center; gap: 10px;
+      margin-bottom: 1.25rem; flex-wrap: wrap;
+    }
+    .search-wrap { position: relative; flex: 1; min-width: 200px; max-width: 320px; }
+    .search-wrap svg { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: #aaa; width: 14px; height: 14px; pointer-events: none; }
+    .search-wrap input {
+      width: 100%; height: 36px; padding: 0 12px 0 32px;
+      font-size: 13.5px; border: 1px solid #ddd; border-radius: 8px;
+      background: #fff; color: #1a1a1a; outline: none;
+      transition: border-color .15s, box-shadow .15s;
+    }
+    .search-wrap input:focus { border-color: #378ADD; box-shadow: 0 0 0 3px rgba(55,138,221,.1); }
+
+    .btn-add {
+      height: 36px; padding: 0 16px;
+      background: #185FA5; color: #fff;
+      border: none; border-radius: 8px;
+      font-size: 13.5px; font-weight: 500; cursor: pointer;
+      display: flex; align-items: center; gap: 6px;
+      transition: background .15s;
+      white-space: nowrap;
+    }
+    .btn-add:hover { background: #0C447C; }
+
+    .btn-action {
+      height: 28px; padding: 0 10px; font-size: 12px;
+      border-radius: 6px; border: 1px solid #e0e0e0;
+      background: none; cursor: pointer; transition: background .12s;
+    }
+    .btn-edit  { color: #185FA5; border-color: #b5d4f4; }
+    .btn-edit:hover  { background: #E6F1FB; }
+    .btn-delete { color: #a32d2d; border-color: #f09595; }
+    .btn-delete:hover { background: #FCEBEB; }
+
+    .total-info { font-size: 13px; color: #888; margin-left: auto; white-space: nowrap; }
+
+    /* Modal overlay */
+    .modal-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,.35); z-index: 999;
+      align-items: center; justify-content: center;
+    }
+    .modal-overlay.open { display: flex; }
+
+    .modal {
+      background: #fff; border-radius: 14px;
+      padding: 1.75rem 2rem; width: 100%; max-width: 480px;
+      box-shadow: 0 8px 32px rgba(0,0,0,.12);
+      animation: fadeIn .2s ease;
+    }
+    .modal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem; }
+    .modal-title { font-size: 16px; font-weight: 600; }
+    .btn-close {
+      width: 30px; height: 30px; border-radius: 7px;
+      border: none; background: none; cursor: pointer; font-size: 18px;
+      color: #aaa; display: flex; align-items: center; justify-content: center;
+      transition: background .15s, color .15s;
+    }
+    .btn-close:hover { background: #f5f5f5; color: #555; }
+
+    .form-field { margin-bottom: 1.1rem; }
+    .form-field label { display: block; font-size: 12.5px; font-weight: 500; color: #444; margin-bottom: 6px; }
+    .form-field label span { color: #E24B4A; }
+    .form-field input[type=text],
+    .form-field textarea {
+      width: 100%; padding: 8px 12px;
+      font-size: 13.5px; font-family: inherit;
+      border: 1px solid #ddd; border-radius: 8px;
+      background: #fff; color: #1a1a1a; outline: none;
+      transition: border-color .15s, box-shadow .15s;
+      resize: vertical;
+    }
+    .form-field input[type=text] { height: 38px; }
+    .form-field textarea { min-height: 80px; }
+    .form-field input:focus, .form-field textarea:focus {
+      border-color: #378ADD; box-shadow: 0 0 0 3px rgba(55,138,221,.1);
+    }
+    .form-field .field-error { font-size: 11.5px; color: #a32d2d; margin-top: 4px; display: none; }
+
+    .modal-footer { display: flex; justify-content: flex-end; gap: 8px; margin-top: 1.5rem; }
+    .btn-cancel {
+      height: 38px; padding: 0 18px;
+      border: 1px solid #ddd; border-radius: 8px;
+      background: none; font-size: 13.5px; color: #555; cursor: pointer;
+      transition: background .15s;
+    }
+    .btn-cancel:hover { background: #f5f5f5; }
+    .btn-save {
+      height: 38px; padding: 0 20px;
+      background: #185FA5; color: #fff;
+      border: none; border-radius: 8px;
+      font-size: 13.5px; font-weight: 500; cursor: pointer;
+      transition: background .15s;
+    }
+    .btn-save:hover { background: #0C447C; }
+
+    /* Confirm delete modal */
+    .modal-confirm { max-width: 380px; text-align: center; }
+    .modal-confirm .confirm-icon { font-size: 36px; margin-bottom: .75rem; }
+    .modal-confirm .confirm-title { font-size: 16px; font-weight: 600; margin-bottom: 6px; }
+    .modal-confirm .confirm-sub { font-size: 13px; color: #666; margin-bottom: 1.5rem; }
+    .modal-confirm .modal-footer { justify-content: center; }
+    .btn-danger {
+      height: 38px; padding: 0 20px;
+      background: #E24B4A; color: #fff;
+      border: none; border-radius: 8px;
+      font-size: 13.5px; font-weight: 500; cursor: pointer;
+      transition: background .15s;
+    }
+    .btn-danger:hover { background: #A32D2D; }
+
+    .empty-row td { text-align: center; padding: 2.5rem !important; color: #aaa; font-size: 13.5px; }
+  </style>
+</head>
+<body>
+
+<!-- ══════════ LOGIN PAGE ══════════ -->
+<div id="loginPage">
+  <div class="login-card">
+    <div class="logo-row">
+      <div class="logo-icon">
+        <svg viewBox="0 0 20 20" fill="none">
+          <rect x="3" y="5" width="14" height="11" rx="2" stroke="white" stroke-width="1.5"/>
+          <path d="M7 5V4a3 3 0 0 1 6 0v1" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+          <circle cx="10" cy="11" r="1.5" fill="white"/>
+          <path d="M10 12.5v1.5" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <div>
+        <div class="logo-name">PayrollPro</div>
+        <div class="logo-tagline">Hệ thống quản lý lương</div>
+      </div>
+    </div>
+
+    <div class="login-title">Đăng nhập</div>
+    <div class="login-sub">Chào mừng bạn quay lại. Vui lòng nhập thông tin.</div>
+
+    <div class="alert alert-error"   id="errMsg"></div>
+    <div class="alert alert-success" id="okMsg"></div>
+
+    <div class="field">
+      <label for="uname">Tên đăng nhập</label>
+      <input type="text" id="uname" placeholder="Nhập tên đăng nhập..." autocomplete="username" />
+    </div>
+
+    <div class="field">
+      <label for="pw">Mật khẩu</label>
+      <div class="pw-wrap">
+        <input type="password" id="pw" placeholder="Nhập mật khẩu..." autocomplete="current-password" />
+        <button class="pw-toggle" id="togglePw" type="button">
+          <svg id="eyeIco" width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <path d="M1 8s2.5-5 7-5 7 5 7 5-2.5 5-7 5-7-5-7-5z" stroke="currentColor" stroke-width="1.2"/>
+            <circle cx="8" cy="8" r="2" stroke="currentColor" stroke-width="1.2"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <div class="row-opts">
+      <label class="remember"><input type="checkbox" id="rem"/> Ghi nhớ đăng nhập</label>
+      <a href="#" class="forgot">Quên mật khẩu?</a>
+    </div>
+
+    <button class="btn-primary" id="loginBtn">Đăng nhập</button>
+
+    <div class="divider">hoặc</div>
+
+    <button class="btn-sso" type="button">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+        <rect x="1" y="1" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.2"/>
+        <rect x="9" y="1" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.2"/>
+        <rect x="1" y="9" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.2"/>
+        <rect x="9" y="9" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.2"/>
+      </svg>
+      Đăng nhập bằng SSO
+    </button>
+  </div>
+</div>
+
+<!-- ══════════ DASHBOARD ══════════ -->
+<div id="dashPage" style="display:none; min-height:100vh;">
+
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="sidebar-logo">
+      <div class="sidebar-logo-icon">
+        <svg viewBox="0 0 20 20" fill="none">
+          <rect x="3" y="5" width="14" height="11" rx="2" stroke="white" stroke-width="1.5"/>
+          <path d="M7 5V4a3 3 0 0 1 6 0v1" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+          <circle cx="10" cy="11" r="1.5" fill="white"/>
+          <path d="M10 12.5v1.5" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <div>
+        <div class="sidebar-logo-name">PayrollPro</div>
+        <div class="sidebar-logo-tagline">Quản lý lương</div>
+      </div>
+    </div>
+
+    <div style="padding: .5rem 0; flex: 1; overflow-y: auto;">
+      <div class="sidebar-section">Tổng quan</div>
+      <div class="nav-item active" data-page="dashboard">
+        <svg viewBox="0 0 16 16" fill="none"><rect x="1" y="1" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.3"/><rect x="9" y="1" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.3"/><rect x="1" y="9" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.3"/><rect x="9" y="9" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.3"/></svg>
+        Dashboard
+      </div>
+
+      <div class="sidebar-section">Nhân sự & Lương</div>
+      <div class="nav-item" data-page="nhanvien">
+        <svg viewBox="0 0 16 16" fill="none"><circle cx="6" cy="5" r="2.5" stroke="currentColor" stroke-width="1.3"/><path d="M1 13c0-2.76 2.24-5 5-5s5 2.24 5 5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><circle cx="12" cy="5" r="2" stroke="currentColor" stroke-width="1.2"/><path d="M12 10c1.66 0 3 1.34 3 3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+        Nhân viên
+      </div>
+      <div class="nav-item" data-page="bangluong">
+        <svg viewBox="0 0 16 16" fill="none"><rect x="2" y="2" width="12" height="12" rx="2" stroke="currentColor" stroke-width="1.3"/><path d="M5 6h6M5 9h4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+        Bảng lương
+        <span class="nav-badge">3</span>
+      </div>
+      <div class="nav-item" data-page="chamcong">
+        <svg viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.3"/><path d="M8 5v3l2 2" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+        Chấm công
+      </div>
+      <div class="nav-item" data-page="thưởng">
+        <svg viewBox="0 0 16 16" fill="none"><path d="M8 2l1.5 3 3.5.5-2.5 2.5.6 3.5L8 10l-3.1 1.5.6-3.5L3 5.5l3.5-.5z" stroke="currentColor" stroke-width="1.2"/></svg>
+        Thưởng & Phụ cấp
+      </div>
+
+      <div class="sidebar-section">Danh mục</div>
+      <div class="nav-item" data-page="khoi-phong-ban">
+        <svg viewBox="0 0 16 16" fill="none"><rect x="1" y="1" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.3"/><rect x="9" y="1" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.3"/><rect x="1" y="9" width="6" height="3" rx="1" stroke="currentColor" stroke-width="1.3"/><rect x="9" y="9" width="6" height="3" rx="1" stroke="currentColor" stroke-width="1.3"/></svg>
+        Khối phòng ban
+      </div>
+      <div class="nav-item" data-page="phong-ban">
+        <svg viewBox="0 0 16 16" fill="none"><rect x="1" y="3" width="14" height="10" rx="1.5" stroke="currentColor" stroke-width="1.3"/><path d="M1 7h14M5 7v6" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+        Phòng ban
+      </div>
+
+      <div class="sidebar-section">Báo cáo</div>
+      <div class="nav-item" data-page="baocao">
+        <svg viewBox="0 0 16 16" fill="none"><path d="M2 12l3.5-4 3 3 2.5-5 3 3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Báo cáo tháng
+      </div>
+      <div class="nav-item" data-page="thue">
+        <svg viewBox="0 0 16 16" fill="none"><rect x="2" y="2" width="12" height="12" rx="2" stroke="currentColor" stroke-width="1.3"/><path d="M5.5 5.5l5 5M10.5 5.5l-5 5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+        Thuế TNCN
+      </div>
+
+      <div class="sidebar-section">Hệ thống</div>
+      <div class="nav-item" data-page="caidat">
+        <svg viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="2.5" stroke="currentColor" stroke-width="1.3"/><path d="M8 1v2M8 13v2M1 8h2M13 8h2M3.05 3.05l1.42 1.42M11.53 11.53l1.42 1.42M3.05 12.95l1.42-1.42M11.53 4.47l1.42-1.42" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+        Cài đặt
+      </div>
+    </div>
+
+    <div class="sidebar-bottom">
+      <div class="user-row">
+        <div class="user-avatar">AD</div>
+        <div>
+          <div class="user-name">Admin</div>
+          <div class="user-role">Quản trị viên</div>
+        </div>
+        <button class="btn-logout" id="logoutBtn" title="Đăng xuất">
+          <svg width="15" height="15" viewBox="0 0 16 16" fill="none">
+            <path d="M6 2H3a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h3M11 11l3-3-3-3M14 8H6" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main -->
+  <div class="main">
+    <div class="topbar">
+      <span class="topbar-title" id="topbarTitle">Dashboard</span>
+      <span class="topbar-date" id="topbarDate"></span>
+      <div class="notif-wrap">
+        <button class="btn-icon">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <path d="M8 1a5 5 0 0 1 5 5v2l1.5 2.5h-13L3 8V6a5 5 0 0 1 5-5z" stroke="currentColor" stroke-width="1.2"/>
+            <path d="M6.5 13a1.5 1.5 0 0 0 3 0" stroke="currentColor" stroke-width="1.2"/>
+          </svg>
+          <span class="notif-dot"></span>
+        </button>
+      </div>
+    </div>
+
+    <div class="content">
+
+      <!-- Dashboard page -->
+      <div class="page-section active fade-in" id="page-dashboard">
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-label">
+              <svg viewBox="0 0 14 14" fill="none"><circle cx="5" cy="4" r="2" stroke="currentColor" stroke-width="1.2"/><path d="M1 11c0-2.2 1.8-4 4-4s4 1.8 4 4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/><circle cx="10" cy="4" r="1.5" stroke="currentColor" stroke-width="1.1"/><path d="M10 8.5c1.38 0 2.5 1.12 2.5 2.5" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/></svg>
+              Tổng nhân viên
+            </div>
+            <div class="stat-value">128</div>
+            <div class="stat-sub"><span class="stat-up">+4</span> so với tháng trước</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">
+              <svg viewBox="0 0 14 14" fill="none"><rect x="1" y="2" width="12" height="10" rx="1.5" stroke="currentColor" stroke-width="1.2"/><path d="M1 5h12" stroke="currentColor" stroke-width="1.2"/><circle cx="7" cy="8.5" r="1" fill="currentColor"/></svg>
+              Quỹ lương tháng
+            </div>
+            <div class="stat-value">4.2 tỷ</div>
+            <div class="stat-sub"><span class="stat-up">+2.1%</span> so với tháng trước</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">
+              <svg viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5.5" stroke="currentColor" stroke-width="1.2"/><path d="M7 4v3l2 2" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+              Đã chấm công
+            </div>
+            <div class="stat-value">119</div>
+            <div class="stat-sub"><span style="color:#aaa">9 chưa chấm</span></div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">
+              <svg viewBox="0 0 14 14" fill="none"><path d="M2 10l2.5-3 2 2 2-4 2.5 2.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              Bảng lương chờ duyệt
+            </div>
+            <div class="stat-value">3</div>
+            <div class="stat-sub"><span class="stat-down">Cần xử lý</span></div>
+          </div>
+        </div>
+
+        <div class="charts-row">
+          <div class="chart-card">
+            <div class="chart-title">Quỹ lương 6 tháng gần nhất</div>
+            <div class="bar-chart" id="barChart"></div>
+          </div>
+          <div class="chart-card">
+            <div class="chart-title">Cơ cấu nhân sự</div>
+            <div class="donut-wrap">
+              <svg width="100" height="100" viewBox="0 0 100 100">
+                <circle cx="50" cy="50" r="35" fill="none" stroke="#eee" stroke-width="18"/>
+                <circle cx="50" cy="50" r="35" fill="none" stroke="#185FA5" stroke-width="18" stroke-dasharray="88 132" stroke-dashoffset="25" transform="rotate(-90 50 50)"/>
+                <circle cx="50" cy="50" r="35" fill="none" stroke="#5DCAA5" stroke-width="18" stroke-dasharray="44 176" stroke-dashoffset="-63" transform="rotate(-90 50 50)"/>
+                <circle cx="50" cy="50" r="35" fill="none" stroke="#EF9F27" stroke-width="18" stroke-dasharray="29 191" stroke-dashoffset="-107" transform="rotate(-90 50 50)"/>
+                <circle cx="50" cy="50" r="35" fill="none" stroke="#E24B4A" stroke-width="18" stroke-dasharray="39 181" stroke-dashoffset="-136" transform="rotate(-90 50 50)"/>
+              </svg>
+              <div class="donut-legend">
+                <div class="legend-item"><div class="legend-dot" style="background:#185FA5"></div>Kỹ thuật — 40%</div>
+                <div class="legend-item"><div class="legend-dot" style="background:#5DCAA5"></div>Kinh doanh — 20%</div>
+                <div class="legend-item"><div class="legend-dot" style="background:#EF9F27"></div>Hành chính — 13%</div>
+                <div class="legend-item"><div class="legend-dot" style="background:#E24B4A"></div>Khác — 27%</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="section-header">
+          <div class="section-title">Bảng lương gần đây</div>
+          <button class="btn-outline">Xem tất cả</button>
+        </div>
+        <div class="table-card">
+          <table>
+            <thead>
+              <tr>
+                <th>Họ tên</th>
+                <th>Phòng ban</th>
+                <th>Lương cơ bản</th>
+                <th>Thưởng</th>
+                <th>Thực nhận</th>
+                <th>Trạng thái</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>Nguyễn Văn An</td><td>Kỹ thuật</td><td>18,000,000</td><td>2,000,000</td><td>19,500,000</td><td><span class="badge badge-green">Đã thanh toán</span></td></tr>
+              <tr><td>Trần Thị Bình</td><td>Kinh doanh</td><td>15,000,000</td><td>5,000,000</td><td>18,200,000</td><td><span class="badge badge-green">Đã thanh toán</span></td></tr>
+              <tr><td>Lê Hoàng Cường</td><td>Hành chính</td><td>12,000,000</td><td>500,000</td><td>12,100,000</td><td><span class="badge badge-amber">Chờ duyệt</span></td></tr>
+              <tr><td>Phạm Minh Đức</td><td>Kỹ thuật</td><td>22,000,000</td><td>3,000,000</td><td>23,800,000</td><td><span class="badge badge-amber">Chờ duyệt</span></td></tr>
+              <tr><td>Hoàng Thị Em</td><td>Kinh doanh</td><td>14,000,000</td><td>1,500,000</td><td>14,900,000</td><td><span class="badge badge-red">Lỗi dữ liệu</span></td></tr>
+              <tr><td>Vũ Quang Phát</td><td>Kỹ thuật</td><td>20,000,000</td><td>2,500,000</td><td>21,200,000</td><td><span class="badge badge-blue">Đang xử lý</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Placeholder pages -->
+      <div class="page-section fade-in" id="page-nhanvien">
+        <div class="section-header"><div class="section-title">Quản lý nhân viên</div><button class="btn-outline">+ Thêm nhân viên</button></div>
+        <div class="placeholder">
+          <svg viewBox="0 0 40 40" fill="none"><circle cx="15" cy="12" r="6" stroke="currentColor" stroke-width="2"/><path d="M3 34c0-6.6 5.4-12 12-12s12 5.4 12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="30" cy="12" r="5" stroke="currentColor" stroke-width="1.8"/><path d="M29 24c4 0 7 3 7 7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+          <p>Danh sách nhân viên sẽ hiển thị tại đây</p>
+        </div>
+      </div>
+
+      <div class="page-section fade-in" id="page-bangluong">
+        <div class="section-header"><div class="section-title">Bảng lương</div><button class="btn-outline">+ Tạo bảng lương</button></div>
+        <div class="placeholder">
+          <svg viewBox="0 0 40 40" fill="none"><rect x="4" y="6" width="32" height="28" rx="3" stroke="currentColor" stroke-width="2"/><path d="M4 14h32M12 14v20M4 22h32" stroke="currentColor" stroke-width="1.8"/></svg>
+          <p>Bảng lương tháng sẽ hiển thị tại đây</p>
+        </div>
+      </div>
+
+      <div class="page-section fade-in" id="page-chamcong">
+        <div class="section-header"><div class="section-title">Chấm công</div><button class="btn-outline">Xuất báo cáo</button></div>
+        <div class="placeholder">
+          <svg viewBox="0 0 40 40" fill="none"><circle cx="20" cy="20" r="15" stroke="currentColor" stroke-width="2"/><path d="M20 10v10l6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          <p>Dữ liệu chấm công sẽ hiển thị tại đây</p>
+        </div>
+      </div>
+
+      <div class="page-section fade-in" id="page-thưởng">
+        <div class="section-header"><div class="section-title">Thưởng & Phụ cấp</div><button class="btn-outline">+ Thêm khoản</button></div>
+        <div class="placeholder">
+          <svg viewBox="0 0 40 40" fill="none"><path d="M20 4l4 8 9 1.3-6.5 6.3 1.5 9L20 24l-8 4.6 1.5-9L7 13.3l9-1.3z" stroke="currentColor" stroke-width="2"/></svg>
+          <p>Các khoản thưởng và phụ cấp sẽ hiển thị tại đây</p>
+        </div>
+      </div>
+
+      <div class="page-section fade-in" id="page-baocao">
+        <div class="section-header"><div class="section-title">Báo cáo tháng</div><button class="btn-outline">Xuất PDF</button></div>
+        <div class="placeholder">
+          <svg viewBox="0 0 40 40" fill="none"><path d="M4 30l9-12 7 8 6-12 8 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <p>Báo cáo tháng sẽ hiển thị tại đây</p>
+        </div>
+      </div>
+
+      <div class="page-section fade-in" id="page-thue">
+        <div class="section-header"><div class="section-title">Thuế thu nhập cá nhân</div></div>
+        <div class="placeholder">
+          <svg viewBox="0 0 40 40" fill="none"><rect x="4" y="4" width="32" height="32" rx="3" stroke="currentColor" stroke-width="2"/><path d="M13 13l14 14M27 13l-14 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          <p>Dữ liệu thuế TNCN sẽ hiển thị tại đây</p>
+        </div>
+      </div>
+
+      <div class="page-section fade-in" id="page-caidat">
+        <div class="section-header"><div class="section-title">Cài đặt hệ thống</div></div>
+        <div class="placeholder">
+          <svg viewBox="0 0 40 40" fill="none"><circle cx="20" cy="20" r="6" stroke="currentColor" stroke-width="2"/><path d="M20 2v4M20 34v4M2 20h4M34 20h4M7.5 7.5l2.8 2.8M29.7 29.7l2.8 2.8M7.5 32.5l2.8-2.8M29.7 10.3l2.8-2.8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          <p>Cài đặt hệ thống sẽ hiển thị tại đây</p>
+        </div>
+      </div>
+
+      <!-- Khối phòng ban page -->
+      <div class="page-section fade-in" id="page-khoi-phong-ban">
+        <div class="toolbar">
+          <div class="search-wrap">
+            <svg viewBox="0 0 16 16" fill="none"><circle cx="6.5" cy="6.5" r="4" stroke="currentColor" stroke-width="1.3"/><path d="M11 11l3 3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+            <input type="text" id="kpbSearch" placeholder="Tìm theo mã hoặc tên khối..." oninput="kpbRender()" />
+          </div>
+          <button class="btn-add" onclick="kpbOpenAdd()">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 1v12M1 7h12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+            Thêm khối
+          </button>
+          <span class="total-info" id="kpbTotal"></span>
+        </div>
+
+        <div class="table-card">
+          <table>
+            <thead>
+              <tr>
+                <th style="width:52px">STT</th>
+                <th style="width:130px">Mã khối</th>
+                <th style="width:220px">Tên khối</th>
+                <th>Mô tả</th>
+                <th style="width:120px; text-align:center">Thao tác</th>
+              </tr>
+            </thead>
+            <tbody id="kpbTbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Modal Thêm / Sửa -->
+      <div class="modal-overlay" id="kpbModal">
+        <div class="modal">
+          <div class="modal-header">
+            <span class="modal-title" id="kpbModalTitle">Thêm khối phòng ban</span>
+            <button class="btn-close" onclick="kpbCloseModal()">×</button>
+          </div>
+          <div class="form-field">
+            <label>Mã khối <span>*</span></label>
+            <input type="text" id="kpbMa" placeholder="VD: KD, KT, HC..." maxlength="20" />
+            <div class="field-error" id="errKpbMa">Vui lòng nhập mã khối.</div>
+          </div>
+          <div class="form-field">
+            <label>Tên khối <span>*</span></label>
+            <input type="text" id="kpbTen" placeholder="VD: Khối Kinh doanh..." maxlength="100" />
+            <div class="field-error" id="errKpbTen">Vui lòng nhập tên khối.</div>
+          </div>
+          <div class="form-field">
+            <label>Mô tả</label>
+            <textarea id="kpbMoTa" placeholder="Mô tả chức năng, nhiệm vụ của khối..."></textarea>
+          </div>
+          <div class="modal-footer">
+            <button class="btn-cancel" onclick="kpbCloseModal()">Hủy</button>
+            <button class="btn-save" onclick="kpbSave()">Lưu</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal Xác nhận xóa -->
+      <div class="modal-overlay" id="kpbDeleteModal">
+        <div class="modal modal-confirm">
+          <div class="confirm-icon">🗑️</div>
+          <div class="confirm-title">Xác nhận xóa</div>
+          <div class="confirm-sub" id="kpbDeleteMsg">Bạn có chắc muốn xóa khối này không?</div>
+          <div class="modal-footer">
+            <button class="btn-cancel" onclick="kpbCloseDelete()">Hủy</button>
+            <button class="btn-danger" onclick="kpbConfirmDelete()">Xóa</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Phòng ban page -->
+      <div class="page-section fade-in" id="page-phong-ban">
+        <div class="toolbar">
+          <div class="search-wrap">
+            <svg viewBox="0 0 16 16" fill="none"><circle cx="6.5" cy="6.5" r="4" stroke="currentColor" stroke-width="1.3"/><path d="M11 11l3 3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+            <input type="text" id="pbSearch" placeholder="Tìm theo tên hoặc viết tắt..." oninput="pbRender()" />
+          </div>
+          <select id="pbFilterKhoi" onchange="pbRender()" style="height:36px;padding:0 10px;font-size:13px;border:1px solid #ddd;border-radius:8px;background:#fff;color:#555;outline:none;cursor:pointer;min-width:160px">
+            <option value="">Tất cả khối</option>
+          </select>
+          <button class="btn-add" onclick="pbOpenAdd()">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 1v12M1 7h12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+            Thêm phòng ban
+          </button>
+          <span class="total-info" id="pbTotal"></span>
+        </div>
+        <div class="table-card">
+          <table>
+            <thead>
+              <tr>
+                <th style="width:48px">STT</th>
+                <th style="width:100px">Thứ tự</th>
+                <th>Tên phòng ban</th>
+                <th style="width:120px">Viết tắt</th>
+                <th style="width:160px">Khối</th>
+                <th>Mô tả</th>
+                <th style="width:120px;text-align:center">Thao tác</th>
+              </tr>
+            </thead>
+            <tbody id="pbTbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+    </div><!-- /content -->
+  </div><!-- /main -->
+</div><!-- /dashPage -->
+
+<!-- ══ PHÒNG BAN MODALS (outside dashPage to avoid z-index issues) ══ -->
+<div class="modal-overlay" id="pbModal">
+  <div class="modal" style="max-width:520px">
+    <div class="modal-header">
+      <span class="modal-title" id="pbModalTitle">Thêm phòng ban</span>
+      <button class="btn-close" onclick="pbCloseModal()">×</button>
+    </div>
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:0 1rem">
+      <div class="form-field" style="grid-column:1/-1">
+        <label>Tên phòng ban <span>*</span></label>
+        <input type="text" id="pbTen" placeholder="VD: Phòng Kinh doanh miền Bắc..." maxlength="120" />
+        <div class="field-error" id="errPbTen">Vui lòng nhập tên phòng ban.</div>
+      </div>
+      <div class="form-field">
+        <label>Tên viết tắt <span>*</span></label>
+        <input type="text" id="pbVietTat" placeholder="VD: KD-MB..." maxlength="30" />
+        <div class="field-error" id="errPbVietTat">Vui lòng nhập tên viết tắt.</div>
+      </div>
+      <div class="form-field">
+        <label>Khối phòng ban <span>*</span></label>
+        <select id="pbKhoi" style="width:100%;height:38px;padding:0 10px;font-size:13.5px;border:1px solid #ddd;border-radius:8px;background:#fff;color:#1a1a1a;outline:none;cursor:pointer;transition:border-color .15s">
+          <option value="">-- Chọn khối --</option>
+        </select>
+        <div class="field-error" id="errPbKhoi">Vui lòng chọn khối phòng ban.</div>
+      </div>
+      <div class="form-field">
+        <label>Thứ tự sắp xếp</label>
+        <input type="text" id="pbThuTu" placeholder="VD: 1, 2, 10..." maxlength="6" />
+        <div class="field-error" id="errPbThuTu">Thứ tự phải là số nguyên dương.</div>
+      </div>
+      <div class="form-field" style="grid-column:1/-1">
+        <label>Mô tả</label>
+        <textarea id="pbMoTa" placeholder="Mô tả chức năng, nhiệm vụ của phòng ban..." style="min-height:72px"></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="pbCloseModal()">Hủy</button>
+      <button class="btn-save" onclick="pbSave()">Lưu</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="pbDeleteModal">
+  <div class="modal modal-confirm">
+    <div class="confirm-icon">🗑️</div>
+    <div class="confirm-title">Xác nhận xóa</div>
+    <div class="confirm-sub" id="pbDeleteMsg">Bạn có chắc muốn xóa phòng ban này không?</div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="pbCloseDelete()">Hủy</button>
+      <button class="btn-danger" onclick="pbConfirmDelete()">Xóa</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ── Date
+  const now = new Date();
+  document.getElementById('topbarDate').textContent =
+    now.toLocaleDateString('vi-VN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+
+  // ── Bar chart
+  const months = ['Th11', 'Th12', 'Th1', 'Th2', 'Th3', 'Th4'];
+  const vals   = [3.6, 3.8, 3.7, 4.0, 3.9, 4.2];
+  const max    = Math.max(...vals);
+  const bc     = document.getElementById('barChart');
+  months.forEach((m, i) => {
+    const h = Math.round((vals[i] / max) * 88);
+    bc.innerHTML += `<div class="bar-col">
+      <div class="bar ${i===5?'highlight':''}" style="height:${h}px" title="${vals[i]} tỷ"></div>
+      <span class="bar-label">${m}</span>
+    </div>`;
+  });
+
+  // ── Login
+  function doLogin() {
+    const u = document.getElementById('uname').value.trim();
+    const p = document.getElementById('pw').value;
+    const err = document.getElementById('errMsg');
+    const ok  = document.getElementById('okMsg');
+    err.style.display = 'none'; ok.style.display = 'none';
+
+    if (!u) { err.textContent = 'Vui lòng nhập tên đăng nhập.'; err.style.display = 'block'; return; }
+    if (!p) { err.textContent = 'Vui lòng nhập mật khẩu.';     err.style.display = 'block'; return; }
+
+    if (u === 'admin' && p === '123456') {
+      const btn = document.getElementById('loginBtn');
+      btn.disabled = true; btn.textContent = 'Đang đăng nhập...';
+      ok.textContent = 'Thành công! Đang chuyển hướng...'; ok.style.display = 'block';
+      setTimeout(() => {
+        document.getElementById('loginPage').style.display = 'none';
+        document.getElementById('dashPage').style.display  = 'flex';
+      }, 800);
+    } else {
+      err.textContent = 'Tên đăng nhập hoặc mật khẩu không đúng.'; err.style.display = 'block';
+    }
+  }
+
+  document.getElementById('loginBtn').addEventListener('click', doLogin);
+  document.addEventListener('keydown', e => { if (e.key === 'Enter' && document.getElementById('loginPage').style.display !== 'none') doLogin(); });
+
+  // ── Toggle password
+  document.getElementById('togglePw').addEventListener('click', function() {
+    const pw = document.getElementById('pw');
+    const hidden = pw.type === 'password';
+    pw.type = hidden ? 'text' : 'password';
+    document.getElementById('eyeIco').innerHTML = hidden
+      ? '<path d="M2 2l12 12M6.5 6.7A3 3 0 0 0 9.3 9.5M4.2 4.4C2.6 5.6 1 8 1 8s2.5 5 7 5c1.4 0 2.7-.4 3.8-1M7 3.1C7.3 3 7.7 3 8 3c4.5 0 7 5 7 5s-.7 1.4-1.9 2.7" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>'
+      : '<path d="M1 8s2.5-5 7-5 7 5 7 5-2.5 5-7 5-7-5-7-5z" stroke="currentColor" stroke-width="1.2"/><circle cx="8" cy="8" r="2" stroke="currentColor" stroke-width="1.2"/>';
+  });
+
+  // ── Sidebar navigation
+  const navItems = document.querySelectorAll('.nav-item');
+  const pageTitles = {
+    dashboard: 'Dashboard', nhanvien: 'Quản lý nhân viên',
+    bangluong: 'Bảng lương', chamcong: 'Chấm công',
+    'thưởng': 'Thưởng & Phụ cấp', baocao: 'Báo cáo tháng',
+    thue: 'Thuế TNCN', caidat: 'Cài đặt',
+    'khoi-phong-ban': 'Danh mục khối phòng ban',
+    'phong-ban': 'Danh mục phòng ban'
+  };
+
+  navItems.forEach(item => {
+    item.addEventListener('click', function() {
+      const page = this.dataset.page;
+      navItems.forEach(n => n.classList.remove('active'));
+      this.classList.add('active');
+      document.querySelectorAll('.page-section').forEach(s => {
+        s.classList.remove('active');
+        s.classList.remove('fade-in');
+      });
+      const target = document.getElementById('page-' + page);
+      if (target) {
+        target.classList.add('active');
+        void target.offsetWidth;
+        target.classList.add('fade-in');
+      }
+      document.getElementById('topbarTitle').textContent = pageTitles[page] || page;
+    });
+  });
+
+  // ── Logout
+  document.getElementById('logoutBtn').addEventListener('click', function() {
+    document.getElementById('dashPage').style.display = 'none';
+    document.getElementById('loginPage').style.display = 'flex';
+    document.getElementById('uname').value = '';
+    document.getElementById('pw').value = '';
+    document.getElementById('loginBtn').disabled = false;
+    document.getElementById('loginBtn').textContent = 'Đăng nhập';
+    document.getElementById('okMsg').style.display = 'none';
+  });
+  // ══════════ KHỐI PHÒNG BAN ══════════
+  let kpbData = [
+    { id: 1, ma: 'KD',  ten: 'Khối Kinh doanh',    moTa: 'Phụ trách kinh doanh, bán hàng và chăm sóc khách hàng.' },
+    { id: 2, ma: 'KT',  ten: 'Khối Kỹ thuật',      moTa: 'Phát triển sản phẩm, hạ tầng và hỗ trợ kỹ thuật.' },
+    { id: 3, ma: 'HC',  ten: 'Khối Hành chính',     moTa: 'Quản lý hành chính, văn phòng và nhân sự tổng hợp.' },
+    { id: 4, ma: 'TC',  ten: 'Khối Tài chính',      moTa: 'Kế toán, tài chính và kiểm soát ngân sách.' },
+    { id: 5, ma: 'MKT', ten: 'Khối Marketing',      moTa: 'Truyền thông, quảng bá thương hiệu và nghiên cứu thị trường.' },
+  ];
+  let kpbNextId = 6;
+  let kpbEditId = null;
+  let kpbDeleteId = null;
+
+  function kpbRender() {
+    const q = (document.getElementById('kpbSearch').value || '').trim().toLowerCase();
+    const filtered = kpbData.filter(r =>
+      r.ma.toLowerCase().includes(q) || r.ten.toLowerCase().includes(q)
+    );
+    const tbody = document.getElementById('kpbTbody');
+    document.getElementById('kpbTotal').textContent = 'Tổng: ' + filtered.length + ' khối';
+
+    if (filtered.length === 0) {
+      tbody.innerHTML = '<tr class="empty-row"><td colspan="5">Không tìm thấy kết quả phù hợp.</td></tr>';
+      return;
+    }
+    tbody.innerHTML = filtered.map((r, i) => `
+      <tr>
+        <td style="color:#aaa; text-align:center">${i + 1}</td>
+        <td><strong style="color:#185FA5; font-weight:600">${r.ma}</strong></td>
+        <td>${r.ten}</td>
+        <td style="color:#555; font-size:13px">${r.moTa || '<span style="color:#ccc">—</span>'}</td>
+        <td style="text-align:center">
+          <button class="btn-action btn-edit" onclick="kpbOpenEdit(${r.id})">Sửa</button>
+          <button class="btn-action btn-delete" onclick="kpbOpenDelete(${r.id})" style="margin-left:6px">Xóa</button>
+        </td>
+      </tr>`).join('');
+  }
+
+  function kpbOpenAdd() {
+    kpbEditId = null;
+    document.getElementById('kpbModalTitle').textContent = 'Thêm khối phòng ban';
+    document.getElementById('kpbMa').value = '';
+    document.getElementById('kpbTen').value = '';
+    document.getElementById('kpbMoTa').value = '';
+    ['errKpbMa','errKpbTen'].forEach(id => document.getElementById(id).style.display = 'none');
+    document.getElementById('kpbModal').classList.add('open');
+    setTimeout(() => document.getElementById('kpbMa').focus(), 100);
+  }
+
+  function kpbOpenEdit(id) {
+    const r = kpbData.find(x => x.id === id);
+    if (!r) return;
+    kpbEditId = id;
+    document.getElementById('kpbModalTitle').textContent = 'Sửa khối phòng ban';
+    document.getElementById('kpbMa').value  = r.ma;
+    document.getElementById('kpbTen').value = r.ten;
+    document.getElementById('kpbMoTa').value = r.moTa;
+    ['errKpbMa','errKpbTen'].forEach(id => document.getElementById(id).style.display = 'none');
+    document.getElementById('kpbModal').classList.add('open');
+    setTimeout(() => document.getElementById('kpbMa').focus(), 100);
+  }
+
+  function kpbCloseModal() {
+    document.getElementById('kpbModal').classList.remove('open');
+  }
+
+  function kpbSave() {
+    const ma  = document.getElementById('kpbMa').value.trim().toUpperCase();
+    const ten = document.getElementById('kpbTen').value.trim();
+    const moTa = document.getElementById('kpbMoTa').value.trim();
+    let valid = true;
+
+    const errMa  = document.getElementById('errKpbMa');
+    const errTen = document.getElementById('errKpbTen');
+    errMa.style.display = 'none'; errTen.style.display = 'none';
+
+    if (!ma)  { errMa.textContent  = 'Vui lòng nhập mã khối.';  errMa.style.display  = 'block'; valid = false; }
+    else {
+      const dup = kpbData.find(x => x.ma.toLowerCase() === ma.toLowerCase() && x.id !== kpbEditId);
+      if (dup) { errMa.textContent = 'Mã khối này đã tồn tại.'; errMa.style.display = 'block'; valid = false; }
+    }
+    if (!ten) { errTen.textContent = 'Vui lòng nhập tên khối.'; errTen.style.display = 'block'; valid = false; }
+    if (!valid) return;
+
+    if (kpbEditId) {
+      const r = kpbData.find(x => x.id === kpbEditId);
+      r.ma = ma; r.ten = ten; r.moTa = moTa;
+    } else {
+      kpbData.push({ id: kpbNextId++, ma, ten, moTa });
+    }
+    kpbCloseModal();
+    kpbRender();
+  }
+
+  function kpbOpenDelete(id) {
+    kpbDeleteId = id;
+    const r = kpbData.find(x => x.id === id);
+    document.getElementById('kpbDeleteMsg').textContent =
+      `Bạn có chắc muốn xóa khối "${r.ten}" (${r.ma}) không? Hành động này không thể hoàn tác.`;
+    document.getElementById('kpbDeleteModal').classList.add('open');
+  }
+
+  function kpbCloseDelete() {
+    document.getElementById('kpbDeleteModal').classList.remove('open');
+  }
+
+  function kpbConfirmDelete() {
+    kpbData = kpbData.filter(x => x.id !== kpbDeleteId);
+    kpbCloseDelete();
+    kpbRender();
+  }
+
+  // Close modals on overlay click
+  document.getElementById('kpbModal').addEventListener('click', function(e) { if (e.target === this) kpbCloseModal(); });
+  document.getElementById('kpbDeleteModal').addEventListener('click', function(e) { if (e.target === this) kpbCloseDelete(); });
+
+  // ══════════ PHÒNG BAN ══════════
+  let pbData = [
+    { id:1, ten:'Phòng Kinh doanh miền Bắc', vietTat:'KD-MB', khoiId:1, thuTu:1, moTa:'Phụ trách kinh doanh khu vực phía Bắc.' },
+    { id:2, ten:'Phòng Kinh doanh miền Nam',  vietTat:'KD-MN', khoiId:1, thuTu:2, moTa:'Phụ trách kinh doanh khu vực phía Nam.' },
+    { id:3, ten:'Phòng Phát triển phần mềm',  vietTat:'PTPM',  khoiId:2, thuTu:1, moTa:'Phát triển và bảo trì sản phẩm phần mềm.' },
+    { id:4, ten:'Phòng Hạ tầng & DevOps',     vietTat:'HT',    khoiId:2, thuTu:2, moTa:'Quản lý hạ tầng, máy chủ và triển khai.' },
+    { id:5, ten:'Phòng Hành chính tổng hợp',  vietTat:'HCTH',  khoiId:3, thuTu:1, moTa:'Hành chính, văn thư và hậu cần.' },
+    { id:6, ten:'Phòng Nhân sự',              vietTat:'NS',    khoiId:3, thuTu:2, moTa:'Tuyển dụng, đào tạo và quản lý nhân sự.' },
+    { id:7, ten:'Phòng Kế toán',              vietTat:'KTO',   khoiId:4, thuTu:1, moTa:'Kế toán tài chính và thuế.' },
+  ];
+  let pbNextId = 8;
+  let pbEditId = null;
+  let pbDeleteId = null;
+
+  function pbGetKhoiName(khoiId) {
+    const k = kpbData.find(x => x.id === khoiId);
+    return k ? k.ten : '—';
+  }
+
+  function pbPopulateKhoiSelects() {
+    const opts = kpbData.map(k => `<option value="${k.id}">${k.ten}</option>`).join('');
+    document.getElementById('pbKhoi').innerHTML = '<option value="">-- Chọn khối --</option>' + opts;
+    document.getElementById('pbFilterKhoi').innerHTML = '<option value="">Tất cả khối</option>' + opts;
+  }
+
+  function pbRender() {
+    const q      = (document.getElementById('pbSearch').value || '').trim().toLowerCase();
+    const khoi   = document.getElementById('pbFilterKhoi').value;
+    let filtered = pbData.filter(r => {
+      const matchQ = !q || r.ten.toLowerCase().includes(q) || r.vietTat.toLowerCase().includes(q);
+      const matchK = !khoi || String(r.khoiId) === khoi;
+      return matchQ && matchK;
+    });
+    // sort by thuTu then ten
+    filtered.sort((a,b) => (a.thuTu||999) - (b.thuTu||999) || a.ten.localeCompare(b.ten, 'vi'));
+
+    const tbody = document.getElementById('pbTbody');
+    document.getElementById('pbTotal').textContent = 'Tổng: ' + filtered.length + ' phòng ban';
+
+    if (filtered.length === 0) {
+      tbody.innerHTML = '<tr class="empty-row"><td colspan="7">Không tìm thấy kết quả phù hợp.</td></tr>';
+      return;
+    }
+    tbody.innerHTML = filtered.map((r, i) => `
+      <tr>
+        <td style="color:#aaa;text-align:center">${i+1}</td>
+        <td style="text-align:center;color:#888">${r.thuTu || '—'}</td>
+        <td style="font-weight:500">${r.ten}</td>
+        <td><span style="background:#E6F1FB;color:#185FA5;font-size:12px;font-weight:600;padding:2px 8px;border-radius:5px">${r.vietTat}</span></td>
+        <td style="font-size:12.5px;color:#555">${pbGetKhoiName(r.khoiId)}</td>
+        <td style="font-size:12.5px;color:#666">${r.moTa || '<span style="color:#ccc">—</span>'}</td>
+        <td style="text-align:center">
+          <button class="btn-action btn-edit" onclick="pbOpenEdit(${r.id})">Sửa</button>
+          <button class="btn-action btn-delete" onclick="pbOpenDelete(${r.id})" style="margin-left:6px">Xóa</button>
+        </td>
+      </tr>`).join('');
+  }
+
+  function pbOpenAdd() {
+    pbPopulateKhoiSelects();
+    pbEditId = null;
+    document.getElementById('pbModalTitle').textContent = 'Thêm phòng ban';
+    document.getElementById('pbTen').value = '';
+    document.getElementById('pbVietTat').value = '';
+    document.getElementById('pbKhoi').value = '';
+    document.getElementById('pbThuTu').value = '';
+    document.getElementById('pbMoTa').value = '';
+    ['errPbTen','errPbVietTat','errPbKhoi','errPbThuTu'].forEach(id => document.getElementById(id).style.display='none');
+    document.getElementById('pbModal').classList.add('open');
+    setTimeout(() => document.getElementById('pbTen').focus(), 100);
+  }
+
+  function pbOpenEdit(id) {
+    pbPopulateKhoiSelects();
+    const r = pbData.find(x => x.id === id);
+    if (!r) return;
+    pbEditId = id;
+    document.getElementById('pbModalTitle').textContent = 'Sửa phòng ban';
+    document.getElementById('pbTen').value     = r.ten;
+    document.getElementById('pbVietTat').value = r.vietTat;
+    document.getElementById('pbKhoi').value    = r.khoiId;
+    document.getElementById('pbThuTu').value   = r.thuTu || '';
+    document.getElementById('pbMoTa').value    = r.moTa;
+    ['errPbTen','errPbVietTat','errPbKhoi','errPbThuTu'].forEach(id => document.getElementById(id).style.display='none');
+    document.getElementById('pbModal').classList.add('open');
+    setTimeout(() => document.getElementById('pbTen').focus(), 100);
+  }
+
+  function pbCloseModal() { document.getElementById('pbModal').classList.remove('open'); }
+
+  function pbSave() {
+    const ten     = document.getElementById('pbTen').value.trim();
+    const vietTat = document.getElementById('pbVietTat').value.trim().toUpperCase();
+    const khoiId  = parseInt(document.getElementById('pbKhoi').value);
+    const thuTuRaw = document.getElementById('pbThuTu').value.trim();
+    const moTa    = document.getElementById('pbMoTa').value.trim();
+    let valid = true;
+
+    ['errPbTen','errPbVietTat','errPbKhoi','errPbThuTu'].forEach(id => document.getElementById(id).style.display='none');
+
+    if (!ten)     { showFE('errPbTen',    'Vui lòng nhập tên phòng ban.');   valid=false; }
+    if (!vietTat) { showFE('errPbVietTat','Vui lòng nhập tên viết tắt.');    valid=false; }
+    if (!khoiId)  { showFE('errPbKhoi',   'Vui lòng chọn khối phòng ban.');  valid=false; }
+    let thuTu = null;
+    if (thuTuRaw !== '') {
+      thuTu = parseInt(thuTuRaw);
+      if (isNaN(thuTu) || thuTu < 1) { showFE('errPbThuTu', 'Thứ tự phải là số nguyên dương.'); valid=false; }
+    }
+    if (!valid) return;
+
+    if (pbEditId) {
+      const r = pbData.find(x => x.id === pbEditId);
+      Object.assign(r, { ten, vietTat, khoiId, thuTu, moTa });
+    } else {
+      pbData.push({ id: pbNextId++, ten, vietTat, khoiId, thuTu, moTa });
+    }
+    pbCloseModal();
+    pbRender();
+  }
+
+  function showFE(id, msg) {
+    const el = document.getElementById(id);
+    el.textContent = msg; el.style.display = 'block';
+  }
+
+  function pbOpenDelete(id) {
+    pbDeleteId = id;
+    const r = pbData.find(x => x.id === id);
+    document.getElementById('pbDeleteMsg').textContent =
+      `Bạn có chắc muốn xóa phòng ban "${r.ten}" (${r.vietTat}) không? Hành động này không thể hoàn tác.`;
+    document.getElementById('pbDeleteModal').classList.add('open');
+  }
+
+  function pbCloseDelete() { document.getElementById('pbDeleteModal').classList.remove('open'); }
+
+  function pbConfirmDelete() {
+    pbData = pbData.filter(x => x.id !== pbDeleteId);
+    pbCloseDelete();
+    pbRender();
+  }
+
+  document.getElementById('pbModal').addEventListener('click', function(e){ if(e.target===this) pbCloseModal(); });
+  document.getElementById('pbDeleteModal').addEventListener('click', function(e){ if(e.target===this) pbCloseDelete(); });
+
+  // style select on focus
+  document.getElementById('pbKhoi').addEventListener('focus', function(){ this.style.borderColor='#378ADD'; this.style.boxShadow='0 0 0 3px rgba(55,138,221,.1)'; });
+  document.getElementById('pbKhoi').addEventListener('blur',  function(){ this.style.borderColor='#ddd'; this.style.boxShadow=''; });
+
+  pbPopulateKhoiSelects();
+  pbRender();
+  kpbRender();
+</script>
+</body>
+</html>
