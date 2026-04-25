@@ -75,11 +75,11 @@
     <!-- DANH MỤC -->
     <div class="nav-group open" id="grp-danhmuc">
       <div class="nav-group-hdr" onclick="sidebarToggle('grp-danhmuc')">
-        <div class="nav-group-ico" style="background:#E6FAF5;color:#1A9E78">
-          <svg viewBox="0 0 14 14" fill="none"><rect x="1" y="1" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.3"/><rect x="8" y="1" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.3"/><rect x="1" y="8" width="5" height="3" rx="1" stroke="currentColor" stroke-width="1.3"/><rect x="8" y="8" width="5" height="3" rx="1" stroke="currentColor" stroke-width="1.3"/></svg>
+        <div class="nav-group-ico" style="background:#E6FAF5;color:#1A9E78;width:24px;height:24px;border-radius:7px;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+          <svg width="13" height="13" viewBox="0 0 14 14" fill="none"><rect x="1" y="1" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.3"/><rect x="8" y="1" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.3"/><rect x="1" y="8" width="5" height="3" rx="1" stroke="currentColor" stroke-width="1.3"/><rect x="8" y="8" width="5" height="3" rx="1" stroke="currentColor" stroke-width="1.3"/></svg>
         </div>
         <span>Danh mục</span>
-        <svg class="nav-group-arrow" viewBox="0 0 10 6" fill="none"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        <svg class="nav-group-arrow" width="10" height="10" viewBox="0 0 10 6" fill="none"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
       </div>
       <div class="nav-group-items">
         <div class="nav-item" data-page="dm-chuc-vu">Danh mục chức vụ</div>
@@ -99,11 +99,11 @@
     <!-- TIỆN ÍCH -->
     <div class="nav-group" id="grp-tienich">
       <div class="nav-group-hdr" onclick="sidebarToggle('grp-tienich')">
-        <div class="nav-group-ico" style="background:#EBF4FF;color:#185FA5">
-          <svg viewBox="0 0 14 14" fill="none"><path d="M2 7h10M7 2l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <div class="nav-group-ico" style="background:#EBF4FF;color:#185FA5;width:24px;height:24px;border-radius:7px;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+          <svg width="13" height="13" viewBox="0 0 14 14" fill="none"><path d="M2 7h10M7 2l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </div>
         <span>Tiện ích</span>
-        <svg class="nav-group-arrow" viewBox="0 0 10 6" fill="none"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        <svg class="nav-group-arrow" width="10" height="10" viewBox="0 0 10 6" fill="none"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
       </div>
       <div class="nav-group-items">
         <div class="nav-item" data-page="chamcong">Quản lý chấm công</div>
@@ -121,11 +121,11 @@
     <!-- QUẢN LÝ PHÒNG BAN -->
     <div class="nav-group" id="grp-qlpb">
       <div class="nav-group-hdr" onclick="sidebarToggle('grp-qlpb')">
-        <div class="nav-group-ico" style="background:#EBF4FF;color:#185FA5">
-          <svg viewBox="0 0 14 14" fill="none"><path d="M2 7h10M7 2l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <div class="nav-group-ico" style="background:#EBF4FF;color:#185FA5;width:24px;height:24px;border-radius:7px;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+          <svg width="13" height="13" viewBox="0 0 14 14" fill="none"><path d="M2 7h10M7 2l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </div>
         <span>Quản lý phòng ban</span>
-        <svg class="nav-group-arrow" viewBox="0 0 10 6" fill="none"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        <svg class="nav-group-arrow" width="10" height="10" viewBox="0 0 10 6" fill="none"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
       </div>
       <div class="nav-group-items">
         <div class="nav-item" data-page="cc-phong-ban">Chấm công phòng ban</div>
@@ -137,11 +137,11 @@
     <!-- QUẢN LÝ HỆ THỐNG -->
     <div class="nav-group" id="grp-hethong">
       <div class="nav-group-hdr" onclick="sidebarToggle('grp-hethong')">
-        <div class="nav-group-ico" style="background:#FEF3E2;color:#B45309">
-          <svg viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="2" stroke="currentColor" stroke-width="1.3"/><path d="M7 1v2M7 11v2M1 7h2M11 7h2M2.76 2.76l1.41 1.41M9.83 9.83l1.41 1.41M2.76 11.24l1.41-1.41M9.83 4.17l1.41-1.41" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+        <div class="nav-group-ico" style="background:#FEF3E2;color:#B45309;width:24px;height:24px;border-radius:7px;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+          <svg width="13" height="13" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="2" stroke="currentColor" stroke-width="1.3"/><path d="M7 1v2M7 11v2M1 7h2M11 7h2M2.76 2.76l1.41 1.41M9.83 9.83l1.41 1.41M2.76 11.24l1.41-1.41M9.83 4.17l1.41-1.41" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
         </div>
         <span>Quản lý hệ thống</span>
-        <svg class="nav-group-arrow" viewBox="0 0 10 6" fill="none"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        <svg class="nav-group-arrow" width="10" height="10" viewBox="0 0 10 6" fill="none"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
       </div>
       <div class="nav-group-items">
         <div class="nav-item" data-page="ql-chuc-nang">Quản lý chức năng</div>
