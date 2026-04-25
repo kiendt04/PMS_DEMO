@@ -1,243 +1,294 @@
-// ══════════════════════════════════════════
-//  QUẢN LÝ CHẤM CÔNG
-// ══════════════════════════════════════════
+/**
+ * chamcong.js — Attendance management with Handsontable
+ */
+(function () {
+  'use strict';
 
-const CC = (() => {
-  // ── Cấu hình cột loại công ──
-  const COL_TYPES = {
-    'thoi-gian': { label: 'Thời gian', cols: ['LV','H','P','L','OTS','CD','KL'] },
-    'ca-dem':    { label: 'Ca đếm',    cols: ['LV','H','P','L','OTS','CD','KL'] },
-    'them-gio':  { label: 'Thêm giờ', cols: ['T1','T15','T2','NG','TG'] },
+  /* ── Constants ── */
+  const Q_MONTHS = { 1: [1,2,3], 2: [4,5,6], 3: [7,8,9], 4: [10,11,12] };
+  const MONTH_LBL = { 1:'T1',2:'T2',3:'T3',4:'T4',5:'T5',6:'T6',7:'T7',8:'T8',9:'T9',10:'T10',11:'T11',12:'T12' };
+  const SUB_COLS = {
+    'thoi-gian': ['LV','H','P','L','OTS','CD','KL'],
+    'ca-dem':    ['LCD','HCD','PCD','OTSCD'],
+    'them-gio':  ['OT','OTN','OTH']
   };
+  const FIXED = 3; // STT | Ho va ten | So TK
 
-  const QUARTERS = {
-    1: [1,2,3], 2: [4,5,6], 3: [7,8,9], 4: [10,11,12]
-  };
-
-  const MONTH_NAMES = ['T1','T2','T3','T4','T5','T6','T7','T8','T9','T10','T11','T12'];
-
-  // ── Sample data ──
-  const departments = [
-    {
-      id: 1, name: 'Phòng Tổng hợp HDTV',
-      employees: [
-        { id: 1, name: 'Nguyễn Kiều Ly',    stk: '1234567891' },
-        { id: 2, name: 'Bùi Hiếu Bằng',     stk: '2468357911' },
-        { id: 3, name: 'Đỗ Trung Kiên',      stk: '1039235587135' },
-        { id: 4, name: 'Dương Văn Minh',     stk: '5494402544' },
-        { id: 5, name: 'Hà Thu Vân',         stk: '1236547899' },
-        { id: 6, name: 'Vũ Duy Hưng',        stk: '9876543211' },
-      ]
-    },
-    {
-      id: 2, name: 'Phòng Kinh tế',
-      employees: [
-        { id: 7, name: 'Đặng Thu Trang',     stk: '9876543219' },
-      ]
-    },
-    {
-      id: 3, name: 'Phòng Kinh doanh',
-      employees: [
-        { id: 8,  name: 'Bố Anh Thu',        stk: '1038759146911' },
-        { id: 9,  name: 'Đỗ Đức Thịnh',      stk: '9876543219' },
-        { id: 10, name: 'Lê Hà Trang',       stk: '3216549871' },
-        { id: 11, name: 'Nguyễn Anh Tài',    stk: '2143658798' },
-        { id: 12, name: 'Nguyễn Anh Tú',     stk: '2134365879' },
-        { id: 13, name: 'Nguyễn Thu Trang',  stk: '5240914905' },
-      ]
-    },
-    {
-      id: 4, name: 'Phòng Kỹ thuật',
-      employees: [
-        { id: 14, name: 'Nguyễn Thị Mai',    stk: '12345678' },
-        { id: 15, name: 'Nguyễn Tú Anh',     stk: '1234548954' },
-      ]
-    },
-    {
-      id: 5, name: 'Phòng Nhân sự',
-      employees: [
-        { id: 16, name: 'Nguyễn Phương Anh', stk: '1256789834' },
-      ]
-    },
-    {
-      id: 6, name: 'Phòng Kế toán',
-      employees: [
-        { id: 17, name: 'Nguyễn Bá Quốc Cường', stk: '3423463456' },
-        { id: 18, name: 'Dương Đức Tú',          stk: '0945870029346' },
-      ]
-    },
-    {
-      id: 7, name: 'Phòng Công nghệ',
-      employees: [
-        { id: 19, name: 'Đoàn Trung Quốc',   stk: '948422354' },
-      ]
-    },
-    {
-      id: 8, name: 'Phòng Chất lượng',
-      employees: [
-        { id: 20, name: 'Nguyễn Văn Kiên',   stk: '2438458346' },
-      ]
-    },
+  /* ── Sample data ── */
+  const DEPTS = [
+    { name: 'Phong Tong hop HDTV', employees: [
+      {stt:1,  name:'Nguyen Kieu Ly',       stk:'1234567891',    data:{}},
+      {stt:2,  name:'Bui Hieu Bang',         stk:'2468357911',    data:{}},
+      {stt:3,  name:'Do Trung Kien',         stk:'103923558735',  data:{}},
+      {stt:4,  name:'Duong Van Minh',        stk:'5494825544',    data:{}},
+      {stt:5,  name:'Ha Thu Van',            stk:'1236547899',    data:{}},
+      {stt:6,  name:'Vu Duy Hung',           stk:'9876543211',    data:{}},
+      {stt:7,  name:'Dang Thu Trang',        stk:'9876543219',    data:{}},
+    ]},
+    { name: 'Phong Kinh te', employees: [] },
+    { name: 'Phong Kinh doanh', employees: [
+      {stt:8,  name:'Do Anh Thu',            stk:'109876914691',  data:{}},
+      {stt:9,  name:'Do Duc Thinh',          stk:'9876543219',    data:{}},
+      {stt:10, name:'Le Ha Trang',           stk:'3216549871',    data:{}},
+      {stt:11, name:'Nguyen Anh Tai',        stk:'2143658790',    data:{}},
+      {stt:12, name:'Nguyen Anh Tu',         stk:'2134365879',    data:{}},
+      {stt:13, name:'Nguyen Thu Trang',      stk:'5240914905',    data:{}},
+    ]},
+    { name: 'Phong Ky thuat', employees: [
+      {stt:14, name:'Nguyen Thi Mai',        stk:'12345678',      data:{}},
+      {stt:15, name:'Nguyen Tu Anh',         stk:'1234548954',    data:{}},
+    ]},
+    { name: 'Phong Nhan su', employees: [
+      {stt:16, name:'Nguyen Phuong Anh',     stk:'1256789834',    data:{}},
+    ]},
+    { name: 'Phong Ke toan', employees: [
+      {stt:17, name:'Nguyen Ba Quoc Cuong',  stk:'3423463456',    data:{4:{LV:2}}},
+      {stt:18, name:'Duong Duc Lu',          stk:'0945780029346', data:{4:{LV:2}}},
+    ]},
+    { name: 'Phong Cong nghe', employees: [
+      {stt:19, name:'Doan Trung Quoc',       stk:'948422354',     data:{}},
+    ]},
+    { name: 'Phong Chat Luong', employees: [
+      {stt:20, name:'Nguyen Van Kien',       stk:'2498458346',    data:{}},
+    ]},
   ];
 
-  // ── Generate random attendance data ──
-  function genData(empId, month, colType) {
-    const cols = COL_TYPES[colType].cols;
-    const seed = (empId * 31 + month * 7) % 17;
-    const result = {};
-    cols.forEach((c, i) => {
-      const val = ((seed + i * 3) % 5 === 0) ? Math.floor(Math.random() * 3 + 1) : 0;
-      result[c] = val;
+  /* ── State ── */
+  let hotInstance = null;
+  let deptRowSet  = new Set();
+
+  /* ── Build flat data for Handsontable ── */
+  function buildData(q, colType) {
+    const months  = Q_MONTHS[q];
+    const subCols = SUB_COLS[colType];
+    const totalCols = FIXED + months.length * subCols.length + 1;
+    const rows = [];
+    deptRowSet = new Set();
+
+    DEPTS.forEach(dept => {
+      // Dept header row
+      const di = rows.length;
+      deptRowSet.add(di);
+      const dRow = new Array(totalCols).fill('');
+      dRow[1] = dept.name;
+      rows.push(dRow);
+
+      dept.employees.forEach(emp => {
+        const row = new Array(totalCols).fill('');
+        row[0] = emp.stt;
+        row[1] = emp.name;
+        row[2] = emp.stk;
+        let total = 0;
+        months.forEach((m, mi) => {
+          subCols.forEach((sc, si) => {
+            const idx = FIXED + mi * subCols.length + si;
+            const v = emp.data[m] && emp.data[m][sc] != null ? emp.data[m][sc] : '';
+            row[idx] = v;
+            if (v !== '') total += Number(v);
+          });
+        });
+        row[totalCols - 1] = total > 0 ? total : '';
+        rows.push(row);
+      });
     });
-    // Ensure LV has meaningful data for non-zero employees
-    if (cols.includes('LV') && empId % 3 !== 0) {
-      result['LV'] = Math.floor(Math.random() * 4 + 18);
-    }
-    return result;
+    return rows;
   }
 
-  // ── State ──
-  let state = {
-    quy: 2,
-    nam: new Date().getFullYear(),
-    loai: 'thoi-gian',
+  /* ── Build nested headers ── */
+  function buildHeaders(q, colType) {
+    const months  = Q_MONTHS[q];
+    const subCols = SUB_COLS[colType];
+    const h1 = [
+      {label:'STT',colspan:1},
+      {label:'Ho va ten',colspan:1},
+      {label:'So TK',colspan:1},
+    ];
+    months.forEach(m => h1.push({label: MONTH_LBL[m], colspan: subCols.length}));
+    h1.push({label: `Tong hop Q${q}`, colspan: 1});
+
+    const h2 = ['STT','Ho va ten','So TK'];
+    months.forEach(() => subCols.forEach(sc => h2.push(sc)));
+    h2.push('Tong');
+
+    return [h1, h2];
+  }
+
+  /* ── Build column config ── */
+  function buildCols(q, colType) {
+    const months  = Q_MONTHS[q];
+    const subCols = SUB_COLS[colType];
+    const cols = [
+      {data:0, readOnly:true, width:45,  type:'text', className:'htCenter htMiddle cc-fixed'},
+      {data:1, readOnly:true, width:165, type:'text', className:'htLeft htMiddle cc-fixed'},
+      {data:2, readOnly:true, width:120, type:'text', className:'htLeft htMiddle cc-fixed'},
+    ];
+    let ci = FIXED;
+    months.forEach(() => {
+      subCols.forEach(() => {
+        cols.push({data:ci++, type:'numeric', width:40, className:'htCenter htMiddle'});
+      });
+    });
+    cols.push({data:ci, readOnly:true, type:'numeric', width:52, className:'htCenter htMiddle cc-total'});
+    return cols;
+  }
+
+  /* ── Custom dept row renderer ── */
+  function deptRenderer(instance, td, row) {
+    td.innerHTML = '';
+    td.style.cssText = 'background:#DBEAFE;color:#1E40AF;font-weight:700;font-size:12px;padding:5px 8px;border-bottom:1px solid #93C5FD;';
+    if (row === 0 || instance.getDataAtCell(row, 1) === instance.getDataAtCell(row, 1)) {
+      td.textContent = instance.getDataAtCell(row, 1) || '';
+    }
+  }
+
+  /* ── Init / re-init Handsontable ── */
+  function initHot(q, year, colType) {
+    const container = document.getElementById('ccHotContainer');
+    if (!container || typeof Handsontable === 'undefined') return;
+
+    const data    = buildData(q, colType);
+    const headers = buildHeaders(q, colType);
+    const cols    = buildCols(q, colType);
+    const totalCols = cols.length;
+
+    // Merge cells for dept rows
+    const merges = [];
+    deptRowSet.forEach(ri => {
+      merges.push({ row: ri, col: 0, rowspan: 1, colspan: totalCols });
+    });
+
+    if (hotInstance) {
+      hotInstance.destroy();
+      hotInstance = null;
+    }
+
+    const containerH = Math.max(300, Math.min(data.length * 26 + 80, window.innerHeight - 260));
+    container.style.height = containerH + 'px';
+
+    hotInstance = new Handsontable(container, {
+      data:           data,
+      nestedHeaders:  headers,
+      columns:        cols,
+      rowHeaders:     false,
+      fixedColumnsStart: FIXED,
+      height:         containerH,
+      width:          '100%',
+      stretchH:       'none',
+      autoColumnSize: false,
+      mergeCells:     merges,
+      licenseKey:     'non-commercial-and-evaluation',
+      renderAllRows:  false,
+
+      cells(row) {
+        if (deptRowSet.has(row)) {
+          return {
+            readOnly: true,
+            renderer: function(inst, td, r, c) {
+              if (c === 0) {
+                td.innerHTML = '';
+                td.style.cssText = 'background:#DBEAFE;color:#1E40AF;font-weight:700;font-size:12px;padding:5px 8px;border-bottom:1px solid #BFDBFE;border-right:1px solid #E2E8F0;';
+                td.textContent = inst.getDataAtCell(r, 1) || '';
+              } else {
+                td.innerHTML = '';
+                td.style.cssText = 'background:#DBEAFE;border-bottom:1px solid #BFDBFE;border-right:1px solid #E2E8F0;';
+              }
+            }
+          };
+        }
+        if (row % 2 === 0) {
+          return { className: 'cc-even-row' };
+        }
+        return {};
+      },
+
+      afterChange(changes) {
+        if (!changes) return;
+        const affectedRows = new Set(changes.map(([r]) => r));
+        affectedRows.forEach(ri => recalcTotal(ri));
+      },
+    });
+  }
+
+  /* ── Recalculate total for a row ── */
+  function recalcTotal(rowIdx) {
+    if (!hotInstance || deptRowSet.has(rowIdx)) return;
+    const row  = hotInstance.getDataAtRow(rowIdx);
+    const last = row.length - 1;
+    let sum    = 0;
+    for (let c = FIXED; c < last; c++) {
+      const v = parseFloat(row[c]);
+      if (!isNaN(v)) sum += v;
+    }
+    hotInstance.setDataAtCell(rowIdx, last, sum > 0 ? sum : '', 'recalc');
+  }
+
+  /* ── Export CSV ── */
+  function exportCSV() {
+    if (!hotInstance) return;
+    try {
+      const plugin = hotInstance.getPlugin('exportFile');
+      plugin.downloadFile('csv', {
+        bom: true,
+        columnHeaders: true,
+        exportHiddenColumns: true,
+        exportHiddenRows: true,
+        fileExtension: 'csv',
+        filename: 'ChamCong_' + new Date().toISOString().slice(0,10),
+        mimeType: 'text/csv',
+        rowDelimiter: '\r\n',
+        rowHeaders: false,
+      });
+    } catch (e) {
+      alert('Xuat file that bai: ' + e.message);
+    }
+  }
+
+  /* ── Refresh ── */
+  function refresh() {
+    const q  = parseInt(document.getElementById('ccQuy')?.value || 2);
+    const yr = parseInt(document.getElementById('ccNam')?.value || new Date().getFullYear());
+    const tp = document.querySelector('input[name="ccLoai"]:checked')?.value || 'thoi-gian';
+    initHot(q, yr, tp);
+  }
+
+  /* ── Init ── */
+  function init() {
+    // Year select
+    const ySel = document.getElementById('ccNam');
+    if (ySel && ySel.options.length === 0) {
+      const cur = new Date().getFullYear();
+      for (let y = cur - 2; y <= cur + 2; y++) {
+        const o = document.createElement('option');
+        o.value = y; o.textContent = y;
+        if (y === cur) o.selected = true;
+        ySel.appendChild(o);
+      }
+    }
+
+    // Event listeners
+    document.getElementById('ccQuy')?.addEventListener('change', refresh);
+    document.getElementById('ccNam')?.addEventListener('change', refresh);
+    document.querySelectorAll('input[name="ccLoai"]').forEach(r => r.addEventListener('change', refresh));
+    document.getElementById('ccExcel')?.addEventListener('click', exportCSV);
+
+    // Initial render (delayed so container has dimensions)
+    setTimeout(refresh, 150);
+  }
+
+  /* ── Re-init when page becomes active ── */
+  const _orig = window.onPageActivate;
+  window.onPageActivate = function (page) {
+    if (typeof _orig === 'function') _orig(page);
+    if (page === 'chamcong' && !hotInstance) {
+      setTimeout(refresh, 50);
+    }
   };
 
-  // ── Render ──
-  function render() {
-    const months = QUARTERS[state.quy];
-    const cols   = COL_TYPES[state.loai].cols;
-    const thead  = document.getElementById('ccThead');
-    const tbody  = document.getElementById('ccTbody');
-    if (!thead || !tbody) return;
-
-    // ── Header ──
-    const qLabel = `Tổng hợp Q${state.quy}`;
-    let row1 = `<tr>
-      <th rowspan="2" class="cc-th-fixed cc-th-stt">#</th>
-      <th rowspan="2" class="cc-th-fixed cc-th-name">Họ và tên</th>
-      <th rowspan="2" class="cc-th-fixed cc-th-stk">Số TK</th>`;
-
-    months.forEach(m => {
-      row1 += `<th colspan="${cols.length}" class="cc-th-month">T${m}</th>`;
-    });
-    row1 += `<th colspan="2" class="cc-th-quarter">${qLabel}</th></tr>`;
-
-    let row2 = '<tr>';
-    months.forEach(() => {
-      cols.forEach(c => {
-        row2 += `<th class="cc-th-col">${c}</th>`;
-      });
-    });
-    row2 += `<th class="cc-th-col">Tổng</th><th class="cc-th-col cc-last">%</th></tr>`;
-
-    thead.innerHTML = row1 + row2;
-
-    // ── Body ──
-    let rowIdx = 0;
-    let html = '';
-    departments.forEach(dept => {
-      html += `<tr class="cc-dept-row"><td colspan="${3 + months.length * cols.length + 2}">${dept.name}</td></tr>`;
-      dept.employees.forEach(emp => {
-        rowIdx++;
-        let total = 0;
-        let cells = '';
-        months.forEach(m => {
-          const data = genData(emp.id, m, state.loai);
-          cols.forEach(c => {
-            const v = data[c] || 0;
-            total += (c === 'LV') ? v : 0;
-            cells += v > 0
-              ? `<td class="cc-td-val">${v}</td>`
-              : `<td class="cc-td-empty"></td>`;
-          });
-        });
-        const pct = total > 0 ? Math.min(100, Math.round(total / (months.length * 22) * 100)) : 0;
-        html += `<tr class="cc-data-row">
-          <td class="cc-td-stt">${rowIdx}</td>
-          <td class="cc-td-name">${emp.name}</td>
-          <td class="cc-td-stk">${emp.stk}</td>
-          ${cells}
-          <td class="cc-td-total">${total || ''}</td>
-          <td class="cc-td-pct">${total > 0 ? pct + '%' : ''}</td>
-        </tr>`;
-      });
-    });
-
-    tbody.innerHTML = html;
+  // Run init
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    setTimeout(init, 200);
   }
 
-  // ── Excel export (basic CSV) ──
-  function exportExcel() {
-    const months = QUARTERS[state.quy];
-    const cols   = COL_TYPES[state.loai].cols;
-    let csv = `"#","Họ và tên","Số TK"`;
-    months.forEach(m => cols.forEach(c => { csv += `,"T${m}-${c}"`; }));
-    csv += `,"Tổng","%"\n`;
-
-    let rowIdx = 0;
-    departments.forEach(dept => {
-      csv += `"","${dept.name}",""\n`;
-      dept.employees.forEach(emp => {
-        rowIdx++;
-        let total = 0;
-        let cells = '';
-        months.forEach(m => {
-          const data = genData(emp.id, m, state.loai);
-          cols.forEach(c => {
-            const v = data[c] || 0;
-            if (c === 'LV') total += v;
-            cells += `,"${v > 0 ? v : ''}"`;
-          });
-        });
-        const pct = total > 0 ? Math.min(100, Math.round(total / (months.length * 22) * 100)) + '%' : '';
-        csv += `"${rowIdx}","${emp.name}","${emp.stk}"${cells},"${total || ''}","${pct}"\n`;
-      });
-    });
-
-    const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
-    const url  = URL.createObjectURL(blob);
-    const a    = document.createElement('a');
-    a.href = url;
-    a.download = `chamcong_Q${state.quy}_${state.nam}.csv`;
-    a.click();
-    URL.revokeObjectURL(url);
-  }
-
-  // ── Init ──
-  function init() {
-    const selQuy  = document.getElementById('ccQuy');
-    const selNam  = document.getElementById('ccNam');
-    const rdGroup = document.querySelectorAll('input[name="ccLoai"]');
-    const btnXls  = document.getElementById('ccExcel');
-
-    if (!selQuy) return; // page not ready
-
-    // Populate năm
-    const curYear = new Date().getFullYear();
-    for (let y = curYear - 3; y <= curYear + 1; y++) {
-      const opt = document.createElement('option');
-      opt.value = y; opt.textContent = y;
-      if (y === curYear) opt.selected = true;
-      selNam.appendChild(opt);
-    }
-
-    selQuy.value = state.quy;
-
-    selQuy.addEventListener('change', () => { state.quy = +selQuy.value; render(); });
-    selNam.addEventListener('change', () => { state.nam = +selNam.value; render(); });
-    rdGroup.forEach(rd => {
-      rd.addEventListener('change', () => { state.loai = rd.value; render(); });
-    });
-    if (btnXls) btnXls.addEventListener('click', exportExcel);
-
-    render();
-  }
-
-  return { init, render };
 })();
-
-// Auto-init when DOM is ready
-document.addEventListener('DOMContentLoaded', CC.init);
-// Also init immediately in case DOM already loaded
-if (document.readyState !== 'loading') CC.init();

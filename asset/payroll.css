@@ -1367,3 +1367,85 @@ tbody tr:hover td { background: #FAFAFA; }
   font-weight: 600;
 }
 .nav-group-items .nav-item.active::before { background: #7EC8F8; }
+
+/* ═══════════════════════════════════════
+   CHAMCONG - Handsontable overrides
+   ═══════════════════════════════════════ */
+
+/* Container */
+#ccHotContainer {
+  border: 1px solid #E2E8F0;
+  border-radius: 10px;
+  overflow: hidden;
+  margin-top: 10px;
+  box-shadow: 0 1px 6px rgba(0,0,0,.06);
+}
+
+/* Nested header row 1 (month groups) */
+#ccHotContainer .ht_nestingLevels .htCore thead tr:first-child th,
+#ccHotContainer .handsontable thead tr:first-child th {
+  background: #1E3A5F !important;
+  color: #fff !important;
+  font-weight: 700;
+  font-size: 12px;
+  text-align: center;
+  border-right: 1px solid #2D5A8E !important;
+  padding: 7px 4px;
+}
+
+/* Nested header row 2 (sub-col labels) */
+#ccHotContainer .handsontable thead tr:last-child th {
+  background: #2A5298 !important;
+  color: #E0EAFF !important;
+  font-size: 11px;
+  font-weight: 600;
+  text-align: center;
+  padding: 5px 2px;
+  border-right: 1px solid #3A6BC0 !important;
+}
+
+/* Fixed col headers (STT / Ho va ten / So TK) */
+#ccHotContainer .handsontable thead tr th:nth-child(-n+3) {
+  background: #1A3461 !important;
+}
+
+/* Body cells */
+#ccHotContainer .handsontable td {
+  font-size: 12px;
+  color: #1E293B;
+  border-right: 1px solid #E9EEF5 !important;
+  border-bottom: 1px solid #E9EEF5 !important;
+  padding: 4px 5px;
+  height: 26px;
+}
+
+/* Fixed columns shadow */
+#ccHotContainer .handsontable .ht_clone_left td {
+  border-right: 2px solid #B0C4DE !important;
+}
+
+/* Alternate row tint */
+#ccHotContainer .handsontable td.cc-even-row {
+  background: #F0F7FF;
+}
+
+/* Total column highlight */
+#ccHotContainer .handsontable td.cc-total {
+  background: #EFF6FF;
+  font-weight: 700;
+  color: #1D4ED8;
+  border-left: 2px solid #BFDBFE !important;
+}
+
+/* Fixed left columns in body */
+#ccHotContainer .handsontable .ht_clone_left .htMiddle {
+  background: #FAFBFD;
+}
+
+/* Handsontable scrollbar thin */
+#ccHotContainer .handsontable .wtHolder::-webkit-scrollbar { height: 6px; width: 6px; }
+#ccHotContainer .handsontable .wtHolder::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 3px; }
+
+/* Cell input focus */
+#ccHotContainer .handsontable td.area { background: #EFF6FF !important; }
+#ccHotContainer .handsontable td.current { outline: 2px solid #3B82F6 !important; outline-offset: -2px; }

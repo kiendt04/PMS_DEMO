@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="vi">
 
 <head>
@@ -7,6 +7,7 @@
   <title>PayrollPro - Dashboard</title>
   <meta name="description" content="He thong quan ly luong PayrollPro" />
   <link rel="stylesheet" href="asset/payroll.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/handsontable@14.6.1/dist/handsontable.full.min.css" />
 </head>
 
 <body>
@@ -496,12 +497,7 @@
               </div>
             </div>
           </div>
-          <div class="cc-table-wrap">
-            <table class="cc-table">
-              <thead id="ccThead"></thead>
-              <tbody id="ccTbody"></tbody>
-            </table>
-          </div>
+          <div id="ccHotContainer" style="overflow:hidden;"></div>
         </div>
 
         <div class="page-section fade-in" id="page-an-toan-dien">
@@ -925,6 +921,7 @@
   </script>
   <script src="asset/khoi-phong-ban.js"></script>
   <script src="asset/phong-ban.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/handsontable@14.6.1/dist/handsontable.full.min.js"></script>
   <script src="asset/chamcong.js"></script>
 </body>
 
