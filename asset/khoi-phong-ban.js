@@ -16,21 +16,31 @@ function kpbRender() {
     r.ma.toLowerCase().includes(q) || r.ten.toLowerCase().includes(q)
   );
   const tbody = document.getElementById('kpbTbody');
-  document.getElementById('kpbTotal').textContent = 'Tổng: ' + filtered.length + ' khối';
+  const pill = document.getElementById('kpbTotal');
+  if (pill) pill.textContent = filtered.length + ' khối';
 
   if (filtered.length === 0) {
-    tbody.innerHTML = '<tr class="empty-row"><td colspan="5">Không tìm thấy kết quả phù hợp.</td></tr>';
+    tbody.innerHTML = `<tr class="cat-empty"><td colspan="5">
+      <svg width="40" height="40" viewBox="0 0 40 40" fill="none" style="display:block;margin:0 auto 10px;opacity:.25"><circle cx="20" cy="20" r="16" stroke="currentColor" stroke-width="2"/><path d="M14 20h12M20 14v12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      Không tìm thấy kết quả phù hợp.
+    </td></tr>`;
     return;
   }
   tbody.innerHTML = filtered.map((r, i) => `
     <tr>
-      <td style="color:#aaa; text-align:center">${i + 1}</td>
-      <td><strong style="color:#185FA5; font-weight:600">${r.ma}</strong></td>
-      <td>${r.ten}</td>
-      <td style="color:#555; font-size:13px">${r.moTa || '<span style="color:#ccc">—</span>'}</td>
+      <td style="color:#9CA3AF;text-align:center;font-size:12.5px">${i + 1}</td>
+      <td><span class="cat-chip-blue">${r.ma}</span></td>
+      <td style="font-weight:600;color:#111827">${r.ten}</td>
+      <td style="color:#6B7280;font-size:13px">${r.moTa || '<span style="color:#D1D5DB">—</span>'}</td>
       <td style="text-align:center">
-        <button class="btn-action btn-edit" onclick="kpbOpenEdit(${r.id})">Sửa</button>
-        <button class="btn-action btn-delete" onclick="kpbOpenDelete(${r.id})" style="margin-left:6px">Xóa</button>
+        <button class="cat-btn-edit" onclick="kpbOpenEdit(${r.id})">
+          <svg viewBox="0 0 14 14" fill="none"><path d="M9.5 2.5l2 2L4 12H2v-2L9.5 2.5z" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Sửa
+        </button>
+        <button class="cat-btn-del" onclick="kpbOpenDelete(${r.id})">
+          <svg viewBox="0 0 14 14" fill="none"><polyline points="2 4 3.5 4 12 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M11 4l-.7 8a1 1 0 0 1-1 .9H4.7a1 1 0 0 1-1-.9L3 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><path d="M5.5 4V3a1 1 0 0 1 1-1h1a1 1 0 0 1 1 1v1" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+          Xóa
+        </button>
       </td>
     </tr>`).join('');
 }
@@ -41,7 +51,10 @@ function kpbOpenAdd() {
   document.getElementById('kpbMa').value = '';
   document.getElementById('kpbTen').value = '';
   document.getElementById('kpbMoTa').value = '';
-  ['errKpbMa','errKpbTen'].forEach(id => document.getElementById(id).style.display = 'none');
+  ['errKpbMa','errKpbTen'].forEach(id => {
+    const el = document.getElementById(id);
+    el.style.display = 'none'; el.textContent = '';
+  });
   document.getElementById('kpbModal').classList.add('open');
   setTimeout(() => document.getElementById('kpbMa').focus(), 100);
 }
@@ -54,7 +67,10 @@ function kpbOpenEdit(id) {
   document.getElementById('kpbMa').value  = r.ma;
   document.getElementById('kpbTen').value = r.ten;
   document.getElementById('kpbMoTa').value = r.moTa;
-  ['errKpbMa','errKpbTen'].forEach(id => document.getElementById(id).style.display = 'none');
+  ['errKpbMa','errKpbTen'].forEach(id => {
+    const el = document.getElementById(id);
+    el.style.display = 'none'; el.textContent = '';
+  });
   document.getElementById('kpbModal').classList.add('open');
   setTimeout(() => document.getElementById('kpbMa').focus(), 100);
 }
@@ -73,8 +89,10 @@ function kpbSave() {
   const errTen = document.getElementById('errKpbTen');
   errMa.style.display = 'none'; errTen.style.display = 'none';
 
-  if (!ma)  { errMa.textContent  = 'Vui lòng nhập mã khối.';  errMa.style.display  = 'block'; valid = false; }
-  else {
+  if (!ma) {
+    errMa.textContent = 'Vui lòng nhập mã khối.';
+    errMa.style.display = 'block'; valid = false;
+  } else {
     const dup = kpbData.find(x => x.ma.toLowerCase() === ma.toLowerCase() && x.id !== kpbEditId);
     if (dup) { errMa.textContent = 'Mã khối này đã tồn tại.'; errMa.style.display = 'block'; valid = false; }
   }
@@ -109,7 +127,6 @@ function kpbConfirmDelete() {
   kpbRender();
 }
 
-// Close modals on overlay click
 document.getElementById('kpbModal').addEventListener('click', function(e) { if (e.target === this) kpbCloseModal(); });
 document.getElementById('kpbDeleteModal').addEventListener('click', function(e) { if (e.target === this) kpbCloseDelete(); });
 
