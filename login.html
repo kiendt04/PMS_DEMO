@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -9,7 +10,13 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
   <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
     body {
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
@@ -20,43 +27,117 @@
 
     /* ── Keyframes ── */
     @keyframes loginFadeUp {
-      from { opacity: 0; transform: translateY(24px); }
-      to   { opacity: 1; transform: translateY(0); }
+      from {
+        opacity: 0;
+        transform: translateY(24px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
+
     @keyframes loginFadeIn {
-      from { opacity: 0; } to { opacity: 1; }
+      from {
+        opacity: 0;
+      }
+
+      to {
+        opacity: 1;
+      }
     }
+
     @keyframes floatCard1 {
-      0%, 100% { transform: translateY(0)    rotate(-2deg); }
-      50%      { transform: translateY(-10px) rotate(-2deg); }
+
+      0%,
+      100% {
+        transform: translateY(0) rotate(-2deg);
+      }
+
+      50% {
+        transform: translateY(-10px) rotate(-2deg);
+      }
     }
+
     @keyframes floatCard2 {
-      0%, 100% { transform: translateY(0)    rotate(3deg); }
-      50%      { transform: translateY(-14px) rotate(3deg); }
+
+      0%,
+      100% {
+        transform: translateY(0) rotate(3deg);
+      }
+
+      50% {
+        transform: translateY(-14px) rotate(3deg);
+      }
     }
+
     @keyframes floatCard3 {
-      0%, 100% { transform: translateY(0)   rotate(-1deg); }
-      50%      { transform: translateY(-8px) rotate(-1deg); }
+
+      0%,
+      100% {
+        transform: translateY(0) rotate(-1deg);
+      }
+
+      50% {
+        transform: translateY(-8px) rotate(-1deg);
+      }
     }
+
     @keyframes pulseOrb {
-      0%, 100% { opacity: .35; transform: scale(1); }
-      50%      { opacity: .55; transform: scale(1.08); }
+
+      0%,
+      100% {
+        opacity: .35;
+        transform: scale(1);
+      }
+
+      50% {
+        opacity: .55;
+        transform: scale(1.08);
+      }
     }
+
     @keyframes shimmer {
-      0%   { background-position: 200% 0; }
-      100% { background-position: -200% 0; }
+      0% {
+        background-position: 200% 0;
+      }
+
+      100% {
+        background-position: -200% 0;
+      }
     }
+
     @keyframes inputSlide {
-      from { opacity: 0; transform: translateX(-6px); }
-      to   { opacity: 1; transform: translateX(0); }
+      from {
+        opacity: 0;
+        transform: translateX(-6px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
     }
+
     @keyframes checkPop {
-      0%   { transform: scale(0); }
-      70%  { transform: scale(1.15); }
-      100% { transform: scale(1); }
+      0% {
+        transform: scale(0);
+      }
+
+      70% {
+        transform: scale(1.15);
+      }
+
+      100% {
+        transform: scale(1);
+      }
     }
+
     @keyframes spin {
-      to { transform: rotate(360deg); }
+      to {
+        transform: rotate(360deg);
+      }
     }
 
     /* ── Root layout ── */
@@ -88,9 +169,33 @@
       animation: pulseOrb 5s ease-in-out infinite;
       pointer-events: none;
     }
-    .hero-orb-1 { width: 380px; height: 380px; background: rgba(55,138,221,.22); top: -90px;  left: -90px;  animation-delay: 0s;   }
-    .hero-orb-2 { width: 280px; height: 280px; background: rgba(93,202,165,.18); bottom: 50px; right: -70px; animation-delay: 2s;   }
-    .hero-orb-3 { width: 200px; height: 200px; background: rgba(239,159,39,.15); top: 42%;    left: 44%;    animation-delay: 3.5s; }
+
+    .hero-orb-1 {
+      width: 380px;
+      height: 380px;
+      background: rgba(55, 138, 221, .22);
+      top: -90px;
+      left: -90px;
+      animation-delay: 0s;
+    }
+
+    .hero-orb-2 {
+      width: 280px;
+      height: 280px;
+      background: rgba(93, 202, 165, .18);
+      bottom: 50px;
+      right: -70px;
+      animation-delay: 2s;
+    }
+
+    .hero-orb-3 {
+      width: 200px;
+      height: 200px;
+      background: rgba(239, 159, 39, .15);
+      top: 42%;
+      left: 44%;
+      animation-delay: 3.5s;
+    }
 
     /* Brand */
     .hero-brand {
@@ -100,17 +205,37 @@
       margin-bottom: 3.5rem;
       animation: loginFadeUp .6s ease both;
     }
+
     .hero-brand-icon {
-      width: 46px; height: 46px;
+      width: 46px;
+      height: 46px;
       background: linear-gradient(135deg, #378ADD 0%, #185FA5 100%);
       border-radius: 13px;
-      display: flex; align-items: center; justify-content: center;
-      box-shadow: 0 4px 18px rgba(55,138,221,.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 18px rgba(55, 138, 221, .5);
       flex-shrink: 0;
     }
-    .hero-brand-icon svg { width: 26px; height: 26px; }
-    .hero-brand-name { font-size: 21px; font-weight: 700; color: #fff; letter-spacing: -.3px; line-height: 1.2; }
-    .hero-brand-tag  { font-size: 11.5px; color: rgba(255,255,255,.42); font-weight: 400; }
+
+    .hero-brand-icon svg {
+      width: 26px;
+      height: 26px;
+    }
+
+    .hero-brand-name {
+      font-size: 21px;
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: -.3px;
+      line-height: 1.2;
+    }
+
+    .hero-brand-tag {
+      font-size: 11.5px;
+      color: rgba(255, 255, 255, .42);
+      font-weight: 400;
+    }
 
     /* Headline */
     .hero-headline {
@@ -122,6 +247,7 @@
       margin-bottom: 1.1rem;
       animation: loginFadeUp .7s .1s ease both;
     }
+
     .hero-headline em {
       font-style: normal;
       background: linear-gradient(90deg, #64B5F6 0%, #5DCAA5 100%);
@@ -129,9 +255,10 @@
       -webkit-text-fill-color: transparent;
       background-clip: text;
     }
+
     .hero-desc {
       font-size: 14.5px;
-      color: rgba(255,255,255,.48);
+      color: rgba(255, 255, 255, .48);
       line-height: 1.75;
       max-width: 390px;
       margin-bottom: 2.75rem;
@@ -145,11 +272,12 @@
       gap: 12px;
       animation: loginFadeUp .7s .28s ease both;
     }
+
     .hc {
       backdrop-filter: blur(16px);
       -webkit-backdrop-filter: blur(16px);
-      background: rgba(255,255,255,.07);
-      border: 1px solid rgba(255,255,255,.13);
+      background: rgba(255, 255, 255, .07);
+      border: 1px solid rgba(255, 255, 255, .13);
       border-radius: 15px;
       padding: 15px 19px;
       display: flex;
@@ -157,41 +285,97 @@
       gap: 15px;
       max-width: 330px;
     }
-    .hc:nth-child(1) { animation: floatCard1 6s   ease-in-out infinite; margin-left: 0;      }
-    .hc:nth-child(2) { animation: floatCard2 7s   ease-in-out infinite; margin-left: 2.2rem; }
-    .hc:nth-child(3) { animation: floatCard3 5.5s ease-in-out infinite; margin-left: .6rem;  }
+
+    .hc:nth-child(1) {
+      animation: floatCard1 6s ease-in-out infinite;
+      margin-left: 0;
+    }
+
+    .hc:nth-child(2) {
+      animation: floatCard2 7s ease-in-out infinite;
+      margin-left: 2.2rem;
+    }
+
+    .hc:nth-child(3) {
+      animation: floatCard3 5.5s ease-in-out infinite;
+      margin-left: .6rem;
+    }
 
     .hc-icon {
-      width: 40px; height: 40px;
+      width: 40px;
+      height: 40px;
       border-radius: 11px;
-      display: flex; align-items: center; justify-content: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       flex-shrink: 0;
     }
-    .hc-icon.blue  { background: rgba(55,138,221,.28); }
-    .hc-icon.green { background: rgba(93,202,165,.28); }
-    .hc-icon.amber { background: rgba(239,159,39,.28); }
-    .hc-icon svg   { width: 19px; height: 19px; }
 
-    .hc-label { font-size: 11px;   color: rgba(255,255,255,.42); margin-bottom: 2px; }
-    .hc-val   { font-size: 16.5px; font-weight: 700; color: #fff; }
-    .hc-sub   { font-size: 10.5px; color: rgba(93,202,165,.95); margin-top: 2px; }
+    .hc-icon.blue {
+      background: rgba(55, 138, 221, .28);
+    }
+
+    .hc-icon.green {
+      background: rgba(93, 202, 165, .28);
+    }
+
+    .hc-icon.amber {
+      background: rgba(239, 159, 39, .28);
+    }
+
+    .hc-icon svg {
+      width: 19px;
+      height: 19px;
+    }
+
+    .hc-label {
+      font-size: 11px;
+      color: rgba(255, 255, 255, .42);
+      margin-bottom: 2px;
+    }
+
+    .hc-val {
+      font-size: 16.5px;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .hc-sub {
+      font-size: 10.5px;
+      color: rgba(93, 202, 165, .95);
+      margin-top: 2px;
+    }
 
     /* Decorative dots */
     .hero-dots {
       position: absolute;
-      bottom: 2.25rem; left: 3.5rem;
-      display: flex; gap: 7px;
+      bottom: 2.25rem;
+      left: 3.5rem;
+      display: flex;
+      gap: 7px;
       animation: loginFadeIn 1s .55s ease both;
     }
-    .hero-dot     { width: 7px; height: 7px; border-radius: 50%; background: rgba(255,255,255,.2); }
-    .hero-dot.on  { background: #378ADD; width: 20px; border-radius: 3.5px; }
+
+    .hero-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, .2);
+    }
+
+    .hero-dot.on {
+      background: #378ADD;
+      width: 20px;
+      border-radius: 3.5px;
+    }
 
     /* Decorative grid overlay */
     .hero-grid {
-      position: absolute; inset: 0;
+      position: absolute;
+      inset: 0;
       background-image:
-        linear-gradient(rgba(255,255,255,.025) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255,255,255,.025) 1px, transparent 1px);
+        linear-gradient(rgba(255, 255, 255, .025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, .025) 1px, transparent 1px);
       background-size: 52px 52px;
       pointer-events: none;
     }
@@ -216,20 +400,25 @@
     .login-panel::before {
       content: '';
       position: absolute;
-      top: -130px; right: -130px;
-      width: 320px; height: 320px;
+      top: -130px;
+      right: -130px;
+      width: 320px;
+      height: 320px;
       border-radius: 50%;
-      background: radial-gradient(circle, rgba(55,138,221,.07) 0%, transparent 70%);
+      background: radial-gradient(circle, rgba(55, 138, 221, .07) 0%, transparent 70%);
       pointer-events: none;
     }
+
     /* Subtle glow bottom-left */
     .login-panel::after {
       content: '';
       position: absolute;
-      bottom: -100px; left: -100px;
-      width: 260px; height: 260px;
+      bottom: -100px;
+      left: -100px;
+      width: 260px;
+      height: 260px;
       border-radius: 50%;
-      background: radial-gradient(circle, rgba(93,202,165,.06) 0%, transparent 70%);
+      background: radial-gradient(circle, rgba(93, 202, 165, .06) 0%, transparent 70%);
       pointer-events: none;
     }
 
@@ -255,9 +444,11 @@
       margin-bottom: 1.85rem;
       letter-spacing: .02em;
     }
+
     .panel-step::before {
       content: '';
-      width: 7px; height: 7px;
+      width: 7px;
+      height: 7px;
       border-radius: 50%;
       background: #378ADD;
       flex-shrink: 0;
@@ -271,6 +462,7 @@
       line-height: 1.22;
       margin-bottom: 7px;
     }
+
     .login-sub {
       font-size: 13.5px;
       color: #7A8EA0;
@@ -288,16 +480,36 @@
       line-height: 1.5;
       animation: inputSlide .25s ease;
     }
-    .alert.show { display: flex; align-items: flex-start; gap: 8px; }
-    .alert-icon { flex-shrink: 0; margin-top: 1px; }
-    .alert-error   { color: #991B1B; background: #FEF2F2; border: 1px solid #FECACA; }
-    .alert-success { color: #14532D; background: #F0FDF4; border: 1px solid #86EFAC; }
+
+    .alert.show {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+    }
+
+    .alert-icon {
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    .alert-error {
+      color: #991B1B;
+      background: #FEF2F2;
+      border: 1px solid #FECACA;
+    }
+
+    .alert-success {
+      color: #14532D;
+      background: #F0FDF4;
+      border: 1px solid #86EFAC;
+    }
 
     /* ── Floating-label input ── */
     .lf {
       position: relative;
       margin-bottom: 1.1rem;
     }
+
     .lf input {
       width: 100%;
       height: 54px;
@@ -311,18 +523,21 @@
       outline: none;
       transition: border-color .2s, box-shadow .2s, background .2s;
     }
+
     .lf input:focus {
       border-color: #378ADD;
       background: #fff;
-      box-shadow: 0 0 0 4px rgba(55,138,221,.1);
+      box-shadow: 0 0 0 4px rgba(55, 138, 221, .1);
     }
-    .lf input:focus + label,
-    .lf input:not(:placeholder-shown) + label {
+
+    .lf input:focus+label,
+    .lf input:not(:placeholder-shown)+label {
       top: 8px;
       font-size: 10.5px;
       color: #378ADD;
       font-weight: 600;
     }
+
     .lf label {
       position: absolute;
       left: 42px;
@@ -333,26 +548,48 @@
       pointer-events: none;
       transition: top .18s ease, font-size .18s ease, color .18s ease, font-weight .18s ease;
     }
+
     .lf-prefix {
       position: absolute;
-      left: 14px; top: 50%; transform: translateY(-50%);
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
       color: #B0BEC5;
       pointer-events: none;
-      display: flex; align-items: center;
+      display: flex;
+      align-items: center;
       transition: color .2s;
     }
-    .lf input:focus ~ .lf-prefix { color: #378ADD; }
+
+    .lf input:focus~.lf-prefix {
+      color: #378ADD;
+    }
 
     /* Password toggle */
-    .lf input.has-toggle { padding-right: 46px; }
+    .lf input.has-toggle {
+      padding-right: 46px;
+    }
+
     .lf-toggle {
       position: absolute;
-      right: 13px; top: 50%; transform: translateY(-50%);
-      background: none; border: none; cursor: pointer; padding: 5px;
-      color: #B0BEC5; display: flex; align-items: center;
-      transition: color .15s; border-radius: 6px;
+      right: 13px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 5px;
+      color: #B0BEC5;
+      display: flex;
+      align-items: center;
+      transition: color .15s;
+      border-radius: 6px;
     }
-    .lf-toggle:hover { color: #378ADD; background: rgba(55,138,221,.08); }
+
+    .lf-toggle:hover {
+      color: #378ADD;
+      background: rgba(55, 138, 221, .08);
+    }
 
     /* ── Row opts ── */
     .row-opts {
@@ -361,108 +598,186 @@
       align-items: center;
       margin: .2rem 0 1.6rem;
     }
+
     .remember {
-      display: flex; align-items: center; gap: 9px;
-      font-size: 13px; color: #64748B;
-      cursor: pointer; user-select: none;
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      font-size: 13px;
+      color: #64748B;
+      cursor: pointer;
+      user-select: none;
     }
-    .remember input[type=checkbox] { display: none; }
+
+    .remember input[type=checkbox] {
+      display: none;
+    }
+
     .cb-box {
-      width: 18px; height: 18px;
+      width: 18px;
+      height: 18px;
       border: 1.5px solid #CBD5E1;
       border-radius: 5px;
-      display: flex; align-items: center; justify-content: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       transition: background .15s, border-color .15s;
       flex-shrink: 0;
     }
-    .remember input[type=checkbox]:checked ~ .cb-box {
+
+    .remember input[type=checkbox]:checked~.cb-box {
       background: #185FA5;
       border-color: #185FA5;
     }
-    .remember input[type=checkbox]:checked ~ .cb-box::after {
+
+    .remember input[type=checkbox]:checked~.cb-box::after {
       content: '';
       display: block;
-      width: 9px; height: 5px;
+      width: 9px;
+      height: 5px;
       border-left: 2px solid #fff;
       border-bottom: 2px solid #fff;
       transform: rotate(-45deg) translateY(-1px);
       animation: checkPop .2s ease;
     }
+
     .forgot {
-      font-size: 13px; color: #378ADD;
-      text-decoration: none; font-weight: 500;
+      font-size: 13px;
+      color: #378ADD;
+      text-decoration: none;
+      font-weight: 500;
       transition: color .15s;
     }
-    .forgot:hover { color: #185FA5; text-decoration: underline; }
+
+    .forgot:hover {
+      color: #185FA5;
+      text-decoration: underline;
+    }
 
     /* ── Submit button ── */
     .btn-login {
-      width: 100%; height: 52px;
+      width: 100%;
+      height: 52px;
       background: linear-gradient(135deg, #378ADD 0%, #185FA5 100%);
       color: #fff;
-      border: none; border-radius: 12px;
-      font-size: 15px; font-weight: 600;
+      border: none;
+      border-radius: 12px;
+      font-size: 15px;
+      font-weight: 600;
       font-family: inherit;
       cursor: pointer;
-      position: relative; overflow: hidden;
+      position: relative;
+      overflow: hidden;
       transition: box-shadow .2s, transform .15s;
       letter-spacing: .015em;
-      display: flex; align-items: center; justify-content: center; gap: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
     }
+
     .btn-login::before {
       content: '';
-      position: absolute; inset: 0;
-      background: linear-gradient(90deg, transparent, rgba(255,255,255,.2), transparent);
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, .2), transparent);
       background-size: 200% 100%;
       opacity: 0;
       transition: opacity .25s;
     }
-    .btn-login:hover { box-shadow: 0 8px 28px rgba(24,95,165,.48); transform: translateY(-1px); }
-    .btn-login:hover::before { opacity: 1; animation: shimmer 1.2s linear infinite; }
-    .btn-login:active { transform: scale(.98) translateY(0); }
+
+    .btn-login:hover {
+      box-shadow: 0 8px 28px rgba(24, 95, 165, .48);
+      transform: translateY(-1px);
+    }
+
+    .btn-login:hover::before {
+      opacity: 1;
+      animation: shimmer 1.2s linear infinite;
+    }
+
+    .btn-login:active {
+      transform: scale(.98) translateY(0);
+    }
+
     .btn-login:disabled {
       background: linear-gradient(135deg, #9DBFDF, #86AECB);
-      cursor: not-allowed; box-shadow: none; transform: none;
+      cursor: not-allowed;
+      box-shadow: none;
+      transform: none;
     }
-    .btn-login:disabled::before { display: none; }
+
+    .btn-login:disabled::before {
+      display: none;
+    }
 
     /* Spinner inside button */
     .btn-spinner {
-      width: 16px; height: 16px;
-      border: 2.5px solid rgba(255,255,255,.4);
+      width: 16px;
+      height: 16px;
+      border: 2.5px solid rgba(255, 255, 255, .4);
       border-top-color: #fff;
       border-radius: 50%;
       animation: spin .7s linear infinite;
       display: none;
     }
-    .btn-login.loading .btn-spinner { display: block; }
-    .btn-login.loading .btn-text    { opacity: .7; }
+
+    .btn-login.loading .btn-spinner {
+      display: block;
+    }
+
+    .btn-login.loading .btn-text {
+      opacity: .7;
+    }
 
     /* ── Divider ── */
     .divider {
-      display: flex; align-items: center; gap: 14px;
-      margin: 1.6rem 0; font-size: 12px; color: #CBD5E1; font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin: 1.6rem 0;
+      font-size: 12px;
+      color: #CBD5E1;
+      font-weight: 500;
     }
-    .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: #F1F5F9; }
+
+    .divider::before,
+    .divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: #F1F5F9;
+    }
 
     /* ── SSO button ── */
     .btn-sso {
-      width: 100%; height: 50px;
+      width: 100%;
+      height: 50px;
       background: #F8FAFC;
       border: 1.5px solid #E2E8F0;
       border-radius: 12px;
-      font-size: 13.5px; color: #475569; font-weight: 500;
+      font-size: 13.5px;
+      color: #475569;
+      font-weight: 500;
       font-family: inherit;
       cursor: pointer;
-      display: flex; align-items: center; justify-content: center; gap: 11px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 11px;
       transition: background .15s, border-color .15s, transform .15s, box-shadow .15s;
     }
+
     .btn-sso:hover {
-      background: #fff; border-color: #B8C4D0;
+      background: #fff;
+      border-color: #B8C4D0;
       transform: translateY(-1px);
-      box-shadow: 0 4px 14px rgba(0,0,0,.07);
+      box-shadow: 0 4px 14px rgba(0, 0, 0, .07);
     }
-    .btn-sso:active { transform: scale(.98); }
+
+    .btn-sso:active {
+      transform: scale(.98);
+    }
 
     /* ── Footer note ── */
     .login-foot {
@@ -472,8 +787,16 @@
       color: #94A3B8;
       line-height: 1.8;
     }
-    .login-foot a { color: #378ADD; text-decoration: none; font-weight: 500; }
-    .login-foot a:hover { text-decoration: underline; }
+
+    .login-foot a {
+      color: #378ADD;
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    .login-foot a:hover {
+      text-decoration: underline;
+    }
 
     /* ── Demo hint ── */
     .demo-hint {
@@ -487,288 +810,311 @@
       text-align: center;
       line-height: 1.6;
     }
-    .demo-hint strong { font-weight: 600; }
+
+    .demo-hint strong {
+      font-weight: 600;
+    }
 
     /* ── Responsive ── */
     @media (max-width: 960px) {
-      .login-hero { display: none; }
-      .login-panel { width: 100%; min-width: unset; }
+      .login-hero {
+        display: none;
+      }
+
+      .login-panel {
+        width: 100%;
+        min-width: unset;
+      }
     }
+
     @media (max-width: 480px) {
-      .login-panel { padding: 2rem 1.5rem; }
+      .login-panel {
+        padding: 2rem 1.5rem;
+      }
     }
   </style>
 </head>
+
 <body>
 
-<div id="loginPage">
+  <div id="loginPage">
 
-  <!-- ══ HERO PANEL (left) ══ -->
-  <div class="login-hero">
-    <div class="hero-grid"></div>
-    <div class="hero-orb hero-orb-1"></div>
-    <div class="hero-orb hero-orb-2"></div>
-    <div class="hero-orb hero-orb-3"></div>
+    <!-- ══ HERO PANEL (left) ══ -->
+    <div class="login-hero">
+      <div class="hero-grid"></div>
+      <div class="hero-orb hero-orb-1"></div>
+      <div class="hero-orb hero-orb-2"></div>
+      <div class="hero-orb hero-orb-3"></div>
 
-    <!-- Brand -->
-    <div class="hero-brand">
-      <div class="hero-brand-icon">
-        <svg viewBox="0 0 20 20" fill="none">
-          <rect x="3" y="5" width="14" height="11" rx="2" stroke="white" stroke-width="1.5"/>
-          <path d="M7 5V4a3 3 0 0 1 6 0v1" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
-          <circle cx="10" cy="11" r="1.5" fill="white"/>
-          <path d="M10 12.5v1.5" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
-        </svg>
-      </div>
-      <div>
-        <div class="hero-brand-name">PayrollPro</div>
-        <div class="hero-brand-tag">Hệ thống quản lý lương</div>
-      </div>
-    </div>
-
-    <!-- Headline -->
-    <div class="hero-headline">
-      Quản lý nhân sự<br><em>thông minh hơn.</em>
-    </div>
-    <div class="hero-desc">
-      Tự động hóa bảng lương, chấm công và thuế TNCN — mọi thứ trong một nền tảng duy nhất, chính xác và bảo mật.
-    </div>
-
-    <!-- Floating stat cards -->
-    <div class="hero-cards">
-      <div class="hc">
-        <div class="hc-icon blue">
-          <svg viewBox="0 0 16 16" fill="none">
-            <circle cx="6" cy="5" r="2.5" stroke="#64B5F6" stroke-width="1.4"/>
-            <path d="M1 13c0-2.76 2.24-5 5-5s5 2.24 5 5" stroke="#64B5F6" stroke-width="1.4" stroke-linecap="round"/>
-            <circle cx="12" cy="5" r="2" stroke="#64B5F6" stroke-width="1.2"/>
-            <path d="M12 10c1.66 0 3 1.34 3 3" stroke="#64B5F6" stroke-width="1.2" stroke-linecap="round"/>
+      <!-- Brand -->
+      <div class="hero-brand">
+        <div class="hero-brand-icon">
+          <svg viewBox="0 0 20 20" fill="none">
+            <rect x="3" y="5" width="14" height="11" rx="2" stroke="white" stroke-width="1.5" />
+            <path d="M7 5V4a3 3 0 0 1 6 0v1" stroke="white" stroke-width="1.5" stroke-linecap="round" />
+            <circle cx="10" cy="11" r="1.5" fill="white" />
+            <path d="M10 12.5v1.5" stroke="white" stroke-width="1.5" stroke-linecap="round" />
           </svg>
         </div>
         <div>
-          <div class="hc-label">Tổng nhân viên</div>
-          <div class="hc-val">128 người</div>
-          <div class="hc-sub">↑ +4 so với tháng trước</div>
+          <div class="hero-brand-name">PayrollPro</div>
+          <div class="hero-brand-tag">Hệ thống quản lý lương</div>
         </div>
       </div>
 
-      <div class="hc">
-        <div class="hc-icon green">
-          <svg viewBox="0 0 16 16" fill="none">
-            <rect x="2" y="2" width="12" height="12" rx="2" stroke="#5DCAA5" stroke-width="1.4"/>
-            <path d="M5 8l2 2 4-4" stroke="#5DCAA5" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
+      <!-- Headline -->
+      <div class="hero-headline">
+        Quản lý nhân sự<br><em>thông minh hơn.</em>
+      </div>
+      <div class="hero-desc">
+        Tự động hóa bảng lương, chấm công và thuế TNCN — mọi thứ trong một nền tảng duy nhất, chính xác và bảo mật.
+      </div>
+
+      <!-- Floating stat cards -->
+      <div class="hero-cards">
+        <div class="hc">
+          <div class="hc-icon blue">
+            <svg viewBox="0 0 16 16" fill="none">
+              <circle cx="6" cy="5" r="2.5" stroke="#64B5F6" stroke-width="1.4" />
+              <path d="M1 13c0-2.76 2.24-5 5-5s5 2.24 5 5" stroke="#64B5F6" stroke-width="1.4" stroke-linecap="round" />
+              <circle cx="12" cy="5" r="2" stroke="#64B5F6" stroke-width="1.2" />
+              <path d="M12 10c1.66 0 3 1.34 3 3" stroke="#64B5F6" stroke-width="1.2" stroke-linecap="round" />
+            </svg>
+          </div>
+          <div>
+            <div class="hc-label">Tổng nhân viên</div>
+            <div class="hc-val">128 người</div>
+            <div class="hc-sub">↑ +4 so với tháng trước</div>
+          </div>
         </div>
-        <div>
-          <div class="hc-label">Quỹ lương tháng 4</div>
-          <div class="hc-val">4.2 tỷ VNĐ</div>
-          <div class="hc-sub">↑ Tăng 2.1% so với T3</div>
+
+        <div class="hc">
+          <div class="hc-icon green">
+            <svg viewBox="0 0 16 16" fill="none">
+              <rect x="2" y="2" width="12" height="12" rx="2" stroke="#5DCAA5" stroke-width="1.4" />
+              <path d="M5 8l2 2 4-4" stroke="#5DCAA5" stroke-width="1.4" stroke-linecap="round"
+                stroke-linejoin="round" />
+            </svg>
+          </div>
+          <div>
+            <div class="hc-label">Quỹ lương tháng 4</div>
+            <div class="hc-val">4.2 tỷ VNĐ</div>
+            <div class="hc-sub">↑ Tăng 2.1% so với T3</div>
+          </div>
+        </div>
+
+        <div class="hc">
+          <div class="hc-icon amber">
+            <svg viewBox="0 0 16 16" fill="none">
+              <circle cx="8" cy="8" r="6" stroke="#EF9F27" stroke-width="1.4" />
+              <path d="M8 5v3l2 2" stroke="#EF9F27" stroke-width="1.4" stroke-linecap="round" />
+            </svg>
+          </div>
+          <div>
+            <div class="hc-label">Chấm công hôm nay</div>
+            <div class="hc-val">119 / 128</div>
+            <div class="hc-sub">↑ Đúng giờ 93%</div>
+          </div>
         </div>
       </div>
 
-      <div class="hc">
-        <div class="hc-icon amber">
-          <svg viewBox="0 0 16 16" fill="none">
-            <circle cx="8" cy="8" r="6" stroke="#EF9F27" stroke-width="1.4"/>
-            <path d="M8 5v3l2 2" stroke="#EF9F27" stroke-width="1.4" stroke-linecap="round"/>
-          </svg>
-        </div>
-        <div>
-          <div class="hc-label">Chấm công hôm nay</div>
-          <div class="hc-val">119 / 128</div>
-          <div class="hc-sub">↑ Đúng giờ 93%</div>
-        </div>
+      <!-- Decorative dots -->
+      <div class="hero-dots">
+        <div class="hero-dot on"></div>
+        <div class="hero-dot"></div>
+        <div class="hero-dot"></div>
       </div>
     </div>
 
-    <!-- Decorative dots -->
-    <div class="hero-dots">
-      <div class="hero-dot on"></div>
-      <div class="hero-dot"></div>
-      <div class="hero-dot"></div>
-    </div>
-  </div>
+    <!-- ══ FORM PANEL (right) ══ -->
+    <div class="login-panel">
+      <div class="login-form-inner">
 
-  <!-- ══ FORM PANEL (right) ══ -->
-  <div class="login-panel">
-    <div class="login-form-inner">
+        <div class="panel-step">Đăng nhập hệ thống</div>
 
-      <div class="panel-step">Đăng nhập hệ thống</div>
+        <h1 class="login-title">Chào mừng trở lại 👋</h1>
+        <p class="login-sub">Nhập thông tin tài khoản của bạn để tiếp tục.</p>
 
-      <h1 class="login-title">Chào mừng trở lại 👋</h1>
-      <p class="login-sub">Nhập thông tin tài khoản của bạn để tiếp tục.</p>
-
-      <!-- Alerts -->
-      <div class="alert alert-error" id="errMsg" role="alert">
-        <svg class="alert-icon" width="15" height="15" viewBox="0 0 16 16" fill="none">
-          <circle cx="8" cy="8" r="7" stroke="currentColor" stroke-width="1.4"/>
-          <path d="M8 5v3M8 10.5v.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-        </svg>
-        <span id="errText"></span>
-      </div>
-      <div class="alert alert-success" id="okMsg" role="status">
-        <svg class="alert-icon" width="15" height="15" viewBox="0 0 16 16" fill="none">
-          <circle cx="8" cy="8" r="7" stroke="currentColor" stroke-width="1.4"/>
-          <path d="M5 8l2 2 4-4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-        <span id="okText"></span>
-      </div>
-
-      <!-- Username -->
-      <div class="lf">
-        <span class="lf-prefix">
-          <svg width="15" height="15" viewBox="0 0 16 16" fill="none">
-            <circle cx="8" cy="5.5" r="2.8" stroke="currentColor" stroke-width="1.4"/>
-            <path d="M2 14c0-3.31 2.69-6 6-6s6 2.69 6 6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+        <!-- Alerts -->
+        <div class="alert alert-error" id="errMsg" role="alert">
+          <svg class="alert-icon" width="15" height="15" viewBox="0 0 16 16" fill="none">
+            <circle cx="8" cy="8" r="7" stroke="currentColor" stroke-width="1.4" />
+            <path d="M8 5v3M8 10.5v.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
           </svg>
-        </span>
-        <input type="text" id="uname" placeholder=" " autocomplete="username" />
-        <label for="uname">Tên đăng nhập</label>
-      </div>
-
-      <!-- Password -->
-      <div class="lf">
-        <span class="lf-prefix">
-          <svg width="15" height="15" viewBox="0 0 16 16" fill="none">
-            <rect x="3" y="7" width="10" height="8" rx="1.5" stroke="currentColor" stroke-width="1.4"/>
-            <path d="M5 7V5a3 3 0 0 1 6 0v2" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
-            <circle cx="8" cy="11" r="1.2" fill="currentColor"/>
+          <span id="errText"></span>
+        </div>
+        <div class="alert alert-success" id="okMsg" role="status">
+          <svg class="alert-icon" width="15" height="15" viewBox="0 0 16 16" fill="none">
+            <circle cx="8" cy="8" r="7" stroke="currentColor" stroke-width="1.4" />
+            <path d="M5 8l2 2 4-4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"
+              stroke-linejoin="round" />
           </svg>
-        </span>
-        <input type="password" id="pw" class="has-toggle" placeholder=" " autocomplete="current-password" />
-        <label for="pw">Mật khẩu</label>
-        <button class="lf-toggle" id="togglePw" type="button" aria-label="Hiện/ẩn mật khẩu" tabindex="-1">
-          <svg id="eyeIco" width="16" height="16" viewBox="0 0 16 16" fill="none">
-            <path d="M1 8s2.5-5 7-5 7 5 7 5-2.5 5-7 5-7-5-7-5z" stroke="currentColor" stroke-width="1.3"/>
-            <circle cx="8" cy="8" r="2" stroke="currentColor" stroke-width="1.3"/>
+          <span id="okText"></span>
+        </div>
+
+        <!-- Username -->
+        <div class="lf">
+          <span class="lf-prefix">
+            <svg width="15" height="15" viewBox="0 0 16 16" fill="none">
+              <circle cx="8" cy="5.5" r="2.8" stroke="currentColor" stroke-width="1.4" />
+              <path d="M2 14c0-3.31 2.69-6 6-6s6 2.69 6 6" stroke="currentColor" stroke-width="1.4"
+                stroke-linecap="round" />
+            </svg>
+          </span>
+          <input type="text" id="uname" placeholder=" " autocomplete="username" />
+          <label for="uname">Tên đăng nhập</label>
+        </div>
+
+        <!-- Password -->
+        <div class="lf">
+          <span class="lf-prefix">
+            <svg width="15" height="15" viewBox="0 0 16 16" fill="none">
+              <rect x="3" y="7" width="10" height="8" rx="1.5" stroke="currentColor" stroke-width="1.4" />
+              <path d="M5 7V5a3 3 0 0 1 6 0v2" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" />
+              <circle cx="8" cy="11" r="1.2" fill="currentColor" />
+            </svg>
+          </span>
+          <input type="password" id="pw" class="has-toggle" placeholder=" " autocomplete="current-password" />
+          <label for="pw">Mật khẩu</label>
+          <button class="lf-toggle" id="togglePw" type="button" aria-label="Hiện/ẩn mật khẩu" tabindex="-1">
+            <svg id="eyeIco" width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M1 8s2.5-5 7-5 7 5 7 5-2.5 5-7 5-7-5-7-5z" stroke="currentColor" stroke-width="1.3" />
+              <circle cx="8" cy="8" r="2" stroke="currentColor" stroke-width="1.3" />
+            </svg>
+          </button>
+        </div>
+
+        <!-- Options row -->
+        <div class="row-opts">
+          <label class="remember">
+            <input type="checkbox" id="rem" />
+            <span class="cb-box"></span>
+            Ghi nhớ đăng nhập
+          </label>
+          <a href="#" class="forgot">Quên mật khẩu?</a>
+        </div>
+
+        <!-- Submit -->
+        <button class="btn-login" id="loginBtn" type="button">
+          <div class="btn-spinner"></div>
+          <span class="btn-text">Đăng nhập</span>
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" class="btn-arrow">
+            <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+              stroke-linejoin="round" />
           </svg>
         </button>
+
+        <div class="divider">hoặc tiếp tục với</div>
+
+        <!-- SSO -->
+        <button class="btn-sso" type="button">
+          <svg width="18" height="18" viewBox="0 0 48 48">
+            <path fill="#EA4335"
+              d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6L39.37 7C35.2 3.13 29.95 1 24 1c-9.3 0-17.29 5.53-21.01 13.42l7.48 5.81C12.37 14.01 17.74 9.5 24 9.5z" />
+            <path fill="#4285F4"
+              d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z" />
+            <path fill="#FBBC05"
+              d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.48-5.81C1.29 16.91 0 20.35 0 24c0 3.65 1.29 7.09 3.05 9.4l7.48-5.81z" />
+            <path fill="#34A853"
+              d="M24 47c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.48 5.81C6.71 41.47 14.7 47 24 47z" />
+          </svg>
+          Đăng nhập với Google SSO
+        </button>
+
+        <!-- Footer -->
+        <div class="login-foot">
+          Chưa có tài khoản?
+          <a href="#">Liên hệ quản trị viên</a>
+          &nbsp;·&nbsp;
+          <a href="#">Chính sách bảo mật</a>
+        </div>
+
+        <!-- Demo hint -->
+        <div class="demo-hint">
+          🔑 Demo: <strong>admin</strong> / <strong>123456</strong>
+        </div>
+
       </div>
-
-      <!-- Options row -->
-      <div class="row-opts">
-        <label class="remember">
-          <input type="checkbox" id="rem" />
-          <span class="cb-box"></span>
-          Ghi nhớ đăng nhập
-        </label>
-        <a href="#" class="forgot">Quên mật khẩu?</a>
-      </div>
-
-      <!-- Submit -->
-      <button class="btn-login" id="loginBtn" type="button">
-        <div class="btn-spinner"></div>
-        <span class="btn-text">Đăng nhập</span>
-        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" class="btn-arrow">
-          <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-      </button>
-
-      <div class="divider">hoặc tiếp tục với</div>
-
-      <!-- SSO -->
-      <button class="btn-sso" type="button">
-        <svg width="18" height="18" viewBox="0 0 48 48">
-          <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6L39.37 7C35.2 3.13 29.95 1 24 1c-9.3 0-17.29 5.53-21.01 13.42l7.48 5.81C12.37 14.01 17.74 9.5 24 9.5z"/>
-          <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
-          <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.48-5.81C1.29 16.91 0 20.35 0 24c0 3.65 1.29 7.09 3.05 9.4l7.48-5.81z"/>
-          <path fill="#34A853" d="M24 47c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.48 5.81C6.71 41.47 14.7 47 24 47z"/>
-        </svg>
-        Đăng nhập với Google SSO
-      </button>
-
-      <!-- Footer -->
-      <div class="login-foot">
-        Chưa có tài khoản?
-        <a href="#">Liên hệ quản trị viên</a>
-        &nbsp;·&nbsp;
-        <a href="#">Chính sách bảo mật</a>
-      </div>
-
-      <!-- Demo hint -->
-      <div class="demo-hint">
-        🔑 Demo: <strong>admin</strong> / <strong>123456</strong>
-      </div>
-
     </div>
-  </div>
 
-</div><!-- /#loginPage -->
+  </div><!-- /#loginPage -->
 
-<script>
-  /* ─── Auto-redirect nếu đã đăng nhập ─── */
-  if (sessionStorage.getItem('pms_user')) {
-    window.location.replace('dashboard.html');
-  }
 
-  /* ─── Helpers ─── */
-  function showErr(msg) {
-    const el = document.getElementById('errMsg');
-    document.getElementById('errText').textContent = msg;
-    el.classList.add('show');
-    document.getElementById('okMsg').classList.remove('show');
-  }
-  function showOk(msg) {
-    const el = document.getElementById('okMsg');
-    document.getElementById('okText').textContent = msg;
-    el.classList.add('show');
-    document.getElementById('errMsg').classList.remove('show');
-  }
-  function clearAlerts() {
-    document.getElementById('errMsg').classList.remove('show');
-    document.getElementById('okMsg').classList.remove('show');
-  }
+  <script>
+    /* ─── Auto-redirect nếu đã đăng nhập ─── */
+    if (sessionStorage.getItem('pms_user')) {
+      window.location.replace('index.html');
+    }
 
-  /* ─── Login ─── */
-  function doLogin() {
-    const u   = document.getElementById('uname').value.trim();
-    const p   = document.getElementById('pw').value;
-    const btn = document.getElementById('loginBtn');
-    clearAlerts();
+    /* ─── Helpers ─── */
+    function showErr(msg) {
+      const el = document.getElementById('errMsg');
+      document.getElementById('errText').textContent = msg;
+      el.classList.add('show');
+      document.getElementById('okMsg').classList.remove('show');
+    }
+    function showOk(msg) {
+      const el = document.getElementById('okMsg');
+      document.getElementById('okText').textContent = msg;
+      el.classList.add('show');
+      document.getElementById('errMsg').classList.remove('show');
+    }
+    function clearAlerts() {
+      document.getElementById('errMsg').classList.remove('show');
+      document.getElementById('okMsg').classList.remove('show');
+    }
 
-    if (!u) { showErr('Vui lòng nhập tên đăng nhập.'); document.getElementById('uname').focus(); return; }
-    if (!p) { showErr('Vui lòng nhập mật khẩu.');      document.getElementById('pw').focus();    return; }
+    /* ─── Login ─── */
+    function doLogin() {
+      const u = document.getElementById('uname').value.trim();
+      const p = document.getElementById('pw').value;
+      const btn = document.getElementById('loginBtn');
+      clearAlerts();
 
-    // Loading state
-    btn.disabled = true;
-    btn.classList.add('loading');
-    btn.querySelector('.btn-text').textContent = 'Đang kiểm tra...';
-    btn.querySelector('.btn-arrow').style.display = 'none';
+      if (!u) { showErr('Vui lòng nhập tên đăng nhập.'); document.getElementById('uname').focus(); return; }
+      if (!p) { showErr('Vui lòng nhập mật khẩu.'); document.getElementById('pw').focus(); return; }
 
-    setTimeout(() => {
-      if (u === 'admin' && p === '123456') {
-        showOk('Đăng nhập thành công! Đang chuyển hướng...');
-        btn.querySelector('.btn-text').textContent = 'Thành công ✓';
-        // Lưu session và chuyển sang dashboard
-        sessionStorage.setItem('pms_user', JSON.stringify({ name: u, role: 'admin' }));
-        setTimeout(() => { window.location.href = 'dashboard.html'; }, 900);
-      } else {
-        showErr('Tên đăng nhập hoặc mật khẩu không đúng.');
-        btn.disabled = false;
-        btn.classList.remove('loading');
-        btn.querySelector('.btn-text').textContent = 'Đăng nhập';
-        btn.querySelector('.btn-arrow').style.display = '';
-      }
-    }, 900);
-  }
+      // Loading state
+      btn.disabled = true;
+      btn.classList.add('loading');
+      btn.querySelector('.btn-text').textContent = 'Đang kiểm tra...';
+      btn.querySelector('.btn-arrow').style.display = 'none';
 
-  document.getElementById('loginBtn').addEventListener('click', doLogin);
-  document.addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+      setTimeout(() => {
+        if (u === 'admin' && p === '123456') {
+          showOk('Đăng nhập thành công! Đang chuyển hướng...');
+          btn.querySelector('.btn-text').textContent = 'Thành công ✓';
+          // Lưu session và chuyển sang dashboard
+          sessionStorage.setItem('pms_user', JSON.stringify({ name: u, role: 'admin' }));
+          setTimeout(() => { window.location.href = 'index.html'; }, 900);
+        } else {
+          showErr('Tên đăng nhập hoặc mật khẩu không đúng.');
+          btn.disabled = false;
+          btn.classList.remove('loading');
+          btn.querySelector('.btn-text').textContent = 'Đăng nhập';
+          btn.querySelector('.btn-arrow').style.display = '';
+        }
+      }, 900);
+    }
 
-  /* ─── Password toggle ─── */
-  document.getElementById('togglePw').addEventListener('click', function () {
-    const pw     = document.getElementById('pw');
-    const hidden = pw.type === 'password';
-    pw.type = hidden ? 'text' : 'password';
-    document.getElementById('eyeIco').innerHTML = hidden
-      ? `<path d="M2 2l12 12M6.5 6.7A3 3 0 0 0 9.3 9.5M4.2 4.4C2.6 5.6 1 8 1 8s2.5 5 7 5c1.4 0 2.7-.4 3.8-1M7 3.1C7.3 3 7.7 3 8 3c4.5 0 7 5 7 5s-.7 1.4-1.9 2.7" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>`
-      : `<path d="M1 8s2.5-5 7-5 7 5 7 5-2.5 5-7 5-7-5-7-5z" stroke="currentColor" stroke-width="1.3"/><circle cx="8" cy="8" r="2" stroke="currentColor" stroke-width="1.3"/>`;
-  });
+    document.getElementById('loginBtn').addEventListener('click', doLogin);
+    document.addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
 
-  /* ─── Clear error on input ─── */
-  ['uname', 'pw'].forEach(id => {
-    document.getElementById(id).addEventListener('input', clearAlerts);
-  });
-</script>
+    /* ─── Password toggle ─── */
+    document.getElementById('togglePw').addEventListener('click', function () {
+      const pw = document.getElementById('pw');
+      const hidden = pw.type === 'password';
+      pw.type = hidden ? 'text' : 'password';
+      document.getElementById('eyeIco').innerHTML = hidden
+        ? `<path d="M2 2l12 12M6.5 6.7A3 3 0 0 0 9.3 9.5M4.2 4.4C2.6 5.6 1 8 1 8s2.5 5 7 5c1.4 0 2.7-.4 3.8-1M7 3.1C7.3 3 7.7 3 8 3c4.5 0 7 5 7 5s-.7 1.4-1.9 2.7" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>`
+        : `<path d="M1 8s2.5-5 7-5 7 5 7 5-2.5 5-7 5-7-5-7-5z" stroke="currentColor" stroke-width="1.3"/><circle cx="8" cy="8" r="2" stroke="currentColor" stroke-width="1.3"/>`;
+    });
+
+    /* ─── Clear error on input ─── */
+    ['uname', 'pw'].forEach(id => {
+      document.getElementById(id).addEventListener('input', clearAlerts);
+    });
+  </script>
 </body>
+
 </html>
