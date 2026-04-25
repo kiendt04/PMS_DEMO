@@ -31,27 +31,36 @@ function pbRender() {
     const matchK = !khoi || String(r.khoiId) === khoi;
     return matchQ && matchK;
   });
-  // sort by thuTu then ten
   filtered.sort((a,b) => (a.thuTu||999) - (b.thuTu||999) || a.ten.localeCompare(b.ten, 'vi'));
 
   const tbody = document.getElementById('pbTbody');
-  document.getElementById('pbTotal').textContent = 'Tổng: ' + filtered.length + ' phòng ban';
+  const pill  = document.getElementById('pbTotal');
+  if (pill) pill.textContent = filtered.length + ' phòng ban';
 
   if (filtered.length === 0) {
-    tbody.innerHTML = '<tr class="empty-row"><td colspan="7">Không tìm thấy kết quả phù hợp.</td></tr>';
+    tbody.innerHTML = `<tr class="cat-empty"><td colspan="7">
+      <svg width="40" height="40" viewBox="0 0 40 40" fill="none" style="display:block;margin:0 auto 10px;opacity:.25"><circle cx="20" cy="20" r="16" stroke="currentColor" stroke-width="2"/><path d="M14 20h12M20 14v12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      Không tìm thấy kết quả phù hợp.
+    </td></tr>`;
     return;
   }
   tbody.innerHTML = filtered.map((r, i) => `
     <tr>
-      <td style="color:#aaa;text-align:center">${i+1}</td>
-      <td style="text-align:center;color:#888">${r.thuTu || '—'}</td>
-      <td style="font-weight:500">${r.ten}</td>
-      <td><span style="background:#E6F1FB;color:#185FA5;font-size:12px;font-weight:600;padding:2px 8px;border-radius:5px">${r.vietTat}</span></td>
-      <td style="font-size:12.5px;color:#555">${pbGetKhoiName(r.khoiId)}</td>
-      <td style="font-size:12.5px;color:#666">${r.moTa || '<span style="color:#ccc">—</span>'}</td>
+      <td style="color:#9CA3AF;text-align:center;font-size:12.5px">${i+1}</td>
+      <td style="text-align:center;color:#9CA3AF;font-size:12.5px">${r.thuTu ?? '—'}</td>
+      <td style="font-weight:600;color:#111827">${r.ten}</td>
+      <td><span class="cat-chip-teal">${r.vietTat}</span></td>
+      <td style="font-size:13px;color:#374151">${pbGetKhoiName(r.khoiId)}</td>
+      <td style="font-size:13px;color:#6B7280">${r.moTa || '<span style="color:#D1D5DB">—</span>'}</td>
       <td style="text-align:center">
-        <button class="btn-action btn-edit" onclick="pbOpenEdit(${r.id})">Sửa</button>
-        <button class="btn-action btn-delete" onclick="pbOpenDelete(${r.id})" style="margin-left:6px">Xóa</button>
+        <button class="cat-btn-edit" onclick="pbOpenEdit(${r.id})">
+          <svg viewBox="0 0 14 14" fill="none"><path d="M9.5 2.5l2 2L4 12H2v-2L9.5 2.5z" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Sửa
+        </button>
+        <button class="cat-btn-del" onclick="pbOpenDelete(${r.id})">
+          <svg viewBox="0 0 14 14" fill="none"><polyline points="2 4 3.5 4 12 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M11 4l-.7 8a1 1 0 0 1-1 .9H4.7a1 1 0 0 1-1-.9L3 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><path d="M5.5 4V3a1 1 0 0 1 1-1h1a1 1 0 0 1 1 1v1" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+          Xóa
+        </button>
       </td>
     </tr>`).join('');
 }
@@ -60,12 +69,12 @@ function pbOpenAdd() {
   pbPopulateKhoiSelects();
   pbEditId = null;
   document.getElementById('pbModalTitle').textContent = 'Thêm phòng ban';
-  document.getElementById('pbTen').value = '';
-  document.getElementById('pbVietTat').value = '';
+  ['pbTen','pbVietTat','pbThuTu','pbMoTa'].forEach(id => document.getElementById(id).value = '');
   document.getElementById('pbKhoi').value = '';
-  document.getElementById('pbThuTu').value = '';
-  document.getElementById('pbMoTa').value = '';
-  ['errPbTen','errPbVietTat','errPbKhoi','errPbThuTu'].forEach(id => document.getElementById(id).style.display='none');
+  ['errPbTen','errPbVietTat','errPbKhoi','errPbThuTu'].forEach(id => {
+    const el = document.getElementById(id);
+    el.style.display = 'none'; el.textContent = '';
+  });
   document.getElementById('pbModal').classList.add('open');
   setTimeout(() => document.getElementById('pbTen').focus(), 100);
 }
@@ -81,7 +90,10 @@ function pbOpenEdit(id) {
   document.getElementById('pbKhoi').value    = r.khoiId;
   document.getElementById('pbThuTu').value   = r.thuTu || '';
   document.getElementById('pbMoTa').value    = r.moTa;
-  ['errPbTen','errPbVietTat','errPbKhoi','errPbThuTu'].forEach(id => document.getElementById(id).style.display='none');
+  ['errPbTen','errPbVietTat','errPbKhoi','errPbThuTu'].forEach(id => {
+    const el = document.getElementById(id);
+    el.style.display = 'none'; el.textContent = '';
+  });
   document.getElementById('pbModal').classList.add('open');
   setTimeout(() => document.getElementById('pbTen').focus(), 100);
 }
@@ -89,22 +101,25 @@ function pbOpenEdit(id) {
 function pbCloseModal() { document.getElementById('pbModal').classList.remove('open'); }
 
 function pbSave() {
-  const ten     = document.getElementById('pbTen').value.trim();
-  const vietTat = document.getElementById('pbVietTat').value.trim().toUpperCase();
-  const khoiId  = parseInt(document.getElementById('pbKhoi').value);
+  const ten      = document.getElementById('pbTen').value.trim();
+  const vietTat  = document.getElementById('pbVietTat').value.trim().toUpperCase();
+  const khoiId   = parseInt(document.getElementById('pbKhoi').value);
   const thuTuRaw = document.getElementById('pbThuTu').value.trim();
-  const moTa    = document.getElementById('pbMoTa').value.trim();
+  const moTa     = document.getElementById('pbMoTa').value.trim();
   let valid = true;
 
-  ['errPbTen','errPbVietTat','errPbKhoi','errPbThuTu'].forEach(id => document.getElementById(id).style.display='none');
+  ['errPbTen','errPbVietTat','errPbKhoi','errPbThuTu'].forEach(id => {
+    const el = document.getElementById(id);
+    el.style.display = 'none'; el.textContent = '';
+  });
 
-  if (!ten)     { showFE('errPbTen',    'Vui lòng nhập tên phòng ban.');   valid=false; }
-  if (!vietTat) { showFE('errPbVietTat','Vui lòng nhập tên viết tắt.');    valid=false; }
-  if (!khoiId)  { showFE('errPbKhoi',   'Vui lòng chọn khối phòng ban.');  valid=false; }
+  if (!ten)     { showFE('errPbTen',    'Vui lòng nhập tên phòng ban.');   valid = false; }
+  if (!vietTat) { showFE('errPbVietTat','Vui lòng nhập tên viết tắt.');    valid = false; }
+  if (!khoiId)  { showFE('errPbKhoi',   'Vui lòng chọn khối phòng ban.');  valid = false; }
   let thuTu = null;
   if (thuTuRaw !== '') {
     thuTu = parseInt(thuTuRaw);
-    if (isNaN(thuTu) || thuTu < 1) { showFE('errPbThuTu', 'Thứ tự phải là số nguyên dương.'); valid=false; }
+    if (isNaN(thuTu) || thuTu < 1) { showFE('errPbThuTu', 'Thứ tự phải là số nguyên dương.'); valid = false; }
   }
   if (!valid) return;
 
@@ -141,10 +156,6 @@ function pbConfirmDelete() {
 
 document.getElementById('pbModal').addEventListener('click', function(e){ if(e.target===this) pbCloseModal(); });
 document.getElementById('pbDeleteModal').addEventListener('click', function(e){ if(e.target===this) pbCloseDelete(); });
-
-// style select on focus
-document.getElementById('pbKhoi').addEventListener('focus', function(){ this.style.borderColor='#378ADD'; this.style.boxShadow='0 0 0 3px rgba(55,138,221,.1)'; });
-document.getElementById('pbKhoi').addEventListener('blur',  function(){ this.style.borderColor='#ddd'; this.style.boxShadow=''; });
 
 pbPopulateKhoiSelects();
 pbRender();
