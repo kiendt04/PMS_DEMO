@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PayrollPro</title>
+  <style>
+    body { margin: 0; background: #0C1E30; display: flex; align-items: center; justify-content: center; min-height: 100vh; }
+    .loader {
+      display: flex; flex-direction: column; align-items: center; gap: 16px;
+    }
+    .logo {
+      width: 52px; height: 52px;
+      background: linear-gradient(135deg, #378ADD 0%, #185FA5 100%);
+      border-radius: 14px;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 4px 20px rgba(55,138,221,.45);
+    }
+    .logo svg { width: 28px; height: 28px; }
+    .spinner {
+      width: 28px; height: 28px;
+      border: 3px solid rgba(255,255,255,.15);
+      border-top-color: #378ADD;
+      border-radius: 50%;
+      animation: spin .7s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    p { color: rgba(255,255,255,.4); font-family: system-ui,sans-serif; font-size: 13px; margin: 0; }
+  </style>
+</head>
+<body>
+  <div class="loader">
+    <div class="logo">
+      <svg viewBox="0 0 20 20" fill="none">
+        <rect x="3" y="5" width="14" height="11" rx="2" stroke="white" stroke-width="1.5"/>
+        <path d="M7 5V4a3 3 0 0 1 6 0v1" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+        <circle cx="10" cy="11" r="1.5" fill="white"/>
+        <path d="M10 12.5v1.5" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+      </svg>
+    </div>
+    <div class="spinner"></div>
+    <p>PayrollPro đang tải...</p>
+  </div>
+
+  <script>
+    // Kiểm tra trạng thái đăng nhập và điều hướng
+    (function () {
+      const user = sessionStorage.getItem('pms_user');
+      if (user) {
+        // Đã đăng nhập → vào dashboard
+        window.location.replace('dashboard.html');
+      } else {
+        // Chưa đăng nhập → vào trang login
+        window.location.replace('login.html');
+      }
+    })();
+  </script>
+</body>
+</html>
