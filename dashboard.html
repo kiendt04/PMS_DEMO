@@ -211,10 +211,41 @@
                 <div class="cat-sub">Quan ly cac chuc vu trong to chuc</div>
               </div>
             </div>
-            <button class="btn-cat-add">+ Them chuc vu</button>
+            <button class="btn-cat-add" onclick="cvOpenAdd()">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                <path d="M7 1v12M1 7h12" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+              </svg>Thêm chức vụ
+            </button>
           </div>
-          <div class="placeholder">
-            <p>Danh sach chuc vu se hien thi tai day</p>
+          <div class="cat-toolbar">
+            <div class="cat-search-wrap"><svg viewBox="0 0 16 16" fill="none">
+                <circle cx="6.5" cy="6.5" r="4" stroke="currentColor" stroke-width="1.4" />
+                <path d="M11 11l3 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" />
+              </svg><input type="text" id="cvSearch" placeholder="Tìm kiếm theo mã hoặc tên chức vụ..."
+                oninput="cvRender()" /></div>
+            <div class="cat-count-pill" id="cvTotal"></div>
+          </div>
+          <div class="cat-table-wrap">
+            <table class="cat-table">
+              <thead>
+                <tr>
+                  <th style="width:40px;text-align:center">ID</th>
+                  <th>Tên chức vụ</th>
+                  <th style="width:100px">Tên viết tắt</th>
+                  <th style="width:130px;text-align:right">HS cơ bản chức vụ</th>
+                  <th style="width:130px;text-align:right">HS trách nhiệm</th>
+                  <th style="width:100px;text-align:right">HS chức vụ</th>
+                  <th style="width:110px">Ngày hiệu lực</th>
+                  <th>Mô tả</th>
+                  <th style="width:130px;text-align:center">Thao tác</th>
+                </tr>
+              </thead>
+              <tbody id="cvTbody"></tbody>
+            </table>
+          </div>
+          <!-- Pagination -->
+          <div id="cvPagination"
+            style="display:flex; justify-content:center; gap:5px; margin-top:15px; padding-bottom: 10px;">
           </div>
         </div>
 
@@ -900,6 +931,74 @@
         <div class="cat-modal-footer" style="justify-content:center"><button class="cat-btn-cancel"
             onclick="pbCloseDelete()">Huy</button><button class="cat-btn-danger"
             onclick="pbConfirmDelete()">Xoa</button></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Chức vụ -->
+  <div class="modal-overlay" id="cvModal">
+    <div class="cat-modal" style="max-width:600px">
+      <div class="cat-modal-accent cat-modal-accent-blue"></div>
+      <div class="cat-modal-body">
+        <div class="cat-modal-header">
+          <div class="cat-modal-title-wrap">
+            <div class="cat-modal-icon cat-icon-blue"><svg viewBox="0 0 16 16" fill="none">
+                <circle cx="8" cy="5" r="3" stroke="currentColor" stroke-width="1.4" />
+                <path d="M2 14c0-3.3 2.7-6 6-6s6 2.7 6 6" stroke="currentColor" stroke-width="1.4"
+                  stroke-linecap="round" />
+              </svg></div><span class="cat-modal-title" id="cvModalTitle">Thêm chức vụ</span>
+          </div><button class="cat-btn-close" onclick="cvCloseModal()"><svg viewBox="0 0 14 14" fill="none">
+              <path d="M2 2l10 10M12 2L2 12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+            </svg></button>
+        </div>
+        <div class="cat-form-grid" style="grid-template-columns:1fr 1fr">
+          <div class="cat-field" style="grid-column:1/-1"><label>Tên chức vụ <span class="req">*</span></label><input
+              type="text" id="cvTen" placeholder="VD: Giám đốc..." maxlength="100" />
+            <div class="cat-field-err" id="errCvTen"></div>
+          </div>
+          <div class="cat-field"><label>Tên viết tắt <span class="req">*</span></label><input type="text" id="cvVietTat"
+              placeholder="VD: GĐ..." maxlength="20" />
+            <div class="cat-field-err" id="errCvVietTat"></div>
+          </div>
+          <div class="cat-field"><label>Ngày hiệu lực <span class="req">*</span></label><input type="date"
+              id="cvNgayHieuLuc" />
+            <div class="cat-field-err" id="errCvNgayHieuLuc"></div>
+          </div>
+          <div class="cat-field"><label>HS cơ bản chức vụ</label><input type="number" id="cvHSCoban" step="0.01"
+              value="0.00" />
+          </div>
+          <div class="cat-field"><label>HS trách nhiệm</label><input type="number" id="cvHSTrachNhiem" step="0.01"
+              value="0.00" />
+          </div>
+          <div class="cat-field"><label>HS chức vụ</label><input type="number" id="cvHSChucVu" step="0.01"
+              value="0.00" />
+          </div>
+          <div class="cat-field" style="grid-column:1/-1"><label>Mô tả</label><textarea id="cvMoTa"
+              placeholder="Mô tả chức vụ..."></textarea></div>
+        </div>
+        <div class="cat-modal-footer"><button class="cat-btn-cancel" onclick="cvCloseModal()">Hủy</button><button
+            class="cat-btn-save" onclick="cvSave()"><svg width="13" height="13" viewBox="0 0 13 13" fill="none">
+              <path d="M2 7l3 3 6-6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
+                stroke-linejoin="round" />
+            </svg>Lưu</button></div>
+      </div>
+    </div>
+  </div>
+  <div class="modal-overlay" id="cvDeleteModal">
+    <div class="cat-modal cat-modal-sm">
+      <div class="cat-modal-accent cat-modal-accent-red"></div>
+      <div class="cat-modal-body">
+        <div class="cat-delete-icon"><svg viewBox="0 0 24 24" fill="none">
+            <polyline points="3 6 5 6 21 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
+              stroke-linejoin="round" />
+            <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" stroke="currentColor" stroke-width="1.8"
+              stroke-linecap="round" stroke-linejoin="round" />
+          </svg></div>
+        <div class="cat-delete-title">Xác nhận xóa</div>
+        <div class="cat-delete-sub" id="cvDeleteMsg">Bạn có chắc muốn xóa chức vụ này?</div>
+        <div class="cat-modal-footer" style="justify-content:center"><button class="cat-btn-cancel"
+            onclick="cvCloseDelete()">Hủy</button><button class="cat-btn-danger"
+            onclick="cvConfirmDelete()">Xóa</button></div>
       </div>
     </div>
   </div>
