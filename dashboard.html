@@ -1,102 +1,17 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="vi">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
   <title>PayrollPro - Dashboard</title>
-  <meta name="description" content="Hệ thống quản lý lương PayrollPro - Dashboard tổng quan" />
-  <link rel="stylesheet" href="asset/payroll.css" />
+  <meta name="description" content="He thong quan ly luong PayrollPro"/>
+  <link rel="stylesheet" href="asset/payroll.css"/>
 </head>
 <body>
+<div id="dashPage" style="display:flex;min-height:100vh;">
 
-<!-- ══════════ DASHBOARD ══════════ -->
-<div id="dashPage" style="display:flex; min-height:100vh;">
-
-  <!-- Sidebar -->
-  <div class="sidebar">
-    <div class="sidebar-logo">
-      <div class="sidebar-logo-icon">
-        <svg viewBox="0 0 20 20" fill="none">
-          <rect x="3" y="5" width="14" height="11" rx="2" stroke="white" stroke-width="1.5"/>
-          <path d="M7 5V4a3 3 0 0 1 6 0v1" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
-          <circle cx="10" cy="11" r="1.5" fill="white"/>
-          <path d="M10 12.5v1.5" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
-        </svg>
-      </div>
-      <div>
-        <div class="sidebar-logo-name">PayrollPro</div>
-        <div class="sidebar-logo-tagline">Quản lý lương</div>
-      </div>
-    </div>
-
-    <div style="padding: .5rem 0; flex: 1; overflow-y: auto;">
-      <div class="sidebar-section">Tổng quan</div>
-      <div class="nav-item active" data-page="dashboard">
-        <svg viewBox="0 0 16 16" fill="none"><rect x="1" y="1" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.3"/><rect x="9" y="1" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.3"/><rect x="1" y="9" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.3"/><rect x="9" y="9" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.3"/></svg>
-        Dashboard
-      </div>
-
-      <div class="sidebar-section">Nhân sự &amp; Lương</div>
-      <div class="nav-item" data-page="nhanvien">
-        <svg viewBox="0 0 16 16" fill="none"><circle cx="6" cy="5" r="2.5" stroke="currentColor" stroke-width="1.3"/><path d="M1 13c0-2.76 2.24-5 5-5s5 2.24 5 5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><circle cx="12" cy="5" r="2" stroke="currentColor" stroke-width="1.2"/><path d="M12 10c1.66 0 3 1.34 3 3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
-        Nhân viên
-      </div>
-      <div class="nav-item" data-page="bangluong">
-        <svg viewBox="0 0 16 16" fill="none"><rect x="2" y="2" width="12" height="12" rx="2" stroke="currentColor" stroke-width="1.3"/><path d="M5 6h6M5 9h4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
-        Bảng lương
-        <span class="nav-badge">3</span>
-      </div>
-      <div class="nav-item" data-page="chamcong">
-        <svg viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.3"/><path d="M8 5v3l2 2" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
-        Chấm công
-      </div>
-      <div class="nav-item" data-page="thưởng">
-        <svg viewBox="0 0 16 16" fill="none"><path d="M8 2l1.5 3 3.5.5-2.5 2.5.6 3.5L8 10l-3.1 1.5.6-3.5L3 5.5l3.5-.5z" stroke="currentColor" stroke-width="1.2"/></svg>
-        Thưởng &amp; Phụ cấp
-      </div>
-
-      <div class="sidebar-section">Danh mục</div>
-      <div class="nav-item" data-page="khoi-phong-ban">
-        <svg viewBox="0 0 16 16" fill="none"><rect x="1" y="1" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.3"/><rect x="9" y="1" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.3"/><rect x="1" y="9" width="6" height="3" rx="1" stroke="currentColor" stroke-width="1.3"/><rect x="9" y="9" width="6" height="3" rx="1" stroke="currentColor" stroke-width="1.3"/></svg>
-        Khối phòng ban
-      </div>
-      <div class="nav-item" data-page="phong-ban">
-        <svg viewBox="0 0 16 16" fill="none"><rect x="1" y="3" width="14" height="10" rx="1.5" stroke="currentColor" stroke-width="1.3"/><path d="M1 7h14M5 7v6" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
-        Phòng ban
-      </div>
-
-      <div class="sidebar-section">Báo cáo</div>
-      <div class="nav-item" data-page="baocao">
-        <svg viewBox="0 0 16 16" fill="none"><path d="M2 12l3.5-4 3 3 2.5-5 3 3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        Báo cáo tháng
-      </div>
-      <div class="nav-item" data-page="thue">
-        <svg viewBox="0 0 16 16" fill="none"><rect x="2" y="2" width="12" height="12" rx="2" stroke="currentColor" stroke-width="1.3"/><path d="M5.5 5.5l5 5M10.5 5.5l-5 5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
-        Thuế TNCN
-      </div>
-
-      <div class="sidebar-section">Hệ thống</div>
-      <div class="nav-item" data-page="caidat">
-        <svg viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="2.5" stroke="currentColor" stroke-width="1.3"/><path d="M8 1v2M8 13v2M1 8h2M13 8h2M3.05 3.05l1.42 1.42M11.53 11.53l1.42 1.42M3.05 12.95l1.42-1.42M11.53 4.47l1.42-1.42" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
-        Cài đặt
-      </div>
-    </div>
-
-    <div class="sidebar-bottom">
-      <div class="user-row">
-        <div class="user-avatar" id="sidebarAvatar">AD</div>
-        <div>
-          <div class="user-name" id="sidebarName">Admin</div>
-          <div class="user-role">Quản trị viên</div>
-        </div>
-        <button class="btn-logout" id="logoutBtn" title="Đăng xuất">
-          <svg width="15" height="15" viewBox="0 0 16 16" fill="none">
-            <path d="M6 2H3a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h3M11 11l3-3-3-3M14 8H6" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-        </button>
-      </div>
-    </div>
-  </div>
+  <!-- Sidebar (injected by sidebar.js) -->
+  <div id="sidebar-mount"></div>
 
   <!-- Main -->
   <div class="main">
@@ -116,50 +31,50 @@
 
     <div class="content">
 
-      <!-- Dashboard page -->
+      <!-- ═══ DASHBOARD ═══ -->
       <div class="page-section active fade-in" id="page-dashboard">
         <div class="stats-grid">
           <div class="stat-card">
             <div class="stat-label">
               <svg viewBox="0 0 14 14" fill="none"><circle cx="5" cy="4" r="2" stroke="currentColor" stroke-width="1.2"/><path d="M1 11c0-2.2 1.8-4 4-4s4 1.8 4 4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/><circle cx="10" cy="4" r="1.5" stroke="currentColor" stroke-width="1.1"/><path d="M10 8.5c1.38 0 2.5 1.12 2.5 2.5" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/></svg>
-              Tổng nhân viên
+              Tong nhan vien
             </div>
             <div class="stat-value">128</div>
-            <div class="stat-sub"><span class="stat-up">+4</span> so với tháng trước</div>
+            <div class="stat-sub"><span class="stat-up">+4</span> so voi thang truoc</div>
           </div>
           <div class="stat-card">
             <div class="stat-label">
               <svg viewBox="0 0 14 14" fill="none"><rect x="1" y="2" width="12" height="10" rx="1.5" stroke="currentColor" stroke-width="1.2"/><path d="M1 5h12" stroke="currentColor" stroke-width="1.2"/><circle cx="7" cy="8.5" r="1" fill="currentColor"/></svg>
-              Quỹ lương tháng
+              Quy luong thang
             </div>
-            <div class="stat-value">4.2 tỷ</div>
-            <div class="stat-sub"><span class="stat-up">+2.1%</span> so với tháng trước</div>
+            <div class="stat-value">4.2 ty</div>
+            <div class="stat-sub"><span class="stat-up">+2.1%</span> so voi thang truoc</div>
           </div>
           <div class="stat-card">
             <div class="stat-label">
               <svg viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5.5" stroke="currentColor" stroke-width="1.2"/><path d="M7 4v3l2 2" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
-              Đã chấm công
+              Da cham cong
             </div>
             <div class="stat-value">119</div>
-            <div class="stat-sub"><span style="color:#aaa">9 chưa chấm</span></div>
+            <div class="stat-sub"><span style="color:#aaa">9 chua cham</span></div>
           </div>
           <div class="stat-card">
             <div class="stat-label">
               <svg viewBox="0 0 14 14" fill="none"><path d="M2 10l2.5-3 2 2 2-4 2.5 2.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-              Bảng lương chờ duyệt
+              Bang luong cho duyet
             </div>
             <div class="stat-value">3</div>
-            <div class="stat-sub"><span class="stat-down">Cần xử lý</span></div>
+            <div class="stat-sub"><span class="stat-down">Can xu ly</span></div>
           </div>
         </div>
 
         <div class="charts-row">
           <div class="chart-card">
-            <div class="chart-title">Quỹ lương 6 tháng gần nhất</div>
+            <div class="chart-title">Quy luong 6 thang gan nhat</div>
             <div class="bar-chart" id="barChart"></div>
           </div>
           <div class="chart-card">
-            <div class="chart-title">Cơ cấu nhân sự</div>
+            <div class="chart-title">Co cau nhan su</div>
             <div class="donut-wrap">
               <svg width="100" height="100" viewBox="0 0 100 100">
                 <circle cx="50" cy="50" r="35" fill="none" stroke="#eee" stroke-width="18"/>
@@ -169,392 +84,183 @@
                 <circle cx="50" cy="50" r="35" fill="none" stroke="#E24B4A" stroke-width="18" stroke-dasharray="39 181" stroke-dashoffset="-136" transform="rotate(-90 50 50)"/>
               </svg>
               <div class="donut-legend">
-                <div class="legend-item"><div class="legend-dot" style="background:#185FA5"></div>Kỹ thuật — 40%</div>
-                <div class="legend-item"><div class="legend-dot" style="background:#5DCAA5"></div>Kinh doanh — 20%</div>
-                <div class="legend-item"><div class="legend-dot" style="background:#EF9F27"></div>Hành chính — 13%</div>
-                <div class="legend-item"><div class="legend-dot" style="background:#E24B4A"></div>Khác — 27%</div>
+                <div class="legend-item"><div class="legend-dot" style="background:#185FA5"></div>Ky thuat - 40%</div>
+                <div class="legend-item"><div class="legend-dot" style="background:#5DCAA5"></div>Kinh doanh - 20%</div>
+                <div class="legend-item"><div class="legend-dot" style="background:#EF9F27"></div>Hanh chinh - 13%</div>
+                <div class="legend-item"><div class="legend-dot" style="background:#E24B4A"></div>Khac - 27%</div>
               </div>
             </div>
           </div>
         </div>
 
         <div class="section-header">
-          <div class="section-title">Bảng lương gần đây</div>
-          <button class="btn-outline">Xem tất cả</button>
+          <div class="section-title">Bang luong gan day</div>
+          <button class="btn-outline">Xem tat ca</button>
         </div>
         <div class="table-card">
           <table>
-            <thead>
-              <tr>
-                <th>Họ tên</th><th>Phòng ban</th><th>Lương cơ bản</th>
-                <th>Thưởng</th><th>Thực nhận</th><th>Trạng thái</th>
-              </tr>
-            </thead>
+            <thead><tr>
+              <th>Ho ten</th><th>Phong ban</th><th>Luong co ban</th>
+              <th>Thuong</th><th>Thuc nhan</th><th>Trang thai</th>
+            </tr></thead>
             <tbody>
-              <tr><td>Nguyễn Văn An</td><td>Kỹ thuật</td><td>18,000,000</td><td>2,000,000</td><td>19,500,000</td><td><span class="badge badge-green">Đã thanh toán</span></td></tr>
-              <tr><td>Trần Thị Bình</td><td>Kinh doanh</td><td>15,000,000</td><td>5,000,000</td><td>18,200,000</td><td><span class="badge badge-green">Đã thanh toán</span></td></tr>
-              <tr><td>Lê Hoàng Cường</td><td>Hành chính</td><td>12,000,000</td><td>500,000</td><td>12,100,000</td><td><span class="badge badge-amber">Chờ duyệt</span></td></tr>
-              <tr><td>Phạm Minh Đức</td><td>Kỹ thuật</td><td>22,000,000</td><td>3,000,000</td><td>23,800,000</td><td><span class="badge badge-amber">Chờ duyệt</span></td></tr>
-              <tr><td>Hoàng Thị Em</td><td>Kinh doanh</td><td>14,000,000</td><td>1,500,000</td><td>14,900,000</td><td><span class="badge badge-red">Lỗi dữ liệu</span></td></tr>
-              <tr><td>Vũ Quang Phát</td><td>Kỹ thuật</td><td>20,000,000</td><td>2,500,000</td><td>21,200,000</td><td><span class="badge badge-blue">Đang xử lý</span></td></tr>
+              <tr><td>Nguyen Van An</td><td>Ky thuat</td><td>18,000,000</td><td>2,000,000</td><td>19,500,000</td><td><span class="badge badge-green">Da thanh toan</span></td></tr>
+              <tr><td>Tran Thi Binh</td><td>Kinh doanh</td><td>15,000,000</td><td>5,000,000</td><td>18,200,000</td><td><span class="badge badge-green">Da thanh toan</span></td></tr>
+              <tr><td>Le Hoang Cuong</td><td>Hanh chinh</td><td>12,000,000</td><td>500,000</td><td>12,100,000</td><td><span class="badge badge-amber">Cho duyet</span></td></tr>
+              <tr><td>Pham Minh Duc</td><td>Ky thuat</td><td>22,000,000</td><td>3,000,000</td><td>23,800,000</td><td><span class="badge badge-amber">Cho duyet</span></td></tr>
+              <tr><td>Hoang Thi Em</td><td>Kinh doanh</td><td>14,000,000</td><td>1,500,000</td><td>14,900,000</td><td><span class="badge badge-red">Loi du lieu</span></td></tr>
+              <tr><td>Vu Quang Phat</td><td>Ky thuat</td><td>20,000,000</td><td>2,500,000</td><td>21,200,000</td><td><span class="badge badge-blue">Dang xu ly</span></td></tr>
             </tbody>
           </table>
         </div>
       </div>
 
-      <!-- Placeholder pages -->
-      <div class="page-section fade-in" id="page-nhanvien">
-        <div class="section-header"><div class="section-title">Quản lý nhân viên</div><button class="btn-outline">+ Thêm nhân viên</button></div>
-        <div class="placeholder">
-          <svg viewBox="0 0 40 40" fill="none"><circle cx="15" cy="12" r="6" stroke="currentColor" stroke-width="2"/><path d="M3 34c0-6.6 5.4-12 12-12s12 5.4 12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="30" cy="12" r="5" stroke="currentColor" stroke-width="1.8"/><path d="M29 24c4 0 7 3 7 7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
-          <p>Danh sách nhân viên sẽ hiển thị tại đây</p>
-        </div>
-      </div>
-
-      <div class="page-section fade-in" id="page-bangluong">
-        <div class="section-header"><div class="section-title">Bảng lương</div><button class="btn-outline">+ Tạo bảng lương</button></div>
-        <div class="placeholder">
-          <svg viewBox="0 0 40 40" fill="none"><rect x="4" y="6" width="32" height="28" rx="3" stroke="currentColor" stroke-width="2"/><path d="M4 14h32M12 14v20M4 22h32" stroke="currentColor" stroke-width="1.8"/></svg>
-          <p>Bảng lương tháng sẽ hiển thị tại đây</p>
-        </div>
-      </div>
-
-      <!-- ══ CHẤM CÔNG ══ -->
-      <div class="page-section fade-in" id="page-chamcong">
-
-        <!-- Page header -->
+      <!-- ═══ DANH MUC pages ═══ -->
+      <!-- Danh muc chuc vu -->
+      <div class="page-section fade-in" id="page-dm-chuc-vu">
         <div class="cat-header">
           <div class="cat-header-left">
-            <div class="cat-icon-wrap" style="background:#FEF3E2;color:#B45309">
-              <svg viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="1.6"/><path d="M10 6v4l3 3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
-            </div>
-            <div>
-              <div class="cat-title">Quản lý chấm công</div>
-              <div class="cat-sub">Theo dõi chấm công theo quý, phân theo phòng ban</div>
-            </div>
+            <div class="cat-icon-wrap cat-icon-blue"><svg viewBox="0 0 20 20" fill="none"><circle cx="10" cy="7" r="4" stroke="currentColor" stroke-width="1.6"/><path d="M2 18c0-4.4 3.6-8 8-8s8 3.6 8 8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></div>
+            <div><div class="cat-title">Danh muc chuc vu</div><div class="cat-sub">Quan ly cac chuc vu trong to chuc</div></div>
           </div>
-          <button class="btn-cat-add" style="background:linear-gradient(135deg,#22c97b,#15a25e);box-shadow:0 2px 10px rgba(21,162,94,.3)" id="ccExcel">
-            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 10v2h10v-2M7 2v7M4 6l3 3 3-3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            Xuất Excel
-          </button>
+          <button class="btn-cat-add">+ Them chuc vu</button>
         </div>
-
-        <!-- Filter bar -->
-        <div class="cc-filterbar">
-          <div class="cc-filter-group">
-            <label>Chọn quý</label>
-            <select id="ccQuy" class="cc-select">
-              <option value="1">Quý 1</option>
-              <option value="2" selected>Quý 2</option>
-              <option value="3">Quý 3</option>
-              <option value="4">Quý 4</option>
-            </select>
-          </div>
-          <div class="cc-filter-group">
-            <label>Chọn năm</label>
-            <select id="ccNam" class="cc-select"></select>
-          </div>
-          <div class="cc-filter-group">
-            <label>Loại công</label>
-            <div class="cc-radio-group">
-              <label class="cc-radio">
-                <input type="radio" name="ccLoai" value="thoi-gian" checked />
-                <span class="cc-radio-dot"></span> Thời gian
-              </label>
-              <label class="cc-radio">
-                <input type="radio" name="ccLoai" value="ca-dem" />
-                <span class="cc-radio-dot"></span> Ca đếm
-              </label>
-              <label class="cc-radio">
-                <input type="radio" name="ccLoai" value="them-gio" />
-                <span class="cc-radio-dot"></span> Thêm giờ
-              </label>
-            </div>
-          </div>
-        </div>
-
-        <!-- Table -->
-        <div class="cc-table-wrap">
-          <table class="cc-table">
-            <thead id="ccThead"></thead>
-            <tbody id="ccTbody"></tbody>
-          </table>
-        </div>
-
+        <div class="placeholder"><p>Danh sach chuc vu se hien thi tai day</p></div>
       </div>
 
-      <div class="page-section fade-in" id="page-thưởng">
-        <div class="section-header"><div class="section-title">Thưởng &amp; Phụ cấp</div><button class="btn-outline">+ Thêm khoản</button></div>
-        <div class="placeholder">
-          <svg viewBox="0 0 40 40" fill="none"><path d="M20 4l4 8 9 1.3-6.5 6.3 1.5 9L20 24l-8 4.6 1.5-9L7 13.3l9-1.3z" stroke="currentColor" stroke-width="2"/></svg>
-          <p>Các khoản thưởng và phụ cấp sẽ hiển thị tại đây</p>
-        </div>
-      </div>
-
-      <div class="page-section fade-in" id="page-baocao">
-        <div class="section-header"><div class="section-title">Báo cáo tháng</div><button class="btn-outline">Xuất PDF</button></div>
-        <div class="placeholder">
-          <svg viewBox="0 0 40 40" fill="none"><path d="M4 30l9-12 7 8 6-12 8 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          <p>Báo cáo tháng sẽ hiển thị tại đây</p>
-        </div>
-      </div>
-
-      <div class="page-section fade-in" id="page-thue">
-        <div class="section-header"><div class="section-title">Thuế thu nhập cá nhân</div></div>
-        <div class="placeholder">
-          <svg viewBox="0 0 40 40" fill="none"><rect x="4" y="4" width="32" height="32" rx="3" stroke="currentColor" stroke-width="2"/><path d="M13 13l14 14M27 13l-14 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-          <p>Dữ liệu thuế TNCN sẽ hiển thị tại đây</p>
-        </div>
-      </div>
-
-      <div class="page-section fade-in" id="page-caidat">
-        <div class="section-header"><div class="section-title">Cài đặt hệ thống</div></div>
-        <div class="placeholder">
-          <svg viewBox="0 0 40 40" fill="none"><circle cx="20" cy="20" r="6" stroke="currentColor" stroke-width="2"/><path d="M20 2v4M20 34v4M2 20h4M34 20h4M7.5 7.5l2.8 2.8M29.7 29.7l2.8 2.8M7.5 32.5l2.8-2.8M29.7 10.3l2.8-2.8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-          <p>Cài đặt hệ thống sẽ hiển thị tại đây</p>
-        </div>
-      </div>
-
-
-      <!-- ══ KHỐI PHÒNG BAN ══ -->
+      <!-- Khoi phong ban (FULL IMPLEMENTATION) -->
       <div class="page-section fade-in" id="page-khoi-phong-ban">
-
-        <!-- Page header -->
         <div class="cat-header">
           <div class="cat-header-left">
-            <div class="cat-icon-wrap cat-icon-blue">
-              <svg viewBox="0 0 20 20" fill="none"><rect x="1" y="1" width="8" height="8" rx="1.5" stroke="currentColor" stroke-width="1.6"/><rect x="11" y="1" width="8" height="8" rx="1.5" stroke="currentColor" stroke-width="1.6"/><rect x="1" y="11" width="8" height="5" rx="1.5" stroke="currentColor" stroke-width="1.6"/><rect x="11" y="11" width="8" height="5" rx="1.5" stroke="currentColor" stroke-width="1.6"/></svg>
-            </div>
-            <div>
-              <div class="cat-title">Danh mục khối phòng ban</div>
-              <div class="cat-sub">Quản lý các khối tổ chức trong hệ thống</div>
-            </div>
+            <div class="cat-icon-wrap cat-icon-blue"><svg viewBox="0 0 20 20" fill="none"><rect x="1" y="1" width="8" height="8" rx="1.5" stroke="currentColor" stroke-width="1.6"/><rect x="11" y="1" width="8" height="8" rx="1.5" stroke="currentColor" stroke-width="1.6"/><rect x="1" y="11" width="8" height="5" rx="1.5" stroke="currentColor" stroke-width="1.6"/><rect x="11" y="11" width="8" height="5" rx="1.5" stroke="currentColor" stroke-width="1.6"/></svg></div>
+            <div><div class="cat-title">Danh muc nhom phong</div><div class="cat-sub">Quan ly cac khoi to chuc trong he thong</div></div>
           </div>
-          <button class="btn-cat-add" onclick="kpbOpenAdd()">
-            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 1v12M1 7h12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-            Thêm khối
-          </button>
+          <button class="btn-cat-add" onclick="kpbOpenAdd()"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 1v12M1 7h12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>Them khoi</button>
         </div>
-
-        <!-- Toolbar -->
         <div class="cat-toolbar">
-          <div class="cat-search-wrap">
-            <svg viewBox="0 0 16 16" fill="none"><circle cx="6.5" cy="6.5" r="4" stroke="currentColor" stroke-width="1.4"/><path d="M11 11l3 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
-            <input type="text" id="kpbSearch" placeholder="Tim theo ma hoac ten khoi..." oninput="kpbRender()" />
-          </div>
+          <div class="cat-search-wrap"><svg viewBox="0 0 16 16" fill="none"><circle cx="6.5" cy="6.5" r="4" stroke="currentColor" stroke-width="1.4"/><path d="M11 11l3 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg><input type="text" id="kpbSearch" placeholder="Tim theo ma hoac ten khoi..." oninput="kpbRender()"/></div>
           <div class="cat-count-pill" id="kpbTotal"></div>
         </div>
-
-        <!-- Table -->
-        <div class="cat-table-wrap">
-          <table class="cat-table">
-            <thead>
-              <tr>
-                <th style="width:52px">#</th>
-                <th style="width:140px">Ma khoi</th>
-                <th style="width:260px">Ten khoi</th>
-                <th>Mo ta</th>
-                <th style="width:130px;text-align:center">Thao tac</th>
-              </tr>
-            </thead>
-            <tbody id="kpbTbody"></tbody>
-          </table>
-        </div>
+        <div class="cat-table-wrap"><table class="cat-table"><thead><tr><th style="width:52px">#</th><th style="width:120px">Ma khoi</th><th style="width:240px">Ten khoi</th><th>Mo ta</th><th style="width:130px;text-align:center">Thao tac</th></tr></thead><tbody id="kpbTbody"></tbody></table></div>
       </div>
 
-      <!-- Modal them/sua Khoi -->
-      <div class="modal-overlay" id="kpbModal">
-        <div class="cat-modal">
-          <div class="cat-modal-accent cat-modal-accent-blue"></div>
-          <div class="cat-modal-body">
-            <div class="cat-modal-header">
-              <div class="cat-modal-title-wrap">
-                <div class="cat-modal-icon cat-icon-blue">
-                  <svg viewBox="0 0 16 16" fill="none"><rect x="1" y="1" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.4"/><rect x="9" y="1" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.4"/><rect x="1" y="9" width="6" height="3.5" rx="1" stroke="currentColor" stroke-width="1.4"/><rect x="9" y="9" width="6" height="3.5" rx="1" stroke="currentColor" stroke-width="1.4"/></svg>
-                </div>
-                <span class="cat-modal-title" id="kpbModalTitle">Them khoi phong ban</span>
-              </div>
-              <button class="cat-btn-close" onclick="kpbCloseModal()">
-                <svg viewBox="0 0 14 14" fill="none"><path d="M2 2l10 10M12 2L2 12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
-              </button>
-            </div>
-            <div class="cat-form-grid" style="grid-template-columns:1fr 1fr">
-              <div class="cat-field">
-                <label>Ma khoi <span class="req">*</span></label>
-                <input type="text" id="kpbMa" placeholder="VD: KD, KT, HC..." maxlength="20" />
-                <div class="cat-field-err" id="errKpbMa"></div>
-              </div>
-              <div class="cat-field">
-                <label>Ten khoi <span class="req">*</span></label>
-                <input type="text" id="kpbTen" placeholder="VD: Khoi Kinh doanh..." maxlength="100" />
-                <div class="cat-field-err" id="errKpbTen"></div>
-              </div>
-              <div class="cat-field" style="grid-column:1/-1">
-                <label>Mo ta</label>
-                <textarea id="kpbMoTa" placeholder="Mo ta chuc nang, nhiem vu cua khoi..."></textarea>
-              </div>
-            </div>
-            <div class="cat-modal-footer">
-              <button class="cat-btn-cancel" onclick="kpbCloseModal()">Huy bo</button>
-              <button class="cat-btn-save" onclick="kpbSave()">
-                <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M2 7l3 3 6-6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                Luu lai
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Modal xoa Khoi -->
-      <div class="modal-overlay" id="kpbDeleteModal">
-        <div class="cat-modal cat-modal-sm">
-          <div class="cat-modal-accent cat-modal-accent-red"></div>
-          <div class="cat-modal-body">
-            <div class="cat-delete-icon">
-              <svg viewBox="0 0 24 24" fill="none"><polyline points="3 6 5 6 21 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M10 11v6M14 11v6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            </div>
-            <div class="cat-delete-title">Xac nhan xoa</div>
-            <div class="cat-delete-sub" id="kpbDeleteMsg">Ban co chac muon xoa khoi nay khong?</div>
-            <div class="cat-modal-footer" style="justify-content:center">
-              <button class="cat-btn-cancel" onclick="kpbCloseDelete()">Huy bo</button>
-              <button class="cat-btn-danger" onclick="kpbConfirmDelete()">Xoa khoi nay</button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- ══ PHONG BAN ══ -->
+      <!-- Phong ban (FULL IMPLEMENTATION) -->
       <div class="page-section fade-in" id="page-phong-ban">
-
-        <!-- Page header -->
         <div class="cat-header">
           <div class="cat-header-left">
-            <div class="cat-icon-wrap cat-icon-teal">
-              <svg viewBox="0 0 20 20" fill="none"><rect x="1" y="3" width="18" height="14" rx="2" stroke="currentColor" stroke-width="1.6"/><path d="M1 9h18M6 9v8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-            </div>
-            <div>
-              <div class="cat-title">Danh muc phong ban</div>
-              <div class="cat-sub">Quan ly co cau phong ban theo tung khoi</div>
-            </div>
+            <div class="cat-icon-wrap cat-icon-teal"><svg viewBox="0 0 20 20" fill="none"><rect x="1" y="3" width="18" height="14" rx="2" stroke="currentColor" stroke-width="1.6"/><path d="M1 9h18M6 9v8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+            <div><div class="cat-title">Danh muc phong ban</div><div class="cat-sub">Quan ly co cau phong ban theo tung khoi</div></div>
           </div>
-          <button class="btn-cat-add btn-cat-add-teal" onclick="pbOpenAdd()">
-            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 1v12M1 7h12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-            Them phong ban
-          </button>
+          <button class="btn-cat-add btn-cat-add-teal" onclick="pbOpenAdd()"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 1v12M1 7h12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>Them phong ban</button>
         </div>
-
-        <!-- Toolbar -->
         <div class="cat-toolbar">
-          <div class="cat-search-wrap">
-            <svg viewBox="0 0 16 16" fill="none"><circle cx="6.5" cy="6.5" r="4" stroke="currentColor" stroke-width="1.4"/><path d="M11 11l3 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
-            <input type="text" id="pbSearch" placeholder="Tim theo ten hoac viet tat..." oninput="pbRender()" />
-          </div>
-          <div class="cat-filter-wrap">
-            <svg viewBox="0 0 16 16" fill="none"><path d="M2 4h12M4 8h8M6 12h4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
-            <select id="pbFilterKhoi" onchange="pbRender()">
-              <option value="">Tat ca khoi</option>
-            </select>
-          </div>
+          <div class="cat-search-wrap"><svg viewBox="0 0 16 16" fill="none"><circle cx="6.5" cy="6.5" r="4" stroke="currentColor" stroke-width="1.4"/><path d="M11 11l3 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg><input type="text" id="pbSearch" placeholder="Tim theo ten hoac viet tat..." oninput="pbRender()"/></div>
+          <div class="cat-filter-wrap"><svg viewBox="0 0 16 16" fill="none"><path d="M2 4h12M4 8h8M6 12h4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg><select id="pbFilterKhoi" onchange="pbRender()"><option value="">Tat ca khoi</option></select></div>
           <div class="cat-count-pill cat-count-pill-teal" id="pbTotal"></div>
         </div>
-
-        <!-- Table -->
-        <div class="cat-table-wrap">
-          <table class="cat-table">
-            <thead>
-              <tr>
-                <th style="width:48px">#</th>
-                <th style="width:56px;text-align:center">TT</th>
-                <th>Ten phong ban</th>
-                <th style="width:110px">Viet tat</th>
-                <th style="width:180px">Khoi</th>
-                <th>Mo ta</th>
-                <th style="width:130px;text-align:center">Thao tac</th>
-              </tr>
-            </thead>
-            <tbody id="pbTbody"></tbody>
-          </table>
-        </div>
+        <div class="cat-table-wrap"><table class="cat-table"><thead><tr><th style="width:48px">#</th><th style="width:56px;text-align:center">TT</th><th>Ten phong ban</th><th style="width:110px">Viet tat</th><th style="width:180px">Khoi</th><th>Mo ta</th><th style="width:130px;text-align:center">Thao tac</th></tr></thead><tbody id="pbTbody"></tbody></table></div>
       </div>
+
+      <!-- Simple placeholders for other dm-* pages -->
+      <div class="page-section fade-in" id="page-dm-luong-co-ban"><div class="cat-header"><div class="cat-header-left"><div class="cat-icon-wrap cat-icon-blue"><svg viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="7" stroke="currentColor" stroke-width="1.6"/><path d="M10 6v4l3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></div><div><div class="cat-title">Danh muc luong co ban</div><div class="cat-sub">Quan ly bang luong co ban</div></div></div><button class="btn-cat-add">+ Them moi</button></div><div class="placeholder"><p>Danh sach luong co ban se hien thi tai day</p></div></div>
+
+      <div class="page-section fade-in" id="page-dm-he-so-danh-gia"><div class="cat-header"><div class="cat-header-left"><div class="cat-icon-wrap cat-icon-blue"><svg viewBox="0 0 20 20" fill="none"><path d="M10 2l2.4 5 5.6.8-4 3.9.9 5.5L10 14.5l-4.9 2.7.9-5.5L2 7.8l5.6-.8z" stroke="currentColor" stroke-width="1.6"/></svg></div><div><div class="cat-title">Danh muc he so danh gia</div><div class="cat-sub">Quan ly he so danh gia hieu qua</div></div></div><button class="btn-cat-add">+ Them moi</button></div><div class="placeholder"><p>Danh sach he so danh gia se hien thi tai day</p></div></div>
+
+      <div class="page-section fade-in" id="page-dm-dinh-muc-dt"><div class="cat-header"><div class="cat-header-left"><div class="cat-icon-wrap cat-icon-blue"><svg viewBox="0 0 20 20" fill="none"><rect x="4" y="2" width="12" height="16" rx="2" stroke="currentColor" stroke-width="1.6"/><path d="M8 15h4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></div><div><div class="cat-title">Danh muc dinh muc dien thoai</div><div class="cat-sub">Quan ly dinh muc cuoc dien thoai</div></div></div><button class="btn-cat-add">+ Them moi</button></div><div class="placeholder"><p>Danh sach dinh muc dien thoai se hien thi tai day</p></div></div>
+
+      <div class="page-section fade-in" id="page-dm-phu-tro"><div class="cat-header"><div class="cat-header-left"><div class="cat-icon-wrap cat-icon-blue"><svg viewBox="0 0 20 20" fill="none"><rect x="2" y="4" width="16" height="12" rx="2" stroke="currentColor" stroke-width="1.6"/><path d="M6 9h8M6 12h5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></div><div><div class="cat-title">Danh muc phu tro</div><div class="cat-sub">Quan ly cac khoan phu tro</div></div></div><button class="btn-cat-add">+ Them moi</button></div><div class="placeholder"><p>Danh sach phu tro se hien thi tai day</p></div></div>
+
+      <div class="page-section fade-in" id="page-dm-thoi-gian-lv"><div class="cat-header"><div class="cat-header-left"><div class="cat-icon-wrap cat-icon-blue"><svg viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="1.6"/><path d="M10 5v5l3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></div><div><div class="cat-title">Danh muc thoi gian lam viec</div><div class="cat-sub">Quan ly lich lam viec theo nam</div></div></div><button class="btn-cat-add">+ Them moi</button></div><div class="placeholder"><p>Danh sach thoi gian lam viec se hien thi tai day</p></div></div>
+
+      <div class="page-section fade-in" id="page-dm-phan-nguon"><div class="cat-header"><div class="cat-header-left"><div class="cat-icon-wrap cat-icon-blue"><svg viewBox="0 0 20 20" fill="none"><path d="M4 10h12M10 4v12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></div><div><div class="cat-title">Danh muc phan nguon</div><div class="cat-sub">Quan ly nguon ngan sach</div></div></div><button class="btn-cat-add">+ Them moi</button></div><div class="placeholder"><p>Danh sach phan nguon se hien thi tai day</p></div></div>
+
+      <div class="page-section fade-in" id="page-dm-an-ca"><div class="cat-header"><div class="cat-header-left"><div class="cat-icon-wrap cat-icon-blue"><svg viewBox="0 0 20 20" fill="none"><path d="M4 10c0-3.3 2.7-6 6-6s6 2.7 6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M4 10v4a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2v-4" stroke="currentColor" stroke-width="1.6"/></svg></div><div><div class="cat-title">Danh muc dinh muc an ca</div><div class="cat-sub">Quan ly dinh muc an ca</div></div></div><button class="btn-cat-add">+ Them moi</button></div><div class="placeholder"><p>Danh sach dinh muc an ca se hien thi tai day</p></div></div>
+
+      <div class="page-section fade-in" id="page-dm-nguoi-dung"><div class="cat-header"><div class="cat-header-left"><div class="cat-icon-wrap cat-icon-blue"><svg viewBox="0 0 20 20" fill="none"><circle cx="10" cy="7" r="4" stroke="currentColor" stroke-width="1.6"/><path d="M2 18c0-4.4 3.6-8 8-8s8 3.6 8 8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></div><div><div class="cat-title">Danh muc nguoi dung</div><div class="cat-sub">Quan ly tai khoan nguoi dung</div></div></div><button class="btn-cat-add">+ Them moi</button></div><div class="placeholder"><p>Danh sach nguoi dung se hien thi tai day</p></div></div>
+
+      <!-- ═══ TIEN ICH pages ═══ -->
+      <!-- Cham cong (FULL) -->
+      <div class="page-section fade-in" id="page-chamcong">
+        <div class="cat-header">
+          <div class="cat-header-left">
+            <div class="cat-icon-wrap" style="background:#FEF3E2;color:#B45309"><svg viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="1.6"/><path d="M10 6v4l3 3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></div>
+            <div><div class="cat-title">Quan ly cham cong</div><div class="cat-sub">Theo doi cham cong theo quy, phan theo phong ban</div></div>
+          </div>
+          <button class="btn-cat-add" style="background:linear-gradient(135deg,#22c97b,#15a25e);box-shadow:0 2px 10px rgba(21,162,94,.3)" id="ccExcel"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 10v2h10v-2M7 2v7M4 6l3 3 3-3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Xuat Excel</button>
+        </div>
+        <div class="cc-filterbar">
+          <div class="cc-filter-group"><label>Chon quy</label><select id="ccQuy" class="cc-select"><option value="1">Quy 1</option><option value="2" selected>Quy 2</option><option value="3">Quy 3</option><option value="4">Quy 4</option></select></div>
+          <div class="cc-filter-group"><label>Chon nam</label><select id="ccNam" class="cc-select"></select></div>
+          <div class="cc-filter-group"><label>Loai cong</label>
+            <div class="cc-radio-group">
+              <label class="cc-radio"><input type="radio" name="ccLoai" value="thoi-gian" checked/><span class="cc-radio-dot"></span>Thoi gian</label>
+              <label class="cc-radio"><input type="radio" name="ccLoai" value="ca-dem"/><span class="cc-radio-dot"></span>Ca dem</label>
+              <label class="cc-radio"><input type="radio" name="ccLoai" value="them-gio"/><span class="cc-radio-dot"></span>Them gio</label>
+            </div>
+          </div>
+        </div>
+        <div class="cc-table-wrap"><table class="cc-table"><thead id="ccThead"></thead><tbody id="ccTbody"></tbody></table></div>
+      </div>
+
+      <div class="page-section fade-in" id="page-an-toan-dien"><div class="cat-header"><div class="cat-header-left"><div class="cat-icon-wrap" style="background:#FEF3E2;color:#B45309"><svg viewBox="0 0 20 20" fill="none"><path d="M10 2l-6 10h5v6l6-10h-5V2z" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><div class="cat-title">Quan ly an toan dien</div><div class="cat-sub">Theo doi an toan lao dong</div></div></div><button class="btn-cat-add">+ Them moi</button></div><div class="placeholder"><p>Du lieu an toan dien se hien thi tai day</p></div></div>
+
+      <div class="page-section fade-in" id="page-tam-ung-luong"><div class="cat-header"><div class="cat-header-left"><div class="cat-icon-wrap" style="background:#FEF3E2;color:#B45309"><svg viewBox="0 0 20 20" fill="none"><rect x="2" y="5" width="16" height="12" rx="2" stroke="currentColor" stroke-width="1.6"/><path d="M6 5V4a4 4 0 0 1 8 0v1M8 12h4M10 10v4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></div><div><div class="cat-title">Quan ly tam ung luong</div><div class="cat-sub">Theo doi cac khoan tam ung</div></div></div><button class="btn-cat-add">+ Them tam ung</button></div><div class="placeholder"><p>Du lieu tam ung luong se hien thi tai day</p></div></div>
+
+      <div class="page-section fade-in" id="page-dieu-chuyen"><div class="cat-header"><div class="cat-header-left"><div class="cat-icon-wrap" style="background:#FEF3E2;color:#B45309"><svg viewBox="0 0 20 20" fill="none"><path d="M4 10h12M10 4l6 6-6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><div class="cat-title">Quan ly dieu chuyen</div><div class="cat-sub">Quan ly dieu chuyen nhan su</div></div></div><button class="btn-cat-add">+ Them moi</button></div><div class="placeholder"><p>Du lieu dieu chuyen se hien thi tai day</p></div></div>
+
+      <div class="page-section fade-in" id="page-nghi-phep"><div class="cat-header"><div class="cat-header-left"><div class="cat-icon-wrap" style="background:#FEF3E2;color:#B45309"><svg viewBox="0 0 20 20" fill="none"><rect x="2" y="4" width="16" height="14" rx="2" stroke="currentColor" stroke-width="1.6"/><path d="M6 2v4M14 2v4M2 10h16" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></div><div><div class="cat-title">Quan ly nghi phep</div><div class="cat-sub">Theo doi va duyet don nghi phep</div></div></div><button class="btn-cat-add">+ Them don</button></div><div class="placeholder"><p>Du lieu nghi phep se hien thi tai day</p></div></div>
+
+      <div class="page-section fade-in" id="page-quan-ly-an-ca"><div class="cat-header"><div class="cat-header-left"><div class="cat-icon-wrap" style="background:#FEF3E2;color:#B45309"><svg viewBox="0 0 20 20" fill="none"><path d="M4 9c0-3.3 2.7-6 6-6s6 2.7 6 6M4 9v4a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V9" stroke="currentColor" stroke-width="1.6"/></svg></div><div><div class="cat-title">Quan ly an ca</div><div class="cat-sub">Theo doi ca an cua nhan vien</div></div></div><button class="btn-cat-add">+ Them moi</button></div><div class="placeholder"><p>Du lieu an ca se hien thi tai day</p></div></div>
+
+      <div class="page-section fade-in" id="page-he-so-luong"><div class="cat-header"><div class="cat-header-left"><div class="cat-icon-wrap" style="background:#FEF3E2;color:#B45309"><svg viewBox="0 0 20 20" fill="none"><path d="M2 14l4-6 4 4 4-8 4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><div class="cat-title">Bang he so luong</div><div class="cat-sub">Quan ly he so luong theo chuc vu</div></div></div><button class="btn-cat-add">+ Them moi</button></div><div class="placeholder"><p>Bang he so luong se hien thi tai day</p></div></div>
+
+      <div class="page-section fade-in" id="page-quyet-toan"><div class="cat-header"><div class="cat-header-left"><div class="cat-icon-wrap" style="background:#FEF3E2;color:#B45309"><svg viewBox="0 0 20 20" fill="none"><rect x="3" y="3" width="14" height="14" rx="2" stroke="currentColor" stroke-width="1.6"/><path d="M7 10l2 2 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><div class="cat-title">Quyet toan luong</div><div class="cat-sub">Quyet toan luong theo thang</div></div></div><button class="btn-cat-add">+ Quyet toan</button></div><div class="placeholder"><p>Du lieu quyet toan luong se hien thi tai day</p></div></div>
+
+      <div class="page-section fade-in" id="page-chi-luong"><div class="cat-header"><div class="cat-header-left"><div class="cat-icon-wrap" style="background:#FEF3E2;color:#B45309"><svg viewBox="0 0 20 20" fill="none"><rect x="2" y="5" width="16" height="12" rx="2" stroke="currentColor" stroke-width="1.6"/><path d="M6 5V4a4 4 0 0 1 8 0v1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M8 11h4M10 9v4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></div><div><div class="cat-title">Quan ly chi luong theo thang</div><div class="cat-sub">Theo doi chi tra luong hang thang</div></div></div><button class="btn-cat-add">+ Them moi</button></div><div class="placeholder"><p>Du lieu chi luong se hien thi tai day</p></div></div>
+
+      <!-- ═══ QUAN LY PHONG BAN pages ═══ -->
+      <div class="page-section fade-in" id="page-cc-phong-ban"><div class="cat-header"><div class="cat-header-left"><div class="cat-icon-wrap cat-icon-teal"><svg viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="1.6"/><path d="M10 6v4l3 3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></div><div><div class="cat-title">Cham cong phong ban</div><div class="cat-sub">Nhan vien phong ban tu cham cong</div></div></div><button class="btn-cat-add btn-cat-add-teal">+ Cham cong</button></div><div class="placeholder"><p>Giao dien cham cong phong ban se hien thi tai day</p></div></div>
+
+      <div class="page-section fade-in" id="page-danh-gia-hq"><div class="cat-header"><div class="cat-header-left"><div class="cat-icon-wrap cat-icon-teal"><svg viewBox="0 0 20 20" fill="none"><path d="M10 2l2.4 5 5.6.8-4 3.9.9 5.5L10 14.5l-4.9 2.7.9-5.5L2 7.8l5.6-.8z" stroke="currentColor" stroke-width="1.6"/></svg></div><div><div class="cat-title">Danh gia hieu qua cong viec</div><div class="cat-sub">Danh gia KPI theo phong ban</div></div></div><button class="btn-cat-add btn-cat-add-teal">+ Danh gia</button></div><div class="placeholder"><p>Du lieu danh gia hieu qua se hien thi tai day</p></div></div>
+
+      <div class="page-section fade-in" id="page-luong-hq"><div class="cat-header"><div class="cat-header-left"><div class="cat-icon-wrap cat-icon-teal"><svg viewBox="0 0 20 20" fill="none"><rect x="2" y="4" width="16" height="12" rx="2" stroke="currentColor" stroke-width="1.6"/><path d="M2 9h16M7 9v7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></div><div><div class="cat-title">Luong hieu qua cong viec - phong ban</div><div class="cat-sub">Tinh luong dua tren hieu qua KPI</div></div></div><button class="btn-cat-add btn-cat-add-teal">+ Tinh luong</button></div><div class="placeholder"><p>Du lieu luong hieu qua se hien thi tai day</p></div></div>
+
+      <!-- ═══ QUAN LY HE THONG pages ═══ -->
+      <div class="page-section fade-in" id="page-ql-chuc-nang"><div class="cat-header"><div class="cat-header-left"><div class="cat-icon-wrap" style="background:#FEF3E2;color:#B45309"><svg viewBox="0 0 20 20" fill="none"><rect x="2" y="2" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.6"/><rect x="11" y="2" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.6"/><rect x="2" y="11" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.6"/><rect x="11" y="11" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.6"/></svg></div><div><div class="cat-title">Quan ly chuc nang</div><div class="cat-sub">Quan ly cac chuc nang he thong</div></div></div><button class="btn-cat-add">+ Them chuc nang</button></div><div class="placeholder"><p>Danh sach chuc nang se hien thi tai day</p></div></div>
+
+      <div class="page-section fade-in" id="page-ql-quyen"><div class="cat-header"><div class="cat-header-left"><div class="cat-icon-wrap" style="background:#FEF3E2;color:#B45309"><svg viewBox="0 0 20 20" fill="none"><rect x="4" y="8" width="12" height="10" rx="1.5" stroke="currentColor" stroke-width="1.6"/><path d="M7 8V6a3 3 0 0 1 6 0v2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></div><div><div class="cat-title">Quan ly quyen</div><div class="cat-sub">Cau hinh cac nhom quyen truy cap</div></div></div><button class="btn-cat-add">+ Them quyen</button></div><div class="placeholder"><p>Danh sach quyen se hien thi tai day</p></div></div>
+
+      <div class="page-section fade-in" id="page-phan-quyen-nd"><div class="cat-header"><div class="cat-header-left"><div class="cat-icon-wrap" style="background:#FEF3E2;color:#B45309"><svg viewBox="0 0 20 20" fill="none"><circle cx="10" cy="7" r="4" stroke="currentColor" stroke-width="1.6"/><path d="M2 18c0-4.4 3.6-8 8-8s8 3.6 8 8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></div><div><div class="cat-title">Phan quyen nguoi dung</div><div class="cat-sub">Gan quyen truy cap cho nguoi dung</div></div></div><button class="btn-cat-add">+ Phan quyen</button></div><div class="placeholder"><p>Cau hinh phan quyen se hien thi tai day</p></div></div>
+
+      <div class="page-section fade-in" id="page-phan-quyen-cn"><div class="cat-header"><div class="cat-header-left"><div class="cat-icon-wrap" style="background:#FEF3E2;color:#B45309"><svg viewBox="0 0 20 20" fill="none"><rect x="4" y="8" width="12" height="10" rx="1.5" stroke="currentColor" stroke-width="1.6"/><path d="M7 8V6a3 3 0 0 1 6 0v2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M10 12v2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></div><div><div class="cat-title">Phan quyen Quyen - chuc nang</div><div class="cat-sub">Gan chuc nang cho tung nhom quyen</div></div></div><button class="btn-cat-add">+ Them moi</button></div><div class="placeholder"><p>Ma tran phan quyen se hien thi tai day</p></div></div>
 
     </div><!-- /content -->
   </div><!-- /main -->
 </div><!-- /dashPage -->
 
-<!-- Modal them/sua Phong ban -->
-<div class="modal-overlay" id="pbModal">
-  <div class="cat-modal" style="max-width:540px">
-    <div class="cat-modal-accent cat-modal-accent-teal"></div>
-    <div class="cat-modal-body">
-      <div class="cat-modal-header">
-        <div class="cat-modal-title-wrap">
-          <div class="cat-modal-icon cat-icon-teal">
-            <svg viewBox="0 0 16 16" fill="none"><rect x="1" y="3" width="14" height="10" rx="1.5" stroke="currentColor" stroke-width="1.4"/><path d="M1 7h14M5 7v6" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
-          </div>
-          <span class="cat-modal-title" id="pbModalTitle">Them phong ban</span>
-        </div>
-        <button class="cat-btn-close" onclick="pbCloseModal()">
-          <svg viewBox="0 0 14 14" fill="none"><path d="M2 2l10 10M12 2L2 12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
-        </button>
-      </div>
-      <div class="cat-form-grid">
-        <div class="cat-field" style="grid-column:1/-1">
-          <label>Ten phong ban <span class="req">*</span></label>
-          <input type="text" id="pbTen" placeholder="VD: Phong Kinh doanh mien Bac..." maxlength="120" />
-          <div class="cat-field-err" id="errPbTen"></div>
-        </div>
-        <div class="cat-field">
-          <label>Ten viet tat <span class="req">*</span></label>
-          <input type="text" id="pbVietTat" placeholder="VD: KD-MB..." maxlength="30" />
-          <div class="cat-field-err" id="errPbVietTat"></div>
-        </div>
-        <div class="cat-field">
-          <label>Thu tu sap xep</label>
-          <input type="text" id="pbThuTu" placeholder="VD: 1, 2, 10..." maxlength="6" />
-          <div class="cat-field-err" id="errPbThuTu"></div>
-        </div>
-        <div class="cat-field" style="grid-column:1/-1">
-          <label>Khoi phong ban <span class="req">*</span></label>
-          <select id="pbKhoi" class="cat-select">
-            <option value="">-- Chon khoi --</option>
-          </select>
-          <div class="cat-field-err" id="errPbKhoi"></div>
-        </div>
-        <div class="cat-field" style="grid-column:1/-1">
-          <label>Mo ta</label>
-          <textarea id="pbMoTa" placeholder="Mo ta chuc nang, nhiem vu cua phong ban..."></textarea>
-        </div>
-      </div>
-      <div class="cat-modal-footer">
-        <button class="cat-btn-cancel" onclick="pbCloseModal()">Huy bo</button>
-        <button class="cat-btn-save cat-btn-save-teal" onclick="pbSave()">
-          <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M2 7l3 3 6-6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          Luu lai
-        </button>
-      </div>
-    </div>
-  </div>
-</div>
+<!-- Modal Khoi phong ban -->
+<div class="modal-overlay" id="kpbModal"><div class="cat-modal"><div class="cat-modal-accent cat-modal-accent-blue"></div><div class="cat-modal-body"><div class="cat-modal-header"><div class="cat-modal-title-wrap"><div class="cat-modal-icon cat-icon-blue"><svg viewBox="0 0 16 16" fill="none"><rect x="1" y="1" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.4"/><rect x="9" y="1" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.4"/><rect x="1" y="9" width="6" height="3.5" rx="1" stroke="currentColor" stroke-width="1.4"/><rect x="9" y="9" width="6" height="3.5" rx="1" stroke="currentColor" stroke-width="1.4"/></svg></div><span class="cat-modal-title" id="kpbModalTitle">Them khoi</span></div><button class="cat-btn-close" onclick="kpbCloseModal()"><svg viewBox="0 0 14 14" fill="none"><path d="M2 2l10 10M12 2L2 12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button></div><div class="cat-form-grid" style="grid-template-columns:1fr 1fr"><div class="cat-field"><label>Ma khoi <span class="req">*</span></label><input type="text" id="kpbMa" placeholder="VD: KD, KT..." maxlength="20"/><div class="cat-field-err" id="errKpbMa"></div></div><div class="cat-field"><label>Ten khoi <span class="req">*</span></label><input type="text" id="kpbTen" placeholder="VD: Khoi Kinh doanh..." maxlength="100"/><div class="cat-field-err" id="errKpbTen"></div></div><div class="cat-field" style="grid-column:1/-1"><label>Mo ta</label><textarea id="kpbMoTa" placeholder="Mo ta chuc nang..."></textarea></div></div><div class="cat-modal-footer"><button class="cat-btn-cancel" onclick="kpbCloseModal()">Huy</button><button class="cat-btn-save" onclick="kpbSave()"><svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M2 7l3 3 6-6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Luu</button></div></div></div></div>
+<div class="modal-overlay" id="kpbDeleteModal"><div class="cat-modal cat-modal-sm"><div class="cat-modal-accent cat-modal-accent-red"></div><div class="cat-modal-body"><div class="cat-delete-icon"><svg viewBox="0 0 24 24" fill="none"><polyline points="3 6 5 6 21 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="cat-delete-title">Xac nhan xoa</div><div class="cat-delete-sub" id="kpbDeleteMsg">Ban co chac muon xoa?</div><div class="cat-modal-footer" style="justify-content:center"><button class="cat-btn-cancel" onclick="kpbCloseDelete()">Huy</button><button class="cat-btn-danger" onclick="kpbConfirmDelete()">Xoa</button></div></div></div></div>
 
-<!-- Modal xoa Phong ban -->
-<div class="modal-overlay" id="pbDeleteModal">
-  <div class="cat-modal cat-modal-sm">
-    <div class="cat-modal-accent cat-modal-accent-red"></div>
-    <div class="cat-modal-body">
-      <div class="cat-delete-icon">
-        <svg viewBox="0 0 24 24" fill="none"><polyline points="3 6 5 6 21 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M10 11v6M14 11v6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      </div>
-      <div class="cat-delete-title">Xac nhan xoa</div>
-      <div class="cat-delete-sub" id="pbDeleteMsg">Ban co chac muon xoa phong ban nay khong?</div>
-      <div class="cat-modal-footer" style="justify-content:center">
-        <button class="cat-btn-cancel" onclick="pbCloseDelete()">Huy bo</button>
-        <button class="cat-btn-danger" onclick="pbConfirmDelete()">Xoa phong ban</button>
-      </div>
-    </div>
-  </div>
-</div>
+<!-- Modal Phong ban -->
+<div class="modal-overlay" id="pbModal"><div class="cat-modal" style="max-width:540px"><div class="cat-modal-accent cat-modal-accent-teal"></div><div class="cat-modal-body"><div class="cat-modal-header"><div class="cat-modal-title-wrap"><div class="cat-modal-icon cat-icon-teal"><svg viewBox="0 0 16 16" fill="none"><rect x="1" y="3" width="14" height="10" rx="1.5" stroke="currentColor" stroke-width="1.4"/><path d="M1 7h14M5 7v6" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg></div><span class="cat-modal-title" id="pbModalTitle">Them phong ban</span></div><button class="cat-btn-close" onclick="pbCloseModal()"><svg viewBox="0 0 14 14" fill="none"><path d="M2 2l10 10M12 2L2 12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button></div><div class="cat-form-grid"><div class="cat-field" style="grid-column:1/-1"><label>Ten phong ban <span class="req">*</span></label><input type="text" id="pbTen" placeholder="VD: Phong Kinh doanh..." maxlength="120"/><div class="cat-field-err" id="errPbTen"></div></div><div class="cat-field"><label>Viet tat <span class="req">*</span></label><input type="text" id="pbVietTat" placeholder="VD: KD-MB..." maxlength="30"/><div class="cat-field-err" id="errPbVietTat"></div></div><div class="cat-field"><label>Thu tu</label><input type="text" id="pbThuTu" placeholder="VD: 1, 2..." maxlength="6"/><div class="cat-field-err" id="errPbThuTu"></div></div><div class="cat-field" style="grid-column:1/-1"><label>Khoi phong ban <span class="req">*</span></label><select id="pbKhoi" class="cat-select"><option value="">-- Chon khoi --</option></select><div class="cat-field-err" id="errPbKhoi"></div></div><div class="cat-field" style="grid-column:1/-1"><label>Mo ta</label><textarea id="pbMoTa" placeholder="Mo ta..."></textarea></div></div><div class="cat-modal-footer"><button class="cat-btn-cancel" onclick="pbCloseModal()">Huy</button><button class="cat-btn-save cat-btn-save-teal" onclick="pbSave()"><svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M2 7l3 3 6-6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Luu</button></div></div></div></div>
+<div class="modal-overlay" id="pbDeleteModal"><div class="cat-modal cat-modal-sm"><div class="cat-modal-accent cat-modal-accent-red"></div><div class="cat-modal-body"><div class="cat-delete-icon"><svg viewBox="0 0 24 24" fill="none"><polyline points="3 6 5 6 21 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="cat-delete-title">Xac nhan xoa</div><div class="cat-delete-sub" id="pbDeleteMsg">Ban co chac muon xoa phong ban nay?</div><div class="cat-modal-footer" style="justify-content:center"><button class="cat-btn-cancel" onclick="pbCloseDelete()">Huy</button><button class="cat-btn-danger" onclick="pbConfirmDelete()">Xoa</button></div></div></div></div>
 
-<script src="asset/dashboard.js"></script>
+<script src="asset/sidebar.js"></script>
+<script>
+// Bar chart (dashboard specific)
+(function(){
+  var months=['Th11','Th12','Th1','Th2','Th3','Th4'];
+  var vals=[3.6,3.8,3.7,4.0,3.9,4.2];
+  var max=Math.max.apply(null,vals);
+  var bc=document.getElementById('barChart');
+  if(!bc) return;
+  months.forEach(function(m,i){
+    var h=Math.round((vals[i]/max)*88);
+    bc.innerHTML+=`<div class="bar-col"><div class="bar ${i===5?'highlight':''}" style="height:${h}px" title="${vals[i]} ty"></div><span class="bar-label">${m}</span></div>`;
+  });
+})();
+</script>
 <script src="asset/khoi-phong-ban.js"></script>
 <script src="asset/phong-ban.js"></script>
 <script src="asset/chamcong.js"></script>
