@@ -1046,13 +1046,6 @@
       window.location.replace('index.html');
     }
 
-<script>
-  /* ─── Auto-redirect nếu đã đăng nhập ─── */
-  if (sessionStorage.getItem('pms_user')) {
-    window.location.replace('dashboard.html');
-  }
-
-
     /* ─── Helpers ─── */
     function showErr(msg) {
       const el = document.getElementById('errMsg');
@@ -1087,7 +1080,6 @@
       btn.querySelector('.btn-text').textContent = 'Đang kiểm tra...';
       btn.querySelector('.btn-arrow').style.display = 'none';
 
-<<<<<<< HEAD
       setTimeout(() => {
         if (u === 'admin' && p === '123456') {
           showOk('Đăng nhập thành công! Đang chuyển hướng...');
@@ -1104,24 +1096,6 @@
         }
       }, 900);
     }
-=======
-    setTimeout(() => {
-      if (u === 'admin' && p === '123456') {
-        showOk('Đăng nhập thành công! Đang chuyển hướng...');
-        btn.querySelector('.btn-text').textContent = 'Thành công ✓';
-        // Lưu session và chuyển sang dashboard
-        sessionStorage.setItem('pms_user', JSON.stringify({ name: u, role: 'admin' }));
-        setTimeout(() => { window.location.href = 'dashboard.html'; }, 900);
-      } else {
-        showErr('Tên đăng nhập hoặc mật khẩu không đúng.');
-        btn.disabled = false;
-        btn.classList.remove('loading');
-        btn.querySelector('.btn-text').textContent = 'Đăng nhập';
-        btn.querySelector('.btn-arrow').style.display = '';
-      }
-    }, 900);
-  }
->>>>>>> 931abd75852f0fd5070f5c1f53a14dc8261d2200
 
     document.getElementById('loginBtn').addEventListener('click', doLogin);
     document.addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
