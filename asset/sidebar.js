@@ -12,38 +12,38 @@
 
   /* ── Page titles ── */
   const PAGE_TITLES = {
-    dashboard:           'Dashboard',
+    dashboard: 'Dashboard',
     // Danh mục
-    'dm-chuc-vu':        'Danh mục chức vụ',
-    'khoi-phong-ban':    'Danh mục nhóm phòng',
-    'phong-ban':         'Danh mục phòng ban',
-    'dm-luong-co-ban':   'Danh mục lương cơ bản',
+    'dm-chuc-vu': 'Danh mục chức vụ',
+    'dm-phong-ban': 'Danh mục phòng ban',
+    'khoi-phong-ban': 'Danh mục nhóm phòng',
+    'phong-ban': 'Danh mục phòng ban (cũ)',
+    'dm-luong-co-ban': 'Danh mục lương cơ bản',
     'dm-he-so-danh-gia': 'Danh mục hệ số đánh giá',
-    'dm-dinh-muc-dt':    'Danh mục định mức điện thoại',
-    'dm-phu-tro':        'Danh mục phụ trợ',
-    'dm-thoi-gian-lv':   'Danh mục thời gian làm việc',
-    'dm-phan-nguon':     'Danh mục phân nguồn',
-    'dm-an-ca':          'Danh mục định mức ăn ca',
-    'dm-nguoi-dung':     'Danh mục người dùng',
+    'dm-phu-tro': 'Danh mục phụ trợ',
+    'dm-thoi-gian-lv': 'Danh mục thời gian làm việc',
+    'dm-phan-nguon': 'Danh mục phân nguồn',
+    'dm-an-ca': 'Danh mục định mức ăn ca',
+    'dm-nguoi-dung': 'Danh mục người dùng',
     // Tiện ích
-    chamcong:            'Quản lý chấm công',
-    'an-toan-dien':      'Quản lý an toàn điện',
-    'tam-ung-luong':     'Quản lý tạm ứng lương',
-    'dieu-chuyen':       'Quản lý điều chuyển',
-    'nghi-phep':         'Quản lý nghỉ phép',
-    'quan-ly-an-ca':     'Quản lý ăn ca',
-    'he-so-luong':       'Bảng hệ số lương',
-    'quyet-toan':        'Quyết toán lương',
-    'chi-luong':         'Quản lý chi lương theo tháng',
+    chamcong: 'Quản lý chấm công',
+    'an-toan-dien': 'Quản lý an toàn điện',
+    'tam-ung-luong': 'Quản lý tạm ứng lương',
+    'dieu-chuyen': 'Quản lý điều chuyển',
+    'nghi-phep': 'Quản lý nghỉ phép',
+    'quan-ly-an-ca': 'Quản lý ăn ca',
+    'he-so-luong': 'Bảng hệ số lương',
+    'quyet-toan': 'Quyết toán lương',
+    'chi-luong': 'Quản lý chi lương theo tháng',
     // Quản lý phòng ban
-    'cc-phong-ban':      'Chấm công phòng ban',
-    'danh-gia-hq':       'Đánh giá hiệu quả công việc',
-    'luong-hq':          'Lương hiệu quả - phòng ban',
+    'cc-phong-ban': 'Chấm công phòng ban',
+    'danh-gia-hq': 'Đánh giá hiệu quả công việc',
+    'luong-hq': 'Lương hiệu quả - phòng ban',
     // Quản lý hệ thống
-    'ql-chuc-nang':      'Quản lý chức năng',
-    'ql-quyen':          'Quản lý quyền',
-    'phan-quyen-nd':     'Phân quyền người dùng',
-    'phan-quyen-cn':     'Phân quyền Quyền - chức năng',
+    'ql-chuc-nang': 'Quản lý chức năng',
+    'ql-quyen': 'Quản lý quyền',
+    'phan-quyen-nd': 'Phân quyền người dùng',
+    'phan-quyen-cn': 'Phân quyền Quyền - chức năng',
   };
 
   /* ── Sidebar HTML ── */
@@ -83,11 +83,10 @@
       </div>
       <div class="nav-group-items">
         <div class="nav-item" data-page="dm-chuc-vu">Danh mục chức vụ</div>
+        <div class="nav-item" data-page="dm-phong-ban">Danh mục phòng ban</div>
         <div class="nav-item" data-page="khoi-phong-ban">Danh mục nhóm phòng</div>
-        <div class="nav-item" data-page="phong-ban">Danh mục phòng ban</div>
         <div class="nav-item" data-page="dm-luong-co-ban">Danh mục lương cơ bản</div>
         <div class="nav-item" data-page="dm-he-so-danh-gia">Danh mục hệ số đánh giá</div>
-        <div class="nav-item" data-page="dm-dinh-muc-dt">Danh mục định mức điện thoại</div>
         <div class="nav-item" data-page="dm-phu-tro">Danh mục phụ trợ</div>
         <div class="nav-item" data-page="dm-thoi-gian-lv">Danh mục thời gian làm việc</div>
         <div class="nav-item" data-page="dm-phan-nguon">Danh mục phân nguồn</div>
