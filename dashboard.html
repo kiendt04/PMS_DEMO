@@ -488,27 +488,8 @@
           </div>
         </div>
 
-        <!-- ═══ TIEN ICH pages ═══ -->
         <!-- Cham cong (FULL) -->
         <div class="page-section fade-in" id="page-chamcong">
-          <div class="cat-header">
-            <div class="cat-header-left">
-              <div class="cat-icon-wrap" style="background:#FEF3E2;color:#B45309"><svg viewBox="0 0 20 20" fill="none">
-                  <circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="1.6" />
-                  <path d="M10 6v4l3 3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
-                </svg></div>
-              <div>
-                <div class="cat-title">Quan ly cham cong</div>
-                <div class="cat-sub">Theo doi cham cong theo quy, phan theo phong ban</div>
-              </div>
-            </div>
-            <button class="btn-cat-add"
-              style="background:linear-gradient(135deg,#22c97b,#15a25e);box-shadow:0 2px 10px rgba(21,162,94,.3)"
-              id="ccExcel"><svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-                <path d="M2 10v2h10v-2M7 2v7M4 6l3 3 3-3" stroke="currentColor" stroke-width="1.8"
-                  stroke-linecap="round" stroke-linejoin="round" />
-              </svg>Xuat Excel</button>
-          </div>
           <div class="cc-filterbar">
             <div class="cc-filter-group"><label>Chon quy</label><select id="ccQuy" class="cc-select">
                 <option value="1">Quy 1</option>
@@ -519,34 +500,43 @@
             <div class="cc-filter-group"><label>Chon nam</label><select id="ccNam" class="cc-select"></select></div>
             <div class="cc-filter-group"><label>Loai cong</label>
               <div class="cc-radio-group">
-                <label class="cc-radio"><input type="radio" name="ccLoai" value="thoi-gian" checked /><span
-                    class="cc-radio-dot"></span>Thoi gian</label>
-                <label class="cc-radio"><input type="radio" name="ccLoai" value="ca-dem" /><span
-                    class="cc-radio-dot"></span>Ca dem</label>
-                <label class="cc-radio"><input type="radio" name="ccLoai" value="them-gio" /><span
-                    class="cc-radio-dot"></span>Them gio</label>
+                <label class="cc-radio"><input type="radio" name="ccLoai" value="thoi-gian" checked /><span class="cc-radio-dot"></span>Thoi gian</label>
+                <label class="cc-radio"><input type="radio" name="ccLoai" value="ca-dem" /><span class="cc-radio-dot"></span>Ca dem</label>
+                <label class="cc-radio"><input type="radio" name="ccLoai" value="them-gio" /><span class="cc-radio-dot"></span>Them gio</label>
               </div>
+            </div>
+            <div class="cc-filter-group" style="margin-left:auto">
+              <button class="btn-cat-add" id="ccExcel"
+                style="background:linear-gradient(135deg,#22c97b,#15a25e);box-shadow:0 2px 8px rgba(21,162,94,.3)">
+                <svg width="13" height="13" viewBox="0 0 14 14" fill="none"><path d="M2 10v2h10v-2M7 2v7M4 6l3 3 3-3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Xuat Excel
+              </button>
             </div>
           </div>
           <div id="ccHotContainer" style="overflow:hidden;"></div>
         </div>
 
         <div class="page-section fade-in" id="page-an-toan-dien">
-          <div class="cat-header">
-            <div class="cat-header-left">
-              <div class="cat-icon-wrap" style="background:#FEF3E2;color:#B45309"><svg viewBox="0 0 20 20" fill="none">
-                  <path d="M10 2l-6 10h5v6l6-10h-5V2z" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"
-                    stroke-linejoin="round" />
-                </svg></div>
-              <div>
-                <div class="cat-title">Quan ly an toan dien</div>
-                <div class="cat-sub">Theo doi an toan lao dong</div>
-              </div>
-            </div><button class="btn-cat-add">+ Them moi</button>
+          <div class="cc-filterbar">
+            <div class="cc-filter-group"><label>Chọn quý</label><select id="atdQuy" class="cc-select">
+              <option value="1">Quý 1</option><option value="2" selected>Quý 2</option>
+              <option value="3">Quý 3</option><option value="4">Quý 4</option>
+            </select></div>
+            <div class="cc-filter-group"><label>Chọn năm</label><select id="atdNam" class="cc-select"></select></div>
+            <div class="cc-filter-group"><label>Chọn phòng ban</label>
+              <select id="atdPhongBan" class="cc-select" style="min-width:160px">
+                <option value="">— Tất cả —</option>
+              </select>
+            </div>
+            <div class="cc-filter-group" style="margin-left:auto;display:flex;flex-direction:row;align-items:center;gap:6px">
+              <button class="btn-cat-add" style="background:linear-gradient(135deg,#22c97b,#15a25e);box-shadow:0 2px 8px rgba(21,162,94,.3)">
+                <svg width="13" height="13" viewBox="0 0 14 14" fill="none"><path d="M2 10v2h10v-2M7 2v7M4 6l3 3 3-3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Import Excel
+              </button>
+              <button class="btn-cat-add" id="atdExcel" style="background:linear-gradient(135deg,#F59E0B,#D97706);box-shadow:0 2px 8px rgba(217,119,6,.3)">
+                <svg width="13" height="13" viewBox="0 0 14 14" fill="none"><path d="M2 10v2h10v-2M7 2v7M4 6l3 3 3-3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Xuất Excel
+              </button>
+            </div>
           </div>
-          <div class="placeholder">
-            <p>Du lieu an toan dien se hien thi tai day</p>
-          </div>
+          <div id="atdHotContainer" style="overflow:hidden;"></div>
         </div>
 
         <div class="page-section fade-in" id="page-tam-ung-luong">
@@ -1022,6 +1012,8 @@
   <script src="asset/phong-ban.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/handsontable@14.6.1/dist/handsontable.full.min.js"></script>
   <script src="asset/chamcong.js"></script>
+  <script src="asset/chuc-vu.js"></script>
+  <script src="asset/an-toan-dien.js"></script>
 </body>
 
 </html>

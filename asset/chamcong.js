@@ -119,17 +119,18 @@
     const months  = Q_MONTHS[q];
     const subCols = SUB_COLS[colType];
     const cols = [
-      {data:0, readOnly:true, width:45,  type:'text', className:'htCenter htMiddle cc-fixed'},
-      {data:1, readOnly:true, width:165, type:'text', className:'htLeft htMiddle cc-fixed'},
-      {data:2, readOnly:true, width:120, type:'text', className:'htLeft htMiddle cc-fixed'},
+      {data:0, readOnly:true, width:38,  type:'text', className:'htCenter htMiddle cc-fixed'},
+      {data:1, readOnly:true, width:145, type:'text', className:'htLeft   htMiddle cc-fixed'},
+      {data:2, readOnly:true, width:110, type:'text', className:'htLeft   htMiddle cc-fixed'},
     ];
     let ci = FIXED;
     months.forEach(() => {
       subCols.forEach(() => {
-        cols.push({data:ci++, type:'numeric', width:42, className:'htCenter htMiddle'});
+        cols.push({data:ci++, type:'numeric', width:38, className:'htCenter htMiddle'});
       });
     });
-    cols.push({data:ci, readOnly:true, type:'numeric', width:58, className:'htCenter htMiddle cc-total'});
+    // Total: no fixed width -> stretchH fills it
+    cols.push({data:ci, readOnly:true, type:'numeric', width:50, className:'htCenter htMiddle cc-total'});
     return cols;
   }
 
@@ -147,39 +148,35 @@
     const container = document.getElementById('ccHotContainer');
     if (!container || typeof Handsontable === 'undefined') return;
 
-    const data    = buildData(q, colType);
-    const headers = buildHeaders(q, colType);
-    const cols    = buildCols(q, colType);
+    const data      = buildData(q, colType);
+    const headers   = buildHeaders(q, colType);
+    const cols      = buildCols(q, colType);
     const totalCols = cols.length;
 
-    // Merge cells for dept rows
     const merges = [];
-    deptRowSet.forEach(ri => {
-      merges.push({ row: ri, col: 0, rowspan: 1, colspan: totalCols });
-    });
+    deptRowSet.forEach(ri => merges.push({row:ri, col:0, rowspan:1, colspan:totalCols}));
 
-    if (hotInstance) {
-      hotInstance.destroy();
-      hotInstance = null;
-    }
+    if (hotInstance) { hotInstance.destroy(); hotInstance = null; }
 
-    const containerH = Math.max(300, Math.min(data.length * 26 + 80, window.innerHeight - 260));
-    container.style.height = containerH + 'px';
+    // Height = remaining viewport from container top
+    const rect = container.getBoundingClientRect();
+    const h    = Math.max(300, window.innerHeight - rect.top - 16);
+    container.style.height = h + 'px';
 
     hotInstance = new Handsontable(container, {
-      data:              data,
+      data,
       nestedHeaders:     headers,
       columns:           cols,
       rowHeaders:        false,
       fixedColumnsStart: FIXED,
-      height:            containerH,
+      height:            h,
       width:             '100%',
-      stretchH:          'none',
+      stretchH:          'last',
       autoColumnSize:    false,
       mergeCells:        merges,
       licenseKey:        'non-commercial-and-evaluation',
-      rowHeights:        26,
-      viewportRowRenderingOffset: 40,
+      rowHeights:        24,
+      viewportRowRenderingOffset: 'auto',
 
       cells(row) {
         if (deptRowSet.has(row)) {
@@ -187,12 +184,11 @@
             readOnly: true,
             renderer(inst, td, r, c) {
               td.innerHTML = '';
-              td.style.background    = '#DBEAFE';
-              td.style.borderBottom  = '1px solid #93C5FD';
-              td.style.borderRight   = '1px solid #BFDBFE';
-              td.style.height        = '26px';
+              td.style.background   = '#DBEAFE';
+              td.style.borderBottom = '1px solid #93C5FD';
+              td.style.borderRight  = '1px solid #BFDBFE';
+              td.style.height       = '24px';
               if (c === 0) {
-                // Sau merge col=0 la cell hien thi text
                 td.style.color      = '#1E40AF';
                 td.style.fontWeight = '700';
                 td.style.fontSize   = '12px';
