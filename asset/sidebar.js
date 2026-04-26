@@ -12,14 +12,13 @@
 
   /* ── Page titles ── */
   const PAGE_TITLES = {
-    dashboard:           'Dashboard',
+    dashboard: 'Dashboard',
     // Danh mục
     'dm-chuc-vu':        'Danh mục chức vụ',
     'khoi-phong-ban':    'Danh mục nhóm phòng',
     'phong-ban':         'Danh mục phòng ban',
     'dm-luong-co-ban':   'Danh mục lương cơ bản',
     'dm-he-so-danh-gia': 'Danh mục hệ số đánh giá',
-    'dm-dinh-muc-dt':    'Danh mục định mức điện thoại',
     'dm-phu-tro':        'Danh mục phụ trợ',
     'dm-thoi-gian-lv':   'Danh mục thời gian làm việc',
     'dm-phan-nguon':     'Danh mục phân nguồn',
@@ -80,11 +79,10 @@
       </div>
       <div class="nav-group-items">
         <div class="nav-item" data-page="dm-chuc-vu">Danh mục chức vụ</div>
+        <div class="nav-item" data-page="dm-phong-ban">Danh mục phòng ban</div>
         <div class="nav-item" data-page="khoi-phong-ban">Danh mục nhóm phòng</div>
-        <div class="nav-item" data-page="phong-ban">Danh mục phòng ban</div>
         <div class="nav-item" data-page="dm-luong-co-ban">Danh mục lương cơ bản</div>
         <div class="nav-item" data-page="dm-he-so-danh-gia">Danh mục hệ số đánh giá</div>
-        <div class="nav-item" data-page="dm-dinh-muc-dt">Danh mục định mức điện thoại</div>
         <div class="nav-item" data-page="dm-phu-tro">Danh mục phụ trợ</div>
         <div class="nav-item" data-page="dm-thoi-gian-lv">Danh mục thời gian làm việc</div>
         <div class="nav-item" data-page="dm-phan-nguon">Danh mục phân nguồn</div>
