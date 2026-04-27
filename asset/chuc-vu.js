@@ -109,8 +109,7 @@
     ['cvTen','cvVietTat','cvMoTa'].forEach(id => document.getElementById(id).value = '');
     ['cvHSCoban','cvHSTrachNhiem','cvHSChucVu'].forEach(id => document.getElementById(id).value = '0.00');
     document.getElementById('cvNgayHieuLuc').value = new Date().toISOString().slice(0,10);
-    ['errCvTen','errCvVietTat','errCvNgayHieuLuc'].forEach(id => document.getElementById(id).textContent = '');
-    document.getElementById('cvModal').classList.add('active');
+    document.getElementById('cvModal').classList.add('open');
   };
 
   /* ── Open Edit ── */
@@ -126,12 +125,11 @@
     document.getElementById('cvHSChucVu').value      = r.hsChucVu;
     document.getElementById('cvNgayHieuLuc').value   = r.ngayHL;
     document.getElementById('cvMoTa').value          = r.moTa;
-    ['errCvTen','errCvVietTat','errCvNgayHieuLuc'].forEach(id => document.getElementById(id).textContent = '');
-    document.getElementById('cvModal').classList.add('active');
+    document.getElementById('cvModal').classList.add('open');
   };
 
   window.cvCloseModal = function () {
-    document.getElementById('cvModal').classList.remove('active');
+    document.getElementById('cvModal').classList.remove('open');
   };
 
   /* ── Save ── */
@@ -169,9 +167,9 @@
     deletingId = id;
     const r = CV_DATA.find(x => x.id === id);
     document.getElementById('cvDeleteMsg').textContent = `Bạn có chắc muốn xóa chức vụ "${r?.ten}"?`;
-    document.getElementById('cvDeleteModal').classList.add('active');
+    document.getElementById('cvDeleteModal').classList.add('open');
   };
-  window.cvCloseDelete   = function () { document.getElementById('cvDeleteModal').classList.remove('active'); };
+  window.cvCloseDelete   = function () { document.getElementById('cvDeleteModal').classList.remove('open'); };
   window.cvConfirmDelete = function () {
     CV_DATA = CV_DATA.filter(x => x.id !== deletingId);
     cvCloseDelete();
