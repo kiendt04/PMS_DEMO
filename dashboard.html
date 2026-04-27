@@ -231,13 +231,13 @@
                 <tr>
                   <th style="width:40px;text-align:center">ID</th>
                   <th>Tên chức vụ</th>
-                  <th style="width:100px">Tên viết tắt</th>
-                  <th style="width:130px;text-align:right">HS cơ bản chức vụ</th>
-                  <th style="width:130px;text-align:right">HS trách nhiệm</th>
-                  <th style="width:100px;text-align:right">HS chức vụ</th>
-                  <th style="width:110px">Ngày hiệu lực</th>
+                  <th style="width:80px">Viết tắt</th>
+                  <th style="width:120px;text-align:center">HS cơ bản</th>
+                  <th style="width:120px;text-align:center">HS trách nhiệm</th>
+                  <th style="width:90px;text-align:center">HS chức vụ</th>
+                  <th style="width:115px;text-align:center">Ngày hiệu lực</th>
                   <th>Mô tả</th>
-                  <th style="width:130px;text-align:center">Thao tác</th>
+                  <th style="width:125px;text-align:center">Thao tác</th>
                 </tr>
               </thead>
               <tbody id="cvTbody"></tbody>
@@ -282,12 +282,12 @@
                 <tr>
                   <th style="width:40px;text-align:center">ID</th>
                   <th>Tên phòng ban</th>
-                  <th style="width:100px">Tên viết tắt</th>
-                  <th style="width:150px;text-align:right">HS cơ bản chức vụ</th>
-                  <th style="width:130px;text-align:right">HS trách nhiệm</th>
-                  <th style="width:110px">Ngày hiệu lực</th>
+                  <th style="width:80px">Viết tắt</th>
+                  <th style="width:120px;text-align:center">HS cơ bản</th>
+                  <th style="width:120px;text-align:center">HS trách nhiệm</th>
+                  <th style="width:115px;text-align:center">Ngày hiệu lực</th>
                   <th>Mô tả</th>
-                  <th style="width:130px;text-align:center">Thao tác</th>
+                  <th style="width:125px;text-align:center">Thao tác</th>
                 </tr>
               </thead>
               <tbody id="pbcTbody"></tbody>
@@ -1452,7 +1452,7 @@
             <input type="text" id="dmacTenLoai" placeholder="VD: Ăn ca trưa, Ăn ca tối..." />
             <div class="cat-field-err" id="errDmacTenLoai"></div>
           </div>
-          <div class="cat-field">
+          <div class="cat-field" style="grid-column: 1/-1;">
             <label>Giá trị (VNĐ) <span class="req">*</span></label>
             <input type="number" id="dmacGiaTri" placeholder="VD: 30000" />
             <div class="cat-field-err" id="errDmacGiaTri"></div>
@@ -1461,6 +1461,10 @@
             <label>Ngày hiệu lực <span class="req">*</span></label>
             <input type="date" id="dmacNgayHieuLuc" />
             <div class="cat-field-err" id="errDmacNgayHieuLuc"></div>
+          </div>
+          <div class="cat-field">
+            <label>Ngày kết thúc</label>
+            <input type="date" id="dmacNgayKetThuc" />
           </div>
           <div class="cat-field" style="grid-column: 1/-1;">
             <label>Mô tả</label>

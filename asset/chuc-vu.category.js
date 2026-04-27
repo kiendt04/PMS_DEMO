@@ -51,10 +51,10 @@ function cvRender() {
       <td style="color:#9CA3AF;text-align:center;font-size:12.5px">${r.id}</td>
       <td style="font-weight:600;color:#111827">${r.ten}</td>
       <td><span class="cat-chip-blue">${r.vietTat}</span></td>
-      <td style="text-align:right">${r.hsCoBan.toFixed(2)}</td>
-      <td style="text-align:right">${r.hsTrachNhiem.toFixed(2)}</td>
-      <td style="text-align:right">${r.hsChucVu.toFixed(2)}</td>
-      <td>${r.ngayHieuLuc}</td>
+      <td style="text-align:center">${r.hsCoBan.toFixed(2)}</td>
+      <td style="text-align:center">${r.hsTrachNhiem.toFixed(2)}</td>
+      <td style="text-align:center">${r.hsChucVu.toFixed(2)}</td>
+      <td style="text-align:center; white-space:nowrap;">${r.ngayHieuLuc}</td>
       <td style="color:#6B7280;font-size:13px">${r.moTa || '<span style="color:#D1D5DB">—</span>'}</td>
       <td style="text-align:center; white-space:nowrap;">
         <div class="cat-action-btns">
