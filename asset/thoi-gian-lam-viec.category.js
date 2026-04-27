@@ -162,7 +162,7 @@ function tlvGoPage(page) {
 
 // ─── Xóa lỗi form ────────────────────────────────────────────────────
 function _tlvClearErrors() {
-  ['errTlvThang', 'errTlvNam', 'errTlvNgayLV', 'errTlvNgayLe'].forEach(id => {
+  ['errTlvThang', 'errTlvNam', 'errTlvNgayLV'].forEach(id => {
     const el = document.getElementById(id);
     if (el) { el.style.display = 'none'; el.textContent = ''; }
   });
@@ -188,7 +188,6 @@ function tlvOpenAdd() {
   _tlvPopulateThangOptions(null);
   document.getElementById('tlvNam').value = new Date().getFullYear();
   document.getElementById('tlvNgayLV').value = '';
-  document.getElementById('tlvNgayLe').value = '0';
   _tlvClearErrors();
   document.getElementById('tlvModal').classList.add('open');
   setTimeout(() => document.getElementById('tlvThang').focus(), 100);
@@ -203,7 +202,6 @@ function tlvOpenEdit(id) {
   _tlvPopulateThangOptions(r.thang);
   document.getElementById('tlvNam').value = r.nam;
   document.getElementById('tlvNgayLV').value = r.soNgayLamViec;
-  document.getElementById('tlvNgayLe').value = r.soNgayLe;
   _tlvClearErrors();
   document.getElementById('tlvModal').classList.add('open');
 }
@@ -217,7 +215,6 @@ function tlvSave() {
   const thang = parseInt(document.getElementById('tlvThang').value) || 0;
   const nam = parseInt(document.getElementById('tlvNam').value) || 0;
   const soNgayLV = parseInt(document.getElementById('tlvNgayLV').value) || 0;
-  const soNgayLe = parseInt(document.getElementById('tlvNgayLe').value) || 0;
 
   let valid = true;
   const errThang = document.getElementById('errTlvThang');
@@ -245,9 +242,9 @@ function tlvSave() {
 
   if (tlvEditId) {
     const r = tlvData.find(x => x.id === tlvEditId);
-    if (r) { r.thang = thang; r.nam = nam; r.soNgayLamViec = soNgayLV; r.soNgayLe = soNgayLe; }
+    if (r) { r.thang = thang; r.nam = nam; r.soNgayLamViec = soNgayLV; }
   } else {
-    tlvData.unshift({ id: tlvNextId++, thang, nam, soNgayLamViec: soNgayLV, soNgayLe });
+    tlvData.unshift({ id: tlvNextId++, thang, nam, soNgayLamViec: soNgayLV });
   }
 
   // Cập nhật lại dropdown năm nếu có năm mới

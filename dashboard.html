@@ -253,7 +253,7 @@
         <div class="page-section fade-in" id="page-dm-phong-ban">
           <div class="cat-header">
             <div class="cat-header-left">
-              <div class="cat-icon-wrap cat-icon-teal"><svg viewBox="0 0 20 20" fill="none">
+              <div class="cat-icon-wrap cat-icon-blue"><svg viewBox="0 0 20 20" fill="none">
                   <rect x="1" y="3" width="18" height="14" rx="2" stroke="currentColor" stroke-width="1.6" />
                   <path d="M1 9h18M6 9v8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
                 </svg></div>
@@ -1194,45 +1194,67 @@
 
   <!-- Modal Danh mục Phòng ban -->
   <div class="modal-overlay" id="pbcModal">
-    <div class="cat-modal" style="max-width:600px">
-      <div class="cat-modal-accent cat-modal-accent-teal"></div>
-      <div class="cat-modal-body">
-        <div class="cat-modal-header">
+    <div class="cat-modal" style="max-width:560px; border-radius: 20px;">
+      <div class="cat-modal-accent cat-modal-accent-blue" style="height: 6px;"></div>
+      <div class="cat-modal-body" style="padding: 2rem;">
+        <div class="cat-modal-header" style="margin-bottom: 1.75rem;">
           <div class="cat-modal-title-wrap">
-            <div class="cat-modal-icon cat-icon-teal"><svg viewBox="0 0 16 16" fill="none">
-                <rect x="1" y="3" width="14" height="10" rx="1.5" stroke="currentColor" stroke-width="1.4" />
-                <path d="M1 7h14M5 7v6" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" />
-              </svg></div><span class="cat-modal-title" id="pbcModalTitle">Thêm phòng ban</span>
-          </div><button class="cat-btn-close" onclick="pbcCloseModal()"><svg viewBox="0 0 14 14" fill="none">
-              <path d="M2 2l10 10M12 2L2 12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
-            </svg></button>
+            <div class="cat-modal-icon cat-icon-blue" style="width: 40px; height: 40px;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+                <line x1="3" y1="9" x2="21" y2="9" />
+                <line x1="9" y1="21" x2="9" y2="9" />
+              </svg>
+            </div>
+            <span class="cat-modal-title" id="pbcModalTitle" style="font-size: 1.25rem; font-weight: 700;">Thêm phòng ban</span>
+          </div>
+          <button class="cat-btn-close" onclick="pbcCloseModal()">
+            <svg viewBox="0 0 14 14" fill="none"><path d="M2 2l10 10M12 2L2 12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+          </button>
         </div>
-        <div class="cat-form-grid" style="grid-template-columns:1fr 1fr">
-          <div class="cat-field" style="grid-column:1/-1"><label>Tên phòng ban <span class="req">*</span></label><input
-              type="text" id="pbcTen" placeholder="VD: Phòng Kỹ thuật..." maxlength="120" />
-            <div class="cat-field-err" id="errPbcTen"></div>
+        
+        <div class="cat-form-grid" style="grid-template-columns: 1fr 1fr; gap: 1.25rem;">
+          <div class="cat-field" style="grid-column: 1 / -1;">
+            <label style="font-weight: 600; color: #475569; margin-bottom: 0.4rem; display: block;">Tên phòng ban <span class="req">*</span></label>
+            <input type="text" id="pbcTen" placeholder="VD: Phòng Kinh doanh, Phòng Kỹ thuật..." style="height: 42px; border-radius: 10px;" />
+            <div class="cat-field-err" id="errPbcTen" style="font-size: 11px; color: #E24B4A; margin-top: 4px;"></div>
           </div>
-          <div class="cat-field"><label>Tên viết tắt <span class="req">*</span></label><input type="text"
-              id="pbcVietTat" placeholder="VD: KT, HCNS..." maxlength="20" />
-            <div class="cat-field-err" id="errPbcVietTat"></div>
+          
+          <div class="cat-field">
+            <label style="font-weight: 600; color: #475569; margin-bottom: 0.4rem; display: block;">Tên viết tắt <span class="req">*</span></label>
+            <input type="text" id="pbcVietTat" placeholder="VD: KD, KT..." style="height: 42px; border-radius: 10px;" />
+            <div class="cat-field-err" id="errPbcVietTat" style="font-size: 11px; color: #E24B4A; margin-top: 4px;"></div>
           </div>
-          <div class="cat-field"><label>Ngày hiệu lực <span class="req">*</span></label><input type="date"
-              id="pbcNgayHieuLuc" />
-            <div class="cat-field-err" id="errPbcNgayHieuLuc"></div>
+          
+          <div class="cat-field">
+            <label style="font-weight: 600; color: #475569; margin-bottom: 0.4rem; display: block;">Ngày hiệu lực <span class="req">*</span></label>
+            <input type="date" id="pbcNgayHieuLuc" style="height: 42px; border-radius: 10px;" />
+            <div class="cat-field-err" id="errPbcNgayHieuLuc" style="font-size: 11px; color: #E24B4A; margin-top: 4px;"></div>
           </div>
-          <div class="cat-field"><label>HS cơ bản chức vụ</label><input type="number" id="pbcHSCoBan" step="0.01"
-              value="0.00" /></div>
-          <div class="cat-field"><label>HS trách nhiệm</label><input type="number" id="pbcHSTrachNhiem" step="0.01"
-              value="0.00" /></div>
-          <div class="cat-field" style="grid-column:1/-1"><label>Mô tả</label><textarea id="pbcMoTa"
-              placeholder="Mô tả phòng ban..."></textarea></div>
+          
+          <div class="cat-field">
+            <label style="font-weight: 600; color: #475569; margin-bottom: 0.4rem; display: block;">HS cơ bản chức vụ</label>
+            <input type="number" id="pbcHSCoBan" step="0.01" value="0.00" style="height: 42px; border-radius: 10px;" />
+          </div>
+          
+          <div class="cat-field">
+            <label style="font-weight: 600; color: #475569; margin-bottom: 0.4rem; display: block;">HS trách nhiệm</label>
+            <input type="number" id="pbcHSTrachNhiem" step="0.01" value="0.00" style="height: 42px; border-radius: 10px;" />
+          </div>
+          
+          <div class="cat-field" style="grid-column: 1 / -1;">
+            <label style="font-weight: 600; color: #475569; margin-bottom: 0.4rem; display: block;">Mô tả</label>
+            <textarea id="pbcMoTa" placeholder="Nhập mô tả phòng ban..." style="height: 80px; border-radius: 10px; padding: 10px;"></textarea>
+          </div>
         </div>
-        <div class="cat-modal-footer"><button class="cat-btn-cancel" onclick="pbcCloseModal()">Hủy</button><button
-            class="cat-btn-save cat-btn-save-teal" onclick="pbcSave()"><svg width="13" height="13" viewBox="0 0 13 13"
-              fill="none">
-              <path d="M2 7l3 3 6-6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
-                stroke-linejoin="round" />
-            </svg>Lưu</button></div>
+
+        <div class="cat-modal-footer" style="margin-top: 2rem; border-top: 1px solid #F1F5F9; pt: 1.25rem; justify-content: flex-end; gap: 10px;">
+          <button class="cat-btn-cancel" onclick="pbcCloseModal()" style="height: 40px; border-radius: 10px; padding: 0 18px; font-weight: 600;">Hủy</button>
+          <button class="cat-btn-save" onclick="pbcSave()" style="height: 40px; border-radius: 10px; padding: 0 22px; font-weight: 600; display: flex; align-items: center; gap: 8px;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+            Lưu dữ liệu
+          </button>
+        </div>
       </div>
     </div>
   </div>
