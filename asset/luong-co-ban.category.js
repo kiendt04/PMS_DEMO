@@ -242,3 +242,11 @@ document.getElementById('lcbDeleteModal').addEventListener('click', function (e)
 
 // ─── Khởi tạo ───────────────────────────────────────────────────────
 lcbRender();
+
+(function() {
+  const prevOnPageActivate = window.onPageActivate;
+  window.onPageActivate = function(page) {
+    if (prevOnPageActivate) prevOnPageActivate(page);
+    if (page === 'dm-luong-co-ban') lcbRender();
+  };
+})();

@@ -1095,539 +1095,329 @@
       <div class="cat-modal-body">
         <div class="cat-modal-header">
           <div class="cat-modal-title-wrap">
-            <div class="cat-modal-icon cat-icon-blue"><svg viewBox="0 0 16 16" fill="none">
-                <rect x="1" y="1" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.4" />
-                <rect x="9" y="1" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.4" />
-                <rect x="1" y="9" width="6" height="3.5" rx="1" stroke="currentColor" stroke-width="1.4" />
-                <rect x="9" y="9" width="6" height="3.5" rx="1" stroke="currentColor" stroke-width="1.4" />
-              </svg></div><span class="cat-modal-title" id="kpbModalTitle">Thêm khối</span>
-          </div><button class="cat-btn-close" onclick="kpbCloseModal()"><svg viewBox="0 0 14 14" fill="none">
-              <path d="M2 2l10 10M12 2L2 12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
-            </svg></button>
+            <span class="cat-modal-title" id="kpbModalTitle">Thêm khối</span>
+          </div>
+          <button class="cat-btn-close" onclick="kpbCloseModal()"><svg viewBox="0 0 14 14" fill="none"><path d="M2 2l10 10M12 2L2 12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
         </div>
-        <div class="cat-form-grid" style="grid-template-columns:1fr 1fr">
-          <div class="cat-field"><label>Mã khối <span class="req">*</span></label><input type="text" id="kpbMa"
-              placeholder="VD: KD, KT..." maxlength="20" />
+        <div class="cat-form-grid" style="grid-template-columns: 1fr 1fr;">
+          <div class="cat-field">
+            <label>Mã khối <span class="req">*</span></label>
+            <input type="text" id="kpbMa" placeholder="VD: KD, KT..." />
             <div class="cat-field-err" id="errKpbMa"></div>
           </div>
-          <div class="cat-field"><label>Tên khối <span class="req">*</span></label><input type="text" id="kpbTen"
-              placeholder="VD: Khối Kinh doanh..." maxlength="100" />
+          <div class="cat-field">
+            <label>Tên khối <span class="req">*</span></label>
+            <input type="text" id="kpbTen" placeholder="VD: Khối Kinh doanh..." />
             <div class="cat-field-err" id="errKpbTen"></div>
           </div>
-          <div class="cat-field" style="grid-column:1/-1"><label>Mô tả</label><textarea id="kpbMoTa"
-              placeholder="Mô tả chức năng..."></textarea></div>
+          <div class="cat-field" style="grid-column: 1/-1;">
+            <label>Mô tả</label>
+            <textarea id="kpbMoTa" placeholder="Mô tả chức năng..."></textarea>
+          </div>
         </div>
-        <div class="cat-modal-footer"><button class="cat-btn-cancel" onclick="kpbCloseModal()">Hủy</button><button
-            class="cat-btn-save" onclick="kpbSave()"><svg width="13" height="13" viewBox="0 0 13 13" fill="none">
-              <path d="M2 7l3 3 6-6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
-                stroke-linejoin="round" />
-            </svg>Lưu</button></div>
+        <div class="cat-modal-footer">
+          <button class="cat-btn-cancel" onclick="kpbCloseModal()">Hủy</button>
+          <button class="cat-btn-save" onclick="kpbSave()">Lưu dữ liệu</button>
+        </div>
       </div>
     </div>
   </div>
+
   <div class="modal-overlay" id="kpbDeleteModal">
     <div class="cat-modal cat-modal-sm">
       <div class="cat-modal-accent cat-modal-accent-red"></div>
       <div class="cat-modal-body">
         <div class="cat-delete-icon"><svg viewBox="0 0 24 24" fill="none">
-            <polyline points="3 6 5 6 21 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
-              stroke-linejoin="round" />
-            <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" stroke="currentColor" stroke-width="1.8"
-              stroke-linecap="round" stroke-linejoin="round" />
+            <polyline points="3 6 5 6 21 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+            <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
           </svg></div>
         <div class="cat-delete-title">Xác nhận xóa</div>
         <div class="cat-delete-sub" id="kpbDeleteMsg">Bạn có chắc muốn xóa?</div>
-        <div class="cat-modal-footer" style="justify-content:center"><button class="cat-btn-cancel"
-            onclick="kpbCloseDelete()">Hủy</button><button class="cat-btn-danger"
-            onclick="kpbConfirmDelete()">Xóa</button></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Modal Phong ban -->
-  <div class="modal-overlay" id="pbModal">
-    <div class="cat-modal" style="max-width:540px">
-      <div class="cat-modal-accent cat-modal-accent-teal"></div>
-      <div class="cat-modal-body">
-        <div class="cat-modal-header">
-          <div class="cat-modal-title-wrap">
-            <div class="cat-modal-icon cat-icon-teal"><svg viewBox="0 0 16 16" fill="none">
-                <rect x="1" y="3" width="14" height="10" rx="1.5" stroke="currentColor" stroke-width="1.4" />
-                <path d="M1 7h14M5 7v6" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" />
-              </svg></div><span class="cat-modal-title" id="pbModalTitle">Thêm phòng ban</span>
-          </div><button class="cat-btn-close" onclick="pbCloseModal()"><svg viewBox="0 0 14 14" fill="none">
-              <path d="M2 2l10 10M12 2L2 12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
-            </svg></button>
-        </div>
-        <div class="cat-form-grid">
-          <div class="cat-field" style="grid-column:1/-1"><label>Tên phòng ban <span class="req">*</span></label><input
-              type="text" id="pbTen" placeholder="VD: Phòng Kinh doanh..." maxlength="120" />
-            <div class="cat-field-err" id="errPbTen"></div>
-          </div>
-          <div class="cat-field"><label>Viết tắt <span class="req">*</span></label><input type="text" id="pbVietTat"
-              placeholder="VD: KD-MB..." maxlength="30" />
-            <div class="cat-field-err" id="errPbVietTat"></div>
-          </div>
-          <div class="cat-field"><label>Thứ tự</label><input type="text" id="pbThuTu" placeholder="VD: 1, 2..."
-              maxlength="6" />
-            <div class="cat-field-err" id="errPbThuTu"></div>
-          </div>
-          <div class="cat-field" style="grid-column:1/-1"><label>Khối phòng ban <span
-                class="req">*</span></label><select id="pbKhoi" class="cat-select">
-              <option value="">-- Chọn khối --</option>
-            </select>
-            <div class="cat-field-err" id="errPbKhoi"></div>
-          </div>
-          <div class="cat-field" style="grid-column:1/-1"><label>Mô tả</label><textarea id="pbMoTa"
-              placeholder="Mô tả..."></textarea></div>
-        </div>
-        <div class="cat-modal-footer"><button class="cat-btn-cancel" onclick="pbCloseModal()">Hủy</button><button
-            class="cat-btn-save cat-btn-save-teal" onclick="pbSave()"><svg width="13" height="13" viewBox="0 0 13 13"
-              fill="none">
-              <path d="M2 7l3 3 6-6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
-                stroke-linejoin="round" />
-            </svg>Lưu</button></div>
-      </div>
-    </div>
-  </div>
-  <div class="modal-overlay" id="pbDeleteModal">
-    <div class="cat-modal cat-modal-sm">
-      <div class="cat-modal-accent cat-modal-accent-red"></div>
-      <div class="cat-modal-body">
-        <div class="cat-delete-icon"><svg viewBox="0 0 24 24" fill="none">
-            <polyline points="3 6 5 6 21 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
-              stroke-linejoin="round" />
-            <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" stroke="currentColor" stroke-width="1.8"
-              stroke-linecap="round" stroke-linejoin="round" />
-          </svg></div>
-        <div class="cat-delete-title">Xác nhận xóa</div>
-        <div class="cat-delete-sub" id="pbDeleteMsg">Bạn có chắc muốn xóa phòng ban này?</div>
-        <div class="cat-modal-footer" style="justify-content:center"><button class="cat-btn-cancel"
-            onclick="pbCloseDelete()">Hủy</button><button class="cat-btn-danger"
-            onclick="pbConfirmDelete()">Xóa</button></div>
+        <div class="cat-modal-footer" style="justify-content:center"><button class="cat-btn-cancel" onclick="kpbCloseDelete()">Hủy</button><button class="cat-btn-danger" onclick="kpbConfirmDelete()">Xóa</button></div>
       </div>
     </div>
   </div>
 
   <!-- Modal Chức vụ -->
   <div class="modal-overlay" id="cvModal">
-    <div class="cat-modal" style="max-width:600px">
+    <div class="cat-modal">
       <div class="cat-modal-accent cat-modal-accent-blue"></div>
       <div class="cat-modal-body">
         <div class="cat-modal-header">
           <div class="cat-modal-title-wrap">
-            <div class="cat-modal-icon cat-icon-blue"><svg viewBox="0 0 16 16" fill="none">
-                <circle cx="8" cy="5" r="3" stroke="currentColor" stroke-width="1.4" />
-                <path d="M2 14c0-3.3 2.7-6 6-6s6 2.7 6 6" stroke="currentColor" stroke-width="1.4"
-                  stroke-linecap="round" />
-              </svg></div><span class="cat-modal-title" id="cvModalTitle">Thêm chức vụ</span>
-          </div><button class="cat-btn-close" onclick="cvCloseModal()"><svg viewBox="0 0 14 14" fill="none">
-              <path d="M2 2l10 10M12 2L2 12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
-            </svg></button>
+            <span class="cat-modal-title" id="cvModalTitle">Thêm chức vụ</span>
+          </div>
+          <button class="cat-btn-close" onclick="cvCloseModal()"><svg viewBox="0 0 14 14" fill="none"><path d="M2 2l10 10M12 2L2 12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
         </div>
-        <div class="cat-form-grid" style="grid-template-columns:1fr 1fr">
-          <div class="cat-field" style="grid-column:1/-1"><label>Tên chức vụ <span class="req">*</span></label><input
-              type="text" id="cvTen" placeholder="VD: Giám đốc..." maxlength="100" />
+        <div class="cat-form-grid" style="grid-template-columns: 1fr 1fr;">
+          <div class="cat-field" style="grid-column: 1/-1;">
+            <label>Tên chức vụ <span class="req">*</span></label>
+            <input type="text" id="cvTen" placeholder="VD: Giám đốc, Kỹ sư..." />
             <div class="cat-field-err" id="errCvTen"></div>
           </div>
-          <div class="cat-field"><label>Tên viết tắt <span class="req">*</span></label><input type="text" id="cvVietTat"
-              placeholder="VD: GĐ..." maxlength="20" />
+          <div class="cat-field">
+            <label>Tên viết tắt <span class="req">*</span></label>
+            <input type="text" id="cvVietTat" placeholder="VD: GĐ, KS..." />
             <div class="cat-field-err" id="errCvVietTat"></div>
           </div>
-          <div class="cat-field"><label>Ngày hiệu lực <span class="req">*</span></label><input type="date"
-              id="cvNgayHieuLuc" />
+          <div class="cat-field">
+            <label>Ngày hiệu lực <span class="req">*</span></label>
+            <input type="date" id="cvNgayHieuLuc" />
             <div class="cat-field-err" id="errCvNgayHieuLuc"></div>
           </div>
-          <div class="cat-field"><label>HS cơ bản chức vụ</label><input type="number" id="cvHSCoban" step="0.01"
-              value="0.00" />
+          <div class="cat-field">
+            <label>HS cơ bản chức vụ</label>
+            <input type="number" id="cvHSCoban" step="0.01" value="0.00" />
           </div>
-          <div class="cat-field"><label>HS trách nhiệm</label><input type="number" id="cvHSTrachNhiem" step="0.01"
-              value="0.00" />
+          <div class="cat-field">
+            <label>HS trách nhiệm</label>
+            <input type="number" id="cvHSTrachNhiem" step="0.01" value="0.00" />
           </div>
-          <div class="cat-field"><label>HS chức vụ</label><input type="number" id="cvHSChucVu" step="0.01"
-              value="0.00" />
+          <div class="cat-field">
+            <label>HS chức vụ</label>
+            <input type="number" id="cvHSChucVu" step="0.01" value="0.00" />
           </div>
-          <div class="cat-field" style="grid-column:1/-1"><label>Mô tả</label><textarea id="cvMoTa"
-              placeholder="Mô tả chức vụ..."></textarea></div>
+          <div class="cat-field" style="grid-column: 1/-1;">
+            <label>Mô tả</label>
+            <textarea id="cvMoTa" placeholder="Nhập mô tả chức vụ..."></textarea>
+          </div>
         </div>
-        <div class="cat-modal-footer"><button class="cat-btn-cancel" onclick="cvCloseModal()">Hủy</button><button
-            class="cat-btn-save" onclick="cvSave()"><svg width="13" height="13" viewBox="0 0 13 13" fill="none">
-              <path d="M2 7l3 3 6-6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
-                stroke-linejoin="round" />
-            </svg>Lưu</button></div>
+        <div class="cat-modal-footer">
+          <button class="cat-btn-cancel" onclick="cvCloseModal()">Hủy</button>
+          <button class="cat-btn-save" onclick="cvSave()">Lưu dữ liệu</button>
+        </div>
       </div>
     </div>
   </div>
+
   <div class="modal-overlay" id="cvDeleteModal">
     <div class="cat-modal cat-modal-sm">
       <div class="cat-modal-accent cat-modal-accent-red"></div>
       <div class="cat-modal-body">
         <div class="cat-delete-icon"><svg viewBox="0 0 24 24" fill="none">
-            <polyline points="3 6 5 6 21 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
-              stroke-linejoin="round" />
-            <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" stroke="currentColor" stroke-width="1.8"
-              stroke-linecap="round" stroke-linejoin="round" />
+            <polyline points="3 6 5 6 21 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+            <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
           </svg></div>
         <div class="cat-delete-title">Xác nhận xóa</div>
         <div class="cat-delete-sub" id="cvDeleteMsg">Bạn có chắc muốn xóa chức vụ này?</div>
-        <div class="cat-modal-footer" style="justify-content:center"><button class="cat-btn-cancel"
-            onclick="cvCloseDelete()">Hủy</button><button class="cat-btn-danger"
-            onclick="cvConfirmDelete()">Xóa</button></div>
+        <div class="cat-modal-footer" style="justify-content:center"><button class="cat-btn-cancel" onclick="cvCloseDelete()">Hủy</button><button class="cat-btn-danger" onclick="cvConfirmDelete()">Xóa</button></div>
       </div>
     </div>
   </div>
 
-  <!-- Modal Danh mục Phòng ban -->
+  <!-- Modal Phòng ban -->
   <div class="modal-overlay" id="pbcModal">
-    <div class="cat-modal" style="max-width:560px; border-radius: 20px;">
-      <div class="cat-modal-accent cat-modal-accent-blue" style="height: 6px;"></div>
-      <div class="cat-modal-body" style="padding: 2rem;">
-        <div class="cat-modal-header" style="margin-bottom: 1.75rem;">
+    <div class="cat-modal">
+      <div class="cat-modal-accent cat-modal-accent-blue"></div>
+      <div class="cat-modal-body">
+        <div class="cat-modal-header">
           <div class="cat-modal-title-wrap">
-            <div class="cat-modal-icon cat-icon-blue" style="width: 40px; height: 40px;">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
-                <line x1="3" y1="9" x2="21" y2="9" />
-                <line x1="9" y1="21" x2="9" y2="9" />
-              </svg>
-            </div>
-            <span class="cat-modal-title" id="pbcModalTitle" style="font-size: 1.25rem; font-weight: 700;">Thêm phòng ban</span>
+            <span class="cat-modal-title" id="pbcModalTitle">Thêm phòng ban</span>
           </div>
-          <button class="cat-btn-close" onclick="pbcCloseModal()">
-            <svg viewBox="0 0 14 14" fill="none"><path d="M2 2l10 10M12 2L2 12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
-          </button>
+          <button class="cat-btn-close" onclick="pbcCloseModal()"><svg viewBox="0 0 14 14" fill="none"><path d="M2 2l10 10M12 2L2 12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
         </div>
-        
-        <div class="cat-form-grid" style="grid-template-columns: 1fr 1fr; gap: 1.25rem;">
+        <div class="cat-form-grid" style="grid-template-columns: 1fr 1fr;">
           <div class="cat-field" style="grid-column: 1 / -1;">
-            <label style="font-weight: 600; color: #475569; margin-bottom: 0.4rem; display: block;">Tên phòng ban <span class="req">*</span></label>
-            <input type="text" id="pbcTen" placeholder="VD: Phòng Kinh doanh, Phòng Kỹ thuật..." style="height: 42px; border-radius: 10px;" />
-            <div class="cat-field-err" id="errPbcTen" style="font-size: 11px; color: #E24B4A; margin-top: 4px;"></div>
+            <label>Tên phòng ban <span class="req">*</span></label>
+            <input type="text" id="pbcTen" placeholder="VD: Phòng Kinh doanh, Phòng Kỹ thuật..." />
+            <div class="cat-field-err" id="errPbcTen"></div>
           </div>
-          
           <div class="cat-field">
-            <label style="font-weight: 600; color: #475569; margin-bottom: 0.4rem; display: block;">Tên viết tắt <span class="req">*</span></label>
-            <input type="text" id="pbcVietTat" placeholder="VD: KD, KT..." style="height: 42px; border-radius: 10px;" />
-            <div class="cat-field-err" id="errPbcVietTat" style="font-size: 11px; color: #E24B4A; margin-top: 4px;"></div>
+            <label>Tên viết tắt <span class="req">*</span></label>
+            <input type="text" id="pbcVietTat" placeholder="VD: KD, KT..." />
+            <div class="cat-field-err" id="errPbcVietTat"></div>
           </div>
-          
           <div class="cat-field">
-            <label style="font-weight: 600; color: #475569; margin-bottom: 0.4rem; display: block;">Ngày hiệu lực <span class="req">*</span></label>
-            <input type="date" id="pbcNgayHieuLuc" style="height: 42px; border-radius: 10px;" />
-            <div class="cat-field-err" id="errPbcNgayHieuLuc" style="font-size: 11px; color: #E24B4A; margin-top: 4px;"></div>
+            <label>Ngày hiệu lực <span class="req">*</span></label>
+            <input type="date" id="pbcNgayHieuLuc" />
+            <div class="cat-field-err" id="errPbcNgayHieuLuc"></div>
           </div>
-          
           <div class="cat-field">
-            <label style="font-weight: 600; color: #475569; margin-bottom: 0.4rem; display: block;">HS cơ bản chức vụ</label>
-            <input type="number" id="pbcHSCoBan" step="0.01" value="0.00" style="height: 42px; border-radius: 10px;" />
+            <label>HS cơ bản chức vụ</label>
+            <input type="number" id="pbcHSCoBan" step="0.01" value="0.00" />
           </div>
-          
           <div class="cat-field">
-            <label style="font-weight: 600; color: #475569; margin-bottom: 0.4rem; display: block;">HS trách nhiệm</label>
-            <input type="number" id="pbcHSTrachNhiem" step="0.01" value="0.00" style="height: 42px; border-radius: 10px;" />
+            <label>HS trách nhiệm</label>
+            <input type="number" id="pbcHSTrachNhiem" step="0.01" value="0.00" />
           </div>
-          
           <div class="cat-field" style="grid-column: 1 / -1;">
-            <label style="font-weight: 600; color: #475569; margin-bottom: 0.4rem; display: block;">Mô tả</label>
-            <textarea id="pbcMoTa" placeholder="Nhập mô tả phòng ban..." style="height: 80px; border-radius: 10px; padding: 10px;"></textarea>
+            <label>Mô tả</label>
+            <textarea id="pbcMoTa" placeholder="Nhập mô tả phòng ban..."></textarea>
           </div>
         </div>
-
-        <div class="cat-modal-footer" style="margin-top: 2rem; border-top: 1px solid #F1F5F9; pt: 1.25rem; justify-content: flex-end; gap: 10px;">
-          <button class="cat-btn-cancel" onclick="pbcCloseModal()" style="height: 40px; border-radius: 10px; padding: 0 18px; font-weight: 600;">Hủy</button>
-          <button class="cat-btn-save" onclick="pbcSave()" style="height: 40px; border-radius: 10px; padding: 0 22px; font-weight: 600; display: flex; align-items: center; gap: 8px;">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
-            Lưu dữ liệu
-          </button>
+        <div class="cat-modal-footer">
+          <button class="cat-btn-cancel" onclick="pbcCloseModal()">Hủy</button>
+          <button class="cat-btn-save" onclick="pbcSave()">Lưu dữ liệu</button>
         </div>
       </div>
     </div>
   </div>
+
   <div class="modal-overlay" id="pbcDeleteModal">
     <div class="cat-modal cat-modal-sm">
       <div class="cat-modal-accent cat-modal-accent-red"></div>
       <div class="cat-modal-body">
         <div class="cat-delete-icon"><svg viewBox="0 0 24 24" fill="none">
-            <polyline points="3 6 5 6 21 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
-              stroke-linejoin="round" />
-            <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" stroke="currentColor" stroke-width="1.8"
-              stroke-linecap="round" stroke-linejoin="round" />
+            <polyline points="3 6 5 6 21 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+            <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
           </svg></div>
         <div class="cat-delete-title">Xác nhận xóa</div>
         <div class="cat-delete-sub" id="pbcDeleteMsg">Bạn có chắc muốn xóa phòng ban này?</div>
-        <div class="cat-modal-footer" style="justify-content:center"><button class="cat-btn-cancel"
-            onclick="pbcCloseDelete()">Hủy</button><button class="cat-btn-danger"
-            onclick="pbcConfirmDelete()">Xóa</button></div>
+        <div class="cat-modal-footer" style="justify-content:center"><button class="cat-btn-cancel" onclick="pbcCloseDelete()">Hủy</button><button class="cat-btn-danger" onclick="pbcConfirmDelete()">Xóa</button></div>
       </div>
     </div>
   </div>
 
   <!-- Modal Lương cơ bản -->
   <div class="modal-overlay" id="lcbModal">
-    <div class="cat-modal" style="max-width:560px">
+    <div class="cat-modal">
       <div class="cat-modal-accent cat-modal-accent-blue"></div>
       <div class="cat-modal-body">
         <div class="cat-modal-header">
           <div class="cat-modal-title-wrap">
-            <div class="cat-modal-icon cat-icon-blue"><svg viewBox="0 0 16 16" fill="none">
-                <rect x="1" y="3" width="14" height="10" rx="1.5" stroke="currentColor" stroke-width="1.4" />
-                <path d="M5 7h6M5 10h4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" />
-              </svg></div><span class="cat-modal-title" id="lcbModalTitle">Thêm mức lương cơ bản</span>
-          </div><button class="cat-btn-close" onclick="lcbCloseModal()"><svg viewBox="0 0 14 14" fill="none">
-              <path d="M2 2l10 10M12 2L2 12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
-            </svg></button>
+            <span class="cat-modal-title" id="lcbModalTitle">Thêm mức lương cơ bản</span>
+          </div>
+          <button class="cat-btn-close" onclick="lcbCloseModal()"><svg viewBox="0 0 14 14" fill="none"><path d="M2 2l10 10M12 2L2 12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
         </div>
-        <div class="cat-form-grid" style="grid-template-columns:1fr 1fr">
-          <div class="cat-field" style="grid-column:1/-1"><label>Tên mức lương <span class="req">*</span></label><input
-              type="text" id="lcbTen" placeholder="VD: Lương tối thiểu vùng I..." maxlength="150" />
+        <div class="cat-form-grid" style="grid-template-columns: 1fr 1fr;">
+          <div class="cat-field" style="grid-column: 1/-1;">
+            <label>Tên mức lương <span class="req">*</span></label>
+            <input type="text" id="lcbTen" placeholder="VD: Lương vùng 1, Lương cơ sở..." />
             <div class="cat-field-err" id="errLcbTen"></div>
           </div>
-          <div class="cat-field" style="grid-column:1/-1"><label>Mức lương (VNĐ) <span
-                class="req">*</span></label><input type="number" id="lcbMucLuong" placeholder="VD: 4680000" min="0"
-              step="1000" />
+          <div class="cat-field">
+            <label>Mức lương (VNĐ) <span class="req">*</span></label>
+            <input type="number" id="lcbMucLuong" placeholder="VD: 1800000" />
             <div class="cat-field-err" id="errLcbMucLuong"></div>
           </div>
-          <div class="cat-field"><label>Ngày hiệu lực <span class="req">*</span></label><input type="date"
-              id="lcbNgayHieuLuc" />
+          <div class="cat-field">
+            <label>Ngày hiệu lực <span class="req">*</span></label>
+            <input type="date" id="lcbNgayHieuLuc" />
             <div class="cat-field-err" id="errLcbNgayHieuLuc"></div>
           </div>
-          <div class="cat-field"><label>Ngày kết thúc <span style="color:#9CA3AF;font-weight:400;font-size:12px">(để
-                trống nếu còn hiệu lực)</span></label><input type="date" id="lcbNgayKetThuc" />
+          <div class="cat-field" style="grid-column: 1/-1;">
+            <label>Mô tả</label>
+            <textarea id="lcbMoTa" placeholder="Ghi chú về mức lương này..."></textarea>
           </div>
-          <div class="cat-field" style="grid-column:1/-1"><label>Mô tả</label><textarea id="lcbMoTa"
-              placeholder="Mô tả mức lương..."></textarea></div>
         </div>
-        <div class="cat-modal-footer"><button class="cat-btn-cancel" onclick="lcbCloseModal()">Hủy</button><button
-            class="cat-btn-save" onclick="lcbSave()"><svg width="13" height="13" viewBox="0 0 13 13" fill="none">
-              <path d="M2 7l3 3 6-6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
-                stroke-linejoin="round" />
-            </svg>Lưu</button></div>
+        <div class="cat-modal-footer">
+          <button class="cat-btn-cancel" onclick="lcbCloseModal()">Hủy</button>
+          <button class="cat-btn-save" onclick="lcbSave()">Lưu dữ liệu</button>
+        </div>
       </div>
     </div>
   </div>
+
   <div class="modal-overlay" id="lcbDeleteModal">
     <div class="cat-modal cat-modal-sm">
       <div class="cat-modal-accent cat-modal-accent-red"></div>
       <div class="cat-modal-body">
         <div class="cat-delete-icon"><svg viewBox="0 0 24 24" fill="none">
-            <polyline points="3 6 5 6 21 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
-              stroke-linejoin="round" />
-            <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" stroke="currentColor" stroke-width="1.8"
-              stroke-linecap="round" stroke-linejoin="round" />
+            <polyline points="3 6 5 6 21 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+            <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
           </svg></div>
         <div class="cat-delete-title">Xác nhận xóa</div>
         <div class="cat-delete-sub" id="lcbDeleteMsg">Bạn có chắc muốn xóa mức lương này?</div>
-        <div class="cat-modal-footer" style="justify-content:center"><button class="cat-btn-cancel"
-            onclick="lcbCloseDelete()">Hủy</button><button class="cat-btn-danger"
-            onclick="lcbConfirmDelete()">Xóa</button></div>
+        <div class="cat-modal-footer" style="justify-content:center"><button class="cat-btn-cancel" onclick="lcbCloseDelete()">Hủy</button><button class="cat-btn-danger" onclick="lcbConfirmDelete()">Xóa</button></div>
       </div>
     </div>
   </div>
-
-  <script src="asset/sidebar.js"></script>
-  <script>
-    // Bar chart (dashboard specific)
-    (function () {
-      var months = ['Th11', 'Th12', 'Th1', 'Th2', 'Th3', 'Th4'];
-      var vals = [3.6, 3.8, 3.7, 4.0, 3.9, 4.2];
-      var max = Math.max.apply(null, vals);
-      var bc = document.getElementById('barChart');
-      if (!bc) return;
-      months.forEach(function (m, i) {
-        var h = Math.round((vals[i] / max) * 88);
-        bc.innerHTML += `<div class="bar-col"><div class="bar ${i === 5 ? 'highlight' : ''}" style="height:${h}px" title="${vals[i]} ty"></div><span class="bar-label">${m}</span></div>`;
-      });
-    })();
-  </script>
-  <script src="asset/khoi-phong-ban.js"></script>
-  <script src="asset/phong-ban.js"></script>
-  <script src="asset/chuc-vu.category.js"></script>
-  <script src="asset/phong-ban.category.js"></script>
-  <script src="asset/luong-co-ban.category.js"></script>
 
   <!-- Modal Thời gian làm việc -->
   <div class="modal-overlay" id="tlvModal">
-    <div class="cat-modal" style="max-width:480px; border-radius: 20px;">
-      <div class="cat-modal-accent cat-modal-accent-blue" style="height: 6px;"></div>
-      <div class="cat-modal-body" style="padding: 2rem;">
-        <div class="cat-modal-header" style="margin-bottom: 1.75rem;">
+    <div class="cat-modal">
+      <div class="cat-modal-accent cat-modal-accent-blue"></div>
+      <div class="cat-modal-body">
+        <div class="cat-modal-header">
           <div class="cat-modal-title-wrap">
-            <div class="cat-modal-icon cat-icon-blue" style="width: 40px; height: 40px;">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                stroke-linejoin="round">
-                <circle cx="12" cy="12" r="10" />
-                <polyline points="12 6 12 12 16 14" />
-              </svg>
-            </div>
-            <span class="cat-modal-title" id="tlvModalTitle" style="font-size: 1.25rem; font-weight: 700;">Thêm thời
-              gian làm việc</span>
+            <span class="cat-modal-title" id="tlvModalTitle">Thêm thời gian làm việc</span>
           </div>
-          <button class="cat-btn-close" onclick="tlvCloseModal()">
-            <svg viewBox="0 0 14 14" fill="none">
-              <path d="M2 2l10 10M12 2L2 12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
-            </svg>
-          </button>
+          <button class="cat-btn-close" onclick="tlvCloseModal()"><svg viewBox="0 0 14 14" fill="none"><path d="M2 2l10 10M12 2L2 12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
         </div>
-
-        <div class="cat-form-grid" style="grid-template-columns: 1fr 1fr; gap: 1.5rem;">
-          <div class="cat-field" style="grid-column: 1 / -1;">
-            <label style="font-weight: 600; color: #475569; margin-bottom: 0.5rem; display: block;">Chọn thời gian <span
-                class="req">*</span></label>
-            <div style="display: flex; gap: 10px;">
-              <div style="flex: 1;">
-                <select id="tlvThang" class="cat-select" style="height: 44px; border-radius: 10px;">
-                  <option value="">-- Tháng --</option>
-                </select>
-                <div class="cat-field-err" id="errTlvThang" style="font-size: 11px; margin-top: 4px;"></div>
-              </div>
-              <div style="flex: 1;">
-                <input type="number" id="tlvNam" min="2000" max="2099" placeholder="Năm (VD: 2025)"
-                  style="height: 44px; border-radius: 10px;" />
-                <div class="cat-field-err" id="errTlvNam" style="font-size: 11px; margin-top: 4px;"></div>
-              </div>
-            </div>
+        <div class="cat-form-grid" style="grid-template-columns: 1fr 1fr;">
+          <div class="cat-field">
+            <label>Năm <span class="req">*</span></label>
+            <input type="number" id="tlvNam" placeholder="VD: 2024" />
+            <div class="cat-field-err" id="errTlvNam"></div>
           </div>
-
-          <div class="cat-field" style="grid-column: 1 / -1;">
-            <label style="font-weight: 600; color: #475569; margin-bottom: 0.5rem; display: block;">Số ngày làm việc
-              trong tháng <span class="req">*</span></label>
-            <div style="position: relative;">
-              <input type="number" id="tlvNgayLV" min="1" max="31" placeholder="Nhập số ngày (VD: 22)"
-                style="height: 44px; border-radius: 10px; padding-left: 40px;" />
-              <div style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #94A3B8;">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                  stroke-linecap="round" stroke-linejoin="round">
-                  <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
-                  <line x1="16" y1="2" x2="16" y2="6" />
-                  <line x1="8" y1="2" x2="8" y2="6" />
-                  <line x1="3" y1="10" x2="21" y2="10" />
-                </svg>
-              </div>
-            </div>
-            <div class="cat-field-err" id="errTlvNgayLV" style="font-size: 11px; margin-top: 4px;"></div>
+          <div class="cat-field">
+            <label>Tháng <span class="req">*</span></label>
+            <select id="tlvThang">
+              <option value="1">Tháng 1</option><option value="2">Tháng 2</option><option value="3">Tháng 3</option>
+              <option value="4">Tháng 4</option><option value="5">Tháng 5</option><option value="6">Tháng 6</option>
+              <option value="7">Tháng 7</option><option value="8">Tháng 8</option><option value="9">Tháng 9</option>
+              <option value="10">Tháng 10</option><option value="11">Tháng 11</option><option value="12">Tháng 12</option>
+            </select>
+            <div class="cat-field-err" id="errTlvThang"></div>
+          </div>
+          <div class="cat-field">
+            <label>Số ngày làm việc <span class="req">*</span></label>
+            <input type="number" id="tlvSoNgayLV" placeholder="VD: 22" />
+            <div class="cat-field-err" id="errTlvSoNgayLV"></div>
+          </div>
+          <div class="cat-field">
+            <label>Ghi chú</label>
+            <input type="text" id="tlvGhiChu" placeholder="Nhập ghi chú..." />
           </div>
         </div>
-
-        <div class="cat-modal-footer"
-          style="margin-top: 2.5rem; border-top: 1px solid #F1F5F9; pt: 1.5rem; justify-content: flex-end; gap: 12px;">
-          <button class="cat-btn-cancel" onclick="tlvCloseModal()"
-            style="height: 42px; border-radius: 10px; padding: 0 20px; font-weight: 600;">Hủy</button>
-          <button class="cat-btn-save" onclick="tlvSave()"
-            style="height: 42px; border-radius: 10px; padding: 0 24px; font-weight: 600; display: flex; align-items: center; gap: 8px;">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
-              stroke-linecap="round" stroke-linejoin="round">
-              <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" />
-              <polyline points="17 21 17 13 7 13 7 21" />
-              <polyline points="7 3 7 8 15 8" />
-            </svg>
-            Lưu dữ liệu
-          </button>
+        <div class="cat-modal-footer">
+          <button class="cat-btn-cancel" onclick="tlvCloseModal()">Hủy</button>
+          <button class="cat-btn-save" onclick="tlvSave()">Lưu dữ liệu</button>
         </div>
       </div>
     </div>
   </div>
+
   <div class="modal-overlay" id="tlvDeleteModal">
     <div class="cat-modal cat-modal-sm">
       <div class="cat-modal-accent cat-modal-accent-red"></div>
       <div class="cat-modal-body">
         <div class="cat-delete-icon"><svg viewBox="0 0 24 24" fill="none">
-            <polyline points="3 6 5 6 21 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
-              stroke-linejoin="round" />
-            <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" stroke="currentColor" stroke-width="1.8"
-              stroke-linecap="round" stroke-linejoin="round" />
+            <polyline points="3 6 5 6 21 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+            <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
           </svg></div>
         <div class="cat-delete-title">Xác nhận xóa</div>
         <div class="cat-delete-sub" id="tlvDeleteMsg">Bạn có chắc muốn xóa bản ghi này?</div>
-        <div class="cat-modal-footer" style="justify-content:center"><button class="cat-btn-cancel"
-            onclick="tlvCloseDelete()">Hủy</button><button class="cat-btn-danger"
-            onclick="tlvConfirmDelete()">Xóa</button></div>
+        <div class="cat-modal-footer" style="justify-content:center"><button class="cat-btn-cancel" onclick="tlvCloseDelete()">Hủy</button><button class="cat-btn-danger" onclick="tlvConfirmDelete()">Xóa</button></div>
       </div>
     </div>
   </div>
-  <div class="modal-overlay" id="cvDeleteModal">
-    <div class="cat-modal cat-modal-sm">
-      <div class="cat-modal-accent cat-modal-accent-red"></div>
+
+  <!-- Modal Định mức ăn ca -->
+  <div class="modal-overlay" id="dmacModal">
+    <div class="cat-modal">
+      <div class="cat-modal-accent cat-modal-accent-blue"></div>
       <div class="cat-modal-body">
-        <div class="cat-delete-icon"><svg viewBox="0 0 24 24" fill="none">
-            <polyline points="3 6 5 6 21 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
-              stroke-linejoin="round" />
-            <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" stroke="currentColor" stroke-width="1.8"
-              stroke-linecap="round" stroke-linejoin="round" />
-          </svg></div>
-        <div class="cat-delete-title">Xác nhận xóa</div>
-        <div class="cat-delete-sub" id="cvDeleteMsg">Bạn có chắc muốn xóa chức vụ này?</div>
-        <div class="cat-modal-footer" style="justify-content:center"><button class="cat-btn-cancel"
-            onclick="cvCloseDelete()">Hủy</button><button class="cat-btn-danger"
-            onclick="cvConfirmDelete()">Xóa</button></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Modal Chức vụ -->
-  <div class="modal-overlay" id="cvModal">
-    <div class="cat-modal" style="max-width:560px; border-radius: 20px;">
-      <div class="cat-modal-accent cat-modal-accent-blue" style="height: 6px;"></div>
-      <div class="cat-modal-body" style="padding: 2rem;">
-        <div class="cat-modal-header" style="margin-bottom: 1.75rem;">
+        <div class="cat-modal-header">
           <div class="cat-modal-title-wrap">
-            <div class="cat-modal-icon cat-icon-blue" style="width: 40px; height: 40px;">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M16 12l-4 4-4-4M12 8v8"/></svg>
-            </div>
-            <span class="cat-modal-title" id="cvModalTitle" style="font-size: 1.25rem; font-weight: 700;">Thêm chức vụ</span>
+            <span class="cat-modal-title" id="dmacModalTitle">Thêm định mức ăn ca</span>
           </div>
-          <button class="cat-btn-close" onclick="cvCloseModal()">
-            <svg viewBox="0 0 14 14" fill="none"><path d="M2 2l10 10M12 2L2 12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
-          </button>
+          <button class="cat-btn-close" onclick="dmacCloseModal()"><svg viewBox="0 0 14 14" fill="none"><path d="M2 2l10 10M12 2L2 12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
         </div>
-        
-        <div class="cat-form-grid" style="grid-template-columns: 1fr 1fr; gap: 1.25rem;">
-          <div class="cat-field" style="grid-column: 1 / -1;">
-            <label style="font-weight: 600; color: #475569; margin-bottom: 0.4rem; display: block;">Tên chức vụ <span class="req">*</span></label>
-            <input type="text" id="cvTen" placeholder="VD: Giám đốc, Trưởng phòng..." style="height: 42px; border-radius: 10px;" />
-            <div class="cat-field-err" id="errCvTen" style="font-size: 11px; color: #E24B4A; margin-top: 4px;"></div>
+        <div class="cat-form-grid" style="grid-template-columns: 1fr 1fr;">
+          <div class="cat-field" style="grid-column: 1/-1;">
+            <label>Tên loại định mức <span class="req">*</span></label>
+            <input type="text" id="dmacTenLoai" placeholder="VD: Ăn ca trưa, Ăn ca tối..." />
+            <div class="cat-field-err" id="errDmacTenLoai"></div>
           </div>
-          
           <div class="cat-field">
-            <label style="font-weight: 600; color: #475569; margin-bottom: 0.4rem; display: block;">Tên viết tắt <span class="req">*</span></label>
-            <input type="text" id="cvVietTat" placeholder="VD: GĐ, TP..." style="height: 42px; border-radius: 10px;" />
-            <div class="cat-field-err" id="errCvVietTat" style="font-size: 11px; color: #E24B4A; margin-top: 4px;"></div>
+            <label>Giá trị (VNĐ) <span class="req">*</span></label>
+            <input type="number" id="dmacGiaTri" placeholder="VD: 30000" />
+            <div class="cat-field-err" id="errDmacGiaTri"></div>
           </div>
-          
           <div class="cat-field">
-            <label style="font-weight: 600; color: #475569; margin-bottom: 0.4rem; display: block;">Ngày hiệu lực <span class="req">*</span></label>
-            <input type="date" id="cvNgayHieuLuc" style="height: 42px; border-radius: 10px;" />
-            <div class="cat-field-err" id="errCvNgayHieuLuc" style="font-size: 11px; color: #E24B4A; margin-top: 4px;"></div>
+            <label>Ngày hiệu lực <span class="req">*</span></label>
+            <input type="date" id="dmacNgayHieuLuc" />
+            <div class="cat-field-err" id="errDmacNgayHieuLuc"></div>
           </div>
-          
-          <div class="cat-field">
-            <label style="font-weight: 600; color: #475569; margin-bottom: 0.4rem; display: block;">HS cơ bản chức vụ</label>
-            <input type="number" id="cvHSCoban" step="0.01" value="0.00" style="height: 42px; border-radius: 10px;" />
-          </div>
-          
-          <div class="cat-field">
-            <label style="font-weight: 600; color: #475569; margin-bottom: 0.4rem; display: block;">HS trách nhiệm</label>
-            <input type="number" id="cvHSTrachNhiem" step="0.01" value="0.00" style="height: 42px; border-radius: 10px;" />
-          </div>
-          
-          <div class="cat-field">
-            <label style="font-weight: 600; color: #475569; margin-bottom: 0.4rem; display: block;">HS chức vụ</label>
-            <input type="number" id="cvHSChucVu" step="0.01" value="0.00" style="height: 42px; border-radius: 10px;" />
-          </div>
-          
-          <div class="cat-field"></div>
-          
-          <div class="cat-field" style="grid-column: 1 / -1;">
-            <label style="font-weight: 600; color: #475569; margin-bottom: 0.4rem; display: block;">Mô tả</label>
-            <textarea id="cvMoTa" placeholder="Nhập mô tả chức vụ..." style="height: 80px; border-radius: 10px; padding: 10px;"></textarea>
+          <div class="cat-field" style="grid-column: 1/-1;">
+            <label>Mô tả</label>
+            <textarea id="dmacMoTa" placeholder="Nhập mô tả định mức ăn ca..."></textarea>
           </div>
         </div>
-
-        <div class="cat-modal-footer" style="margin-top: 2rem; border-top: 1px solid #F1F5F9; pt: 1.25rem; justify-content: flex-end; gap: 10px;">
-          <button class="cat-btn-cancel" onclick="cvCloseModal()" style="height: 40px; border-radius: 10px; padding: 0 18px; font-weight: 600;">Hủy</button>
-          <button class="cat-btn-save" onclick="cvSave()" style="height: 40px; border-radius: 10px; padding: 0 22px; font-weight: 600; display: flex; align-items: center; gap: 8px;">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
-            Lưu chức vụ
-          </button>
+        <div class="cat-modal-footer">
+          <button class="cat-btn-cancel" onclick="dmacCloseModal()">Hủy</button>
+          <button class="cat-btn-save" onclick="dmacSave()">Lưu dữ liệu</button>
         </div>
       </div>
     </div>
@@ -1638,137 +1428,118 @@
       <div class="cat-modal-accent cat-modal-accent-red"></div>
       <div class="cat-modal-body">
         <div class="cat-delete-icon"><svg viewBox="0 0 24 24" fill="none">
-            <polyline points="3 6 5 6 21 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
-              stroke-linejoin="round" />
-            <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" stroke="currentColor" stroke-width="1.8"
-              stroke-linecap="round" stroke-linejoin="round" />
+            <polyline points="3 6 5 6 21 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+            <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
           </svg></div>
         <div class="cat-delete-title">Xác nhận xóa</div>
         <div class="cat-delete-sub" id="dmacDeleteMsg">Bạn có chắc muốn xóa định mức này?</div>
-        <div class="cat-modal-footer" style="justify-content:center"><button class="cat-btn-cancel"
-            onclick="dmacCloseDelete()">Hủy</button><button class="cat-btn-danger"
-            onclick="dmacConfirmDelete()">Xóa</button></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Modal Định mức ăn ca -->
-  <div class="modal-overlay" id="dmacModal">
-    <div class="cat-modal" style="max-width:560px">
-      <div class="cat-modal-accent cat-modal-accent-blue"></div>
-      <div class="cat-modal-body">
-        <div class="cat-modal-header">
-          <div class="cat-modal-title-wrap">
-            <div class="cat-modal-icon cat-icon-blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M18 8h1a4 4 0 0 1 0 8h-1"></path>
-                <path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"></path>
-                <line x1="6" y1="1" x2="6" y2="4"></line>
-                <line x1="10" y1="1" x2="10" y2="4"></line>
-                <line x1="14" y1="1" x2="14" y2="4"></line>
-              </svg></div><span class="cat-modal-title" id="dmacModalTitle">Thêm định mức ăn ca</span>
-          </div><button class="cat-btn-close" onclick="dmacCloseModal()"><svg viewBox="0 0 14 14" fill="none">
-              <path d="M2 2l10 10M12 2L2 12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
-            </svg></button>
-        </div>
-        <div class="cat-form-grid" style="grid-template-columns:1fr 1fr">
-          <div class="cat-field" style="grid-column:1/-1"><label>Tên loại định mức <span
-                class="req">*</span></label><input type="text" id="dmacTenLoai" placeholder="VD: Ăn ca trưa..."
-              maxlength="150" />
-            <div class="cat-field-err" id="errDmacTenLoai"></div>
-          </div>
-          <div class="cat-field" style="grid-column:1/-1"><label>Giá trị (VNĐ) <span class="req">*</span></label><input
-              type="number" id="dmacGiaTri" placeholder="VD: 30000" min="0" step="1000" />
-            <div class="cat-field-err" id="errDmacGiaTri"></div>
-          </div>
-          <div class="cat-field"><label>Ngày hiệu lực <span class="req">*</span></label><input type="date"
-              id="dmacNgayHieuLuc" />
-            <div class="cat-field-err" id="errDmacNgayHieuLuc"></div>
-          </div>
-          <div class="cat-field"><label>Ngày kết thúc <span style="color:#9CA3AF;font-weight:400;font-size:12px">(để
-                trống nếu còn hiệu lực)</span></label><input type="date" id="dmacNgayKetThuc" />
-          </div>
-          <div class="cat-field" style="grid-column:1/-1"><label>Mô tả</label><textarea id="dmacMoTa"
-              placeholder="Mô tả định mức..."></textarea></div>
-        </div>
-        <div class="cat-modal-footer"><button class="cat-btn-cancel" onclick="dmacCloseModal()">Hủy</button><button
-            class="cat-btn-save" onclick="dmacSave()"><svg width="13" height="13" viewBox="0 0 13 13" fill="none">
-              <path d="M2 7l3 3 6-6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
-                stroke-linejoin="round" />
-            </svg>Lưu</button></div>
+        <div class="cat-modal-footer" style="justify-content:center"><button class="cat-btn-cancel" onclick="dmacCloseDelete()">Hủy</button><button class="cat-btn-danger" onclick="dmacConfirmDelete()">Xóa</button></div>
       </div>
     </div>
   </div>
 
   <!-- Modal Phân nguồn -->
-  <!-- 1. Nguồn chính -->
   <div class="modal-overlay" id="pnMainModal">
-    <div class="cat-modal" style="max-width:500px">
+    <div class="cat-modal">
       <div class="cat-modal-accent cat-modal-accent-blue"></div>
       <div class="cat-modal-body">
         <div class="cat-modal-header">
-          <div class="cat-modal-title-wrap"><span class="cat-modal-title" id="pnMainModalTitle">Thêm nguồn chính</span></div>
+          <div class="cat-modal-title-wrap">
+            <span class="cat-modal-title" id="pnMainModalTitle">Thêm nguồn chính</span>
+          </div>
           <button class="cat-btn-close" onclick="pnMainCloseModal()"><svg viewBox="0 0 14 14" fill="none"><path d="M2 2l10 10M12 2L2 12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
         </div>
-        <div class="cat-form-grid" style="grid-template-columns: 1fr;">
-          <div class="cat-field"><label>Năm <span class="req">*</span></label><input type="number" id="pnMainNam" /></div>
-          <div class="cat-field"><label>Tổng ngân sách (VNĐ) <span class="req">*</span></label><input type="number" id="pnMainTong" /></div>
-          <div class="cat-field"><label>Ngân sách nhân viên (VNĐ) <span class="req">*</span></label><input type="number" id="pnMainNsNLĐ" /></div>
-          <div class="cat-field"><label>Ngân sách quản lý (VNĐ) <span class="req">*</span></label><input type="number" id="pnMainNsNQL" /></div>
+        <div class="cat-form-grid" style="grid-template-columns: 1fr 1fr;">
+          <div class="cat-field">
+            <label>Năm <span class="req">*</span></label>
+            <input type="number" id="pnMainNam" placeholder="VD: 2024" />
+          </div>
+          <div class="cat-field">
+            <label>Tổng ngân sách (VNĐ) <span class="req">*</span></label>
+            <input type="number" id="pnMainTong" placeholder="VD: 5000000000" />
+          </div>
+          <div class="cat-field">
+            <label>Ngân sách nhân viên (VNĐ) <span class="req">*</span></label>
+            <input type="number" id="pnMainNsNLĐ" placeholder="VD: 3500000000" />
+          </div>
+          <div class="cat-field">
+            <label>Ngân sách quản lý (VNĐ) <span class="req">*</span></label>
+            <input type="number" id="pnMainNsNQL" placeholder="VD: 1500000000" />
+          </div>
         </div>
         <div class="cat-modal-footer">
           <button class="cat-btn-cancel" onclick="pnMainCloseModal()">Hủy</button>
-          <button class="cat-btn-save" onclick="pnMainSave()">Lưu</button>
+          <button class="cat-btn-save" onclick="pnMainSave()">Lưu dữ liệu</button>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- 2. Phân nguồn tháng -->
   <div class="modal-overlay" id="pnMonthModal">
-    <div class="cat-modal" style="max-width:560px">
+    <div class="cat-modal">
       <div class="cat-modal-accent cat-modal-accent-blue"></div>
       <div class="cat-modal-body">
         <div class="cat-modal-header">
-          <div class="cat-modal-title-wrap"><span class="cat-modal-title" id="pnMonthModalTitle">Thêm phân nguồn tháng</span></div>
+          <div class="cat-modal-title-wrap">
+            <span class="cat-modal-title" id="pnMonthModalTitle">Thêm phân nguồn tháng</span>
+          </div>
           <button class="cat-btn-close" onclick="pnMonthCloseModal()"><svg viewBox="0 0 14 14" fill="none"><path d="M2 2l10 10M12 2L2 12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
         </div>
         <div class="cat-form-grid" style="grid-template-columns: 1fr 1fr;">
-          <div class="cat-field"><label>Năm <span class="req">*</span></label><input type="number" id="pnMonthNam" /></div>
-          <div class="cat-field"><label>Quý <span class="req">*</span></label><select id="pnMonthQuy" class="cat-select"><option value="1">Quý 1</option><option value="2">Quý 2</option><option value="3">Quý 3</option><option value="4">Quý 4</option></select></div>
-          <div class="cat-field"><label>Tháng <span class="req">*</span></label><select id="pnMonthThang" class="cat-select"><option value="1">Tháng 1</option><option value="2">Tháng 2</option><option value="3">Tháng 3</option><option value="4">Tháng 4</option><option value="5">Tháng 5</option><option value="6">Tháng 6</option><option value="7">Tháng 7</option><option value="8">Tháng 8</option><option value="9">Tháng 9</option><option value="10">Tháng 10</option><option value="11">Tháng 11</option><option value="12">Tháng 12</option></select></div>
-          <div class="cat-field"></div>
-          <div class="cat-field"><label>NLĐ (VNĐ) <span class="req">*</span></label><input type="number" id="pnMonthNLD" /></div>
-          <div class="cat-field"><label>NQL (VNĐ) <span class="req">*</span></label><input type="number" id="pnMonthNQL" /></div>
-          <div class="cat-field" style="grid-column: 1/-1;"><label>Ghi chú</label><textarea id="pnMonthGhiChu"></textarea></div>
+          <div class="cat-field">
+            <label>Năm <span class="req">*</span></label>
+            <input type="number" id="pnMonthNam" />
+          </div>
+          <div class="cat-field">
+            <label>Quý <span class="req">*</span></label>
+            <select id="pnMonthQuy">
+              <option value="1">Quý 1</option><option value="2">Quý 2</option>
+              <option value="3">Quý 3</option><option value="4">Quý 4</option>
+            </select>
+          </div>
+          <div class="cat-field">
+            <label>Tháng <span class="req">*</span></label>
+            <select id="pnMonthThang">
+              <option value="1">Tháng 1</option><option value="2">Tháng 2</option><option value="3">Tháng 3</option>
+              <option value="4">Tháng 4</option><option value="5">Tháng 5</option><option value="6">Tháng 6</option>
+              <option value="7">Tháng 7</option><option value="8">Tháng 8</option><option value="9">Tháng 9</option>
+              <option value="10">Tháng 10</option><option value="11">Tháng 11</option><option value="12">Tháng 12</option>
+            </select>
+          </div>
+          <div class="cat-field">
+            <label>NLĐ (VNĐ) <span class="req">*</span></label>
+            <input type="number" id="pnMonthNLD" placeholder="Nhập số tiền..." />
+          </div>
+          <div class="cat-field">
+            <label>NQL (VNĐ) <span class="req">*</span></label>
+            <input type="number" id="pnMonthNQL" placeholder="Nhập số tiền..." />
+          </div>
+          <div class="cat-field" style="grid-column: 1/-1;">
+            <label>Ghi chú</label>
+            <textarea id="pnMonthGhiChu" placeholder="Nhập ghi chú..."></textarea>
+          </div>
         </div>
         <div class="cat-modal-footer">
           <button class="cat-btn-cancel" onclick="pnMonthCloseModal()">Hủy</button>
-          <button class="cat-btn-save" onclick="pnMonthSave()">Lưu</button>
+          <button class="cat-btn-save" onclick="pnMonthSave()">Lưu dữ liệu</button>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- 3. Chi tiết phân nguồn theo phòng -->
   <div class="modal-overlay" id="pnDetailModal">
-    <div class="cat-modal" style="max-width:960px; border-radius: 24px;">
-      <div class="cat-modal-accent cat-modal-accent-blue" style="height: 6px;"></div>
-      <div class="cat-modal-body" style="padding: 2rem;">
-        <div class="cat-modal-header" style="margin-bottom: 1.5rem;">
+    <div class="cat-modal" style="max-width: 960px;">
+      <div class="cat-modal-accent cat-modal-accent-blue"></div>
+      <div class="cat-modal-body">
+        <div class="cat-modal-header">
           <div class="cat-modal-title-wrap">
-            <div class="cat-modal-icon cat-icon-blue" style="width: 44px; height: 44px;">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
-            </div>
-            <span class="cat-modal-title" id="pnDetailTitle" style="font-size: 1.4rem; font-weight: 800;">Chi tiết phân nguồn</span>
+            <span class="cat-modal-title">Chi tiết phân nguồn theo từng phòng</span>
           </div>
-          <button class="cat-btn-close" onclick="pnDetailCloseModal()">
-            <svg viewBox="0 0 14 14" fill="none"><path d="M2 2l10 10M12 2L2 12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
-          </button>
+          <button class="cat-btn-close" onclick="pnDetailCloseModal()"><svg viewBox="0 0 14 14" fill="none"><path d="M2 2l10 10M12 2L2 12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
         </div>
 
-        <!-- Chỉ số tổng hợp -->
-        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 2rem;">
+        <!-- Chỉ số tổng quan -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin-bottom: 20px;">
           <div style="background: #F8FAFC; padding: 12px 16px; border-radius: 12px; border: 1px solid #E2E8F0;">
             <div style="font-size: 12px; font-weight: 600; color: #64748B; margin-bottom: 4px;">Ngân sách NLĐ (V1)</div>
             <div id="pnSumV1" style="font-size: 16px; font-weight: 700; color: #1E293B;">0</div>
@@ -1816,13 +1587,12 @@
         </div>
 
         <div class="cat-modal-footer" style="margin-top: 1.5rem;">
-          <button class="cat-btn-cancel" onclick="pnDetailCloseModal()" style="padding: 0 24px; font-weight: 700;">Đóng</button>
+          <button class="cat-btn-cancel" onclick="pnDetailCloseModal()" style="padding: 0 24px;">Đóng</button>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- 4. Delete Modals -->
   <div class="modal-overlay" id="pnMainDeleteModal">
     <div class="cat-modal cat-modal-sm"><div class="cat-modal-accent cat-modal-accent-red"></div><div class="cat-modal-body"><div class="cat-delete-title">Xác nhận xóa</div><div class="cat-delete-sub">Bạn có chắc muốn xóa nguồn chính này?</div><div class="cat-modal-footer" style="justify-content:center"><button class="cat-btn-cancel" onclick="pnMainCloseDelete()">Hủy</button><button class="cat-btn-danger" onclick="pnMainConfirmDelete()">Xóa</button></div></div></div>
   </div>
@@ -1830,14 +1600,50 @@
     <div class="cat-modal cat-modal-sm"><div class="cat-modal-accent cat-modal-accent-red"></div><div class="cat-modal-body"><div class="cat-delete-title">Xác nhận xóa</div><div class="cat-delete-sub">Bạn có chắc muốn xóa phân nguồn tháng này?</div><div class="cat-modal-footer" style="justify-content:center"><button class="cat-btn-cancel" onclick="pnMonthCloseDelete()">Hủy</button><button class="cat-btn-danger" onclick="pnMonthConfirmDelete()">Xóa</button></div></div></div>
   </div>
 
+  <script src="asset/sidebar.js"></script>
+  <script src="asset/khoi-phong-ban.js"></script>
+  <script src="asset/phong-ban.js"></script>
+  <script src="asset/chuc-vu.js"></script>
+  <script src="asset/chuc-vu.category.js"></script>
+  <script src="asset/phong-ban.category.js"></script>
+  <script src="asset/luong-co-ban.category.js"></script>
   <script src="asset/thoi-gian-lam-viec.category.js"></script>
   <script src="asset/phan-nguon.category.js"></script>
   <script src="asset/dinh-muc-an-ca.category.js"></script>
+  
+  <script>
+    (function () {
+      var months = ['Th11', 'Th12', 'Th1', 'Th2', 'Th3', 'Th4'];
+      var vals = [3.6, 3.8, 3.7, 4.0, 3.9, 4.2];
+      var max = Math.max.apply(null, vals);
+      var bc = document.getElementById('barChart');
+      if (!bc) return;
+      months.forEach(function (m, i) {
+        var h = Math.round((vals[i] / max) * 88);
+        bc.innerHTML += `<div class="bar-col"><div class="bar ${i === 5 ? 'highlight' : ''}" style="height:${h}px" title="${vals[i]} ty"></div><span class="bar-label">${m}</span></div>`;
+      });
+    })();
+  </script>
+  
   <script src="https://cdn.jsdelivr.net/npm/handsontable@14.6.1/dist/handsontable.full.min.js"></script>
   <script src="asset/chamcong.js"></script>
-  <script src="asset/chuc-vu.js"></script>
   <script src="asset/an-toan-dien.js"></script>
   <script src="asset/tam-ung-luong.js"></script>
+  <script src="asset/dieu-chuyen.js"></script>
+  <script src="asset/nghi-phep.js"></script>
+  <script src="asset/quan-ly-an-ca.js"></script>
+  <script src="asset/he-so-luong.js"></script>
+  <script src="asset/quyet-toan.js"></script>
+  <script src="asset/chi-luong.js"></script>
+  <script src="asset/cc-phong-ban.js"></script>
+  <script src="asset/danh-gia-hq.js"></script>
+  <script src="asset/luong-hq.js"></script>
+  <script src="asset/ql-chuc-nang.js"></script>
+  <script src="asset/ql-quyen.js"></script>
+  <script src="asset/phan-quyen-nd.js"></script>
+  <script src="asset/phan-quyen-cn.js"></script>
+  <script src="asset/phu-tro.category.js"></script>
+  <script src="asset/he-so-danh-gia.category.js"></script>
+  <script src="asset/nguoi-dung.category.js"></script>
 </body>
-
 </html>
