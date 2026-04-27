@@ -1,0 +1,69 @@
+﻿@model PMS.Models.tblGeneralRoom
+
+@{
+    ViewData["Title"] = "THÊM MỚI NHÓM PHÒNG BAN CHUNG";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                @* <h4 class="card-title">Thêm mới nhóm phòng ban</h4>
+                <hr /> *@
+
+                @* @if (TempData["SuccessMessage"] != null)
+                {
+                    <div class="alert alert-success">
+                        @TempData["SuccessMessage"]
+                    </div>
+                } *@
+
+                <form asp-action="Create">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                    <div class="form-group row">
+                        <label asp-for="name_general" class="col-md-2 col-form-label">Tên nhóm phòng ban <span class="text-danger">*</span></label>
+                        <div class="col-md-10">
+                            <input asp-for="name_general" class="form-control" placeholder="Nhập tên nhóm phòng ban" />
+                            <span asp-validation-for="name_general" class="text-danger"></span>
+                            @if (ViewData.ModelState["name_general"]?.Errors?.Count > 0)
+                            {
+                                <span class="text-danger">@ViewData.ModelState["name_general"].Errors[0].ErrorMessage</span>
+                            }
+                        </div>
+                    </div>
+
+                    <div class="form-group row mt-3">
+                        <div class="col-md-10 offset-md-2">
+                            <button type="submit" class="btn btn-success me-3">
+                                <i class="fa fa-save"></i> Lưu
+                            </button>
+                            <a asp-action="Index" class="btn btn-secondary">
+                                <i class="fa fa-arrow-left"></i> Quay lại
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fa fa-save"></i> Lưu
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        $(document).ready(function () {
+            // Xóa thông báo sau 5 giây
+            setTimeout(function () {
+                $('.alert').fadeOut('slow');
+            }, 5000);
+        });
+    </script>
+}

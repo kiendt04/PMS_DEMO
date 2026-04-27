@@ -1,0 +1,552 @@
+﻿@{
+    ViewData["Title"] = "QUẢN LÝ HIỆU QUẢ CÔNG VIỆC";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/handsontable@14.3.0/dist/handsontable.full.min.css" />
+
+<style>
+    /* Tăng font-size và màu chữ */
+    .handsontable td {
+        color: #333333 !important;
+        font-size: 14px !important;
+        white-space: nowrap !important;
+    }
+    .handsontable span.colHeader {
+        color: #333333 !important;
+        font-weight: 700 !important;
+    }
+    /* Ẩn scrollbar dọc của Handsontable, giữ scrollbar ngang ở dưới */
+    #timekeepingHot .wtHolder {
+        overflow-x: auto !important;
+        overflow-y: visible !important;
+        height: auto !important;
+    }
+    #timekeepingHot .ht_master .wtHolder {
+        overflow-x: auto !important;
+        overflow-y: visible !important;
+    }
+    /* Ẩn scrollbar của header clone - chỉ giữ 1 scroll ở dưới */
+    #timekeepingHot .ht_clone_top .wtHolder {
+        overflow: hidden !important;
+    }
+</style>
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+
+                <!-- Bộ lọc -->
+                <div class="row align-items-center mt-2 mb-2">
+
+                    <div class="col-auto d-flex align-items-center mb-2">
+                        <label class="fw-bold me-3 mb-0" style="min-width: 120px;">Chọn phòng ban:</label>
+                        <select class="form-control form-select-sm" id="selectPhongBan">
+                            <option value="0">-- Tất cả --</option>
+                            @if (ViewBag.Departments != null)
+                            {
+                                foreach (var dept in ViewBag.Departments)
+                                {
+                                    <option value="@dept.Id">@dept.Name</option>
+                                }
+                            }
+                        </select>
+                    </div>
+
+                    <div class="col-auto d-flex align-items-center mr-3 mb-2">
+                        <label class="fw-bold me-3 mb-0" style="min-width: 100px;">Chọn tháng:</label>
+                        <select class="form-control form-select-sm" id="selectMonth" style="width:80px;">
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                            <option value="5">5</option>
+                            <option value="6">6</option>
+                            <option value="7">7</option>
+                            <option value="8">8</option>
+                            <option value="9">9</option>
+                            <option value="10">10</option>
+                            <option value="11">11</option>
+                            <option value="12">12</option>
+                        </select>
+                    </div>
+                    <div class="col-auto d-flex align-items-center mr-3 mb-2">
+                        <label class="fw-bold me-3 mb-0" style="min-width: 90px;">Chọn năm:</label>
+                        <select class="form-control form-select-sm" id="selectYear">
+                            @if (ViewBag.AvailableYears != null && ViewBag.AvailableYears.Count > 0)
+                            {
+                                foreach (int year in ViewBag.AvailableYears)
+                                {
+                                    if (year == ViewBag.DefaultYear)
+                                    {
+                                        <option value="@year" selected>@year</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="@year">@year</option>
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                @* Tự động tạo danh sách năm nếu ViewBag không có dữ liệu *@
+                                @for (int i = DateTime.Now.Year - 2; i <= DateTime.Now.Year + 1; i++)
+                                {
+                                    if (i == DateTime.Now.Year)
+                                    {
+                                        <option value="@i" selected>@i</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="@i">@i</option>
+                                    }
+                                }
+                            }
+                        </select>
+                    </div>
+                    <div class="col-auto d-flex align-items-center mb-2 ms-auto">
+                        <button id="btnExportExcel" class="btn btn-primary" title="Xuất dữ liệu">
+                            <i class="fa fa-download"></i> Xuất Excel
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Bảng Handsontable -->
+                <div class="table-responsive" id="timekeepingHotWrapper" style="overflow:visible;">
+                    <div id="timekeepingHot"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/handsontable@14.3.0/dist/handsontable.full.min.js"></script>
+<script src="~/js/handsontable-formula.js?v=2.1"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const container = document.getElementById('timekeepingHot');
+        const monthSelect = document.getElementById('selectMonth');
+        const yearSelect = document.getElementById('selectYear');
+        const phongBanSelect = document.getElementById('selectPhongBan');
+        
+        // Queue để xử lý batch updates khi paste nhiều cells
+        let updateQueue = new Set(); // Dùng Set để tránh duplicate userId
+        let updateTimer = null;
+        
+        // Set tháng hiện tại
+        const currentMonth = new Date().getMonth() + 1;
+        monthSelect.value = currentMonth;
+        
+        // Set phòng ban mặc định nếu có
+        @if (ViewBag.CurrentUserDepartmentId != null)
+        {
+            <text>
+            phongBanSelect.value = @ViewBag.CurrentUserDepartmentId;
+            </text>
+
+            var isSuperAdmin = (ViewBag.IsSuperAdmin ?? false);
+            if (!isSuperAdmin)
+            {
+                 <text>
+                 phongBanSelect.disabled = true;
+                 phongBanSelect.value = @ViewBag.CurrentUserDepartmentId;
+                 </text>
+            }
+        }
+        
+            let hot;
+            let headerConfig = [];
+            let currentColumns = [];
+            let currentNestedHeaders = [];
+            loadTableHeader();
+            function loadTableHeader()
+            {
+                fetch('/WorkPerformance/GetTableHeader')
+                    .then(response => response.json())
+                    .then(result => {
+                        if (result.success && result.data)
+                        {
+                            buildNestedHeader(result);
+                            console.log(result);        
+                        }
+                        else{
+                            alert('Fail' + result.message);
+                        }
+                    })
+            }
+
+            function buildNestedHeader(result)
+            {
+                const rattingSignCount = result.rattingSignCount || 0;
+                const daysSignCount = result.daysSignCount || 0;
+                const level1 = ['STT', 'HỌ VÀ TÊN', 'Số TK'];
+                const level2 =  ['','',''];
+                const headerData = result.data;
+                
+                if (rattingSignCount > 0) {
+                    level1.push({ label: 'HỆ SỐ ĐG', colspan: rattingSignCount });
+
+                    // Lấy các header có PerformanceSign != null
+                    const ratingHeaders = headerData.filter(h => h.performanceSign != null)
+                                                   .sort((a, b) => a.order - b.order);
+
+                    ratingHeaders.forEach(header => {
+                        level2.push(header.performanceSign);
+                    });
+                }
+
+                // Thêm header cho NGÀY CÔNG (Days)
+                if (daysSignCount > 0) {
+                    level1.push({ label: 'NGÀY CÔNG', colspan: daysSignCount });
+
+                    console.log(daysSignCount);
+
+                    // Lấy tất cả header (hoặc chỉ những cái còn lại)
+                    const dayHeaders = headerData.filter(h => h.daysSign != null)
+                                                .sort((a, b) => a.order - b.order);
+
+                    headerData.forEach(header => {
+                        level2.push(header.daysSign);
+                    });
+                }
+
+                // Thêm cột Ghi chú
+                level1.push('Ghi chú');
+                level2.push('');
+
+                currentNestedHeaders = [level1, level2];
+
+                buildColumnsConfig(headerData, rattingSignCount, daysSignCount);
+
+                // Khởi tạo hoặc cập nhật bảng
+                initializeOrUpdateHot();
+                
+                // Load dữ liệu sau khi bảng đã được khởi tạo
+                loadDataFromServer();
+            }
+
+            function buildColumnsConfig(headerData, rattingSignCount, daysSignCount) {
+                // Các cột cố định đầu tiên
+                currentColumns = [
+                    { data: 'stt', type: 'numeric', readOnly: true, className: 'htCenter', width: 50 },
+                    { data: 'name', type: 'text', readOnly: true, className: 'htLeft' },  // Auto width theo content
+                    { data: 'userCode', type: 'text', readOnly: true, className: 'htCenter' }  // Auto width theo content
+                ];
+
+                // Thêm cột cho HỆ SỐ ĐG
+                const ratingHeaders = headerData.filter(h => h.performanceSign != null)
+                                               .sort((a, b) => a.order - b.order);
+
+                ratingHeaders.forEach((header, index) => {
+                    currentColumns.push({
+                        data: `rating_${header.id}`, // hoặc header.performanceSign
+                        title: header.performanceSign,
+                        type: 'numeric',
+                        numericFormat: { pattern: '0.00' },
+                        allowInvalid: false,
+                        width: 70,
+                        className: 'htCenter'
+                    });
+                });
+
+                // Thêm cột cho NGÀY CÔNG
+                const dayHeaders = headerData.filter(h => h.daysSign != null)
+                                            .sort((a, b) => a.order - b.order);
+
+                dayHeaders.forEach((header, index) => {
+                    currentColumns.push({
+                        data: `day_${header.id}`, // hoặc header.name
+                        title: header.name,
+                        type: 'numeric',
+                        numericFormat: { pattern: '0' },
+                        allowInvalid: false,
+                        width: 70,
+                        className: 'htCenter'
+                    });
+                });
+
+                // Thêm cột Ghi chú
+                currentColumns.push({
+                    data: 'note',
+                    type: 'text',
+                    width: 200
+                });
+            }
+
+            function initializeOrUpdateHot() {
+                if (!hot) {
+                    hot = new Handsontable(container, getHotConfig());
+                } else {
+                    hot.updateSettings(getHotConfig());
+                }
+            }
+
+            function getHotConfig() {
+                return {
+                    data: [],
+                    columns: currentColumns,
+                    nestedHeaders: currentNestedHeaders,
+                    colHeaders: false,
+                    rowHeaders: false,
+                    height: 'auto',  // Sử dụng scroll dọc của web
+                    width: '100%',
+                    stretchH: 'none',  // Không kéo dãn, để cột tự động theo nội dung
+                    autoColumnSize: true,
+                    manualColumnFreeze: true,
+                    manualColumnMove: true,
+                    fixedColumnsLeft: 3,
+                    contextMenu: true,
+                    filters: false,
+                    dropdownMenu: false,
+                    licenseKey: 'non-commercial-and-evaluation',
+                    afterChange: function(changes, source) {
+                        if (changes && source !== 'loadData' && source !== 'updateData') {
+                            changes.forEach(([row, prop, oldVal, newVal]) => {
+
+                                if (oldVal !== newVal) {
+                                    const rowData = this.getSourceDataAtRow(row);
+                                    if (rowData && rowData.userId) {
+                                        updateQueue.add(rowData.userId);
+                                    }
+                                }
+                            });
+
+                            if (updateTimer) clearTimeout(updateTimer);
+                            updateTimer = setTimeout(() => {
+                                processBatchUpdates();
+                            }, 500);
+                        }
+                    }
+                };
+            }
+
+
+        // Load dữ liệu từ server
+        function loadDataFromServer() {
+            const departmentId = phongBanSelect.value || 0;
+            const month = parseInt(monthSelect.value);
+            const year = parseInt(yearSelect.value);
+            
+            // Show loading indicator if needed
+            
+            fetch(`/WorkPerformance/GetData?departmentId=${departmentId}&month=${month}&year=${year}`)
+                .then(response => response.json())
+                .then(result => {
+                    if (result.success && result.employees) {
+                        const data = result.employees.map((emp, index) => {
+                            const row = {
+                                stt: index + 1,
+                                userId: emp.userId,
+                                name: emp.userName,
+                                userCode: emp.tk, // Mapping Tk to userCode
+                                note: emp.note || ''
+                            };
+
+                            // Map dynamic data
+                            if (emp.data && Array.isArray(emp.data)) {
+                                emp.data.forEach(item => {
+                                    // item.typeWorkDays is the ID
+                                    row[`rating_${item.typeWorkDays}`] = item.rate;
+                                    row[`day_${item.typeWorkDays}`] = item.days;
+                                });
+                            }
+                            
+                            return row;
+                        });
+                                
+                        hot.loadData(data);
+                    } else {
+                        showUpdateNotification('error', result.message || 'Không thể tải dữ liệu');
+                    }
+                })
+                .catch(error => {
+                    console.error('Lỗi khi tải dữ liệu:', error);
+                    showUpdateNotification('error', 'Có lỗi xảy ra khi tải dữ liệu');
+                });
+        }
+        
+        // Hàm xử lý batch updates
+        function processBatchUpdates() {
+            if (updateQueue.size === 0) return;
+            
+            const totalUpdates = updateQueue.size;
+            
+            // Hiển thị thông báo đang xử lý
+            if (totalUpdates > 1) {
+                showUpdateNotification('info', `Đang lưu ${totalUpdates} nhân viên...`);
+            }
+            
+            // Chuyển Set thành Array
+            const userIds = Array.from(updateQueue);
+            
+            // Clear queue trước khi gọi save
+            updateQueue.clear();
+            
+            // Gọi autoSaveData với danh sách userIds
+            autoSaveData(userIds);
+        }
+        
+        // Hàm auto-save dữ liệu
+        function autoSaveData(userIds = null) {
+            const departmentId = phongBanSelect.value ? parseInt(phongBanSelect.value) : null;
+            const month = parseInt(monthSelect.value);
+            const year = parseInt(yearSelect.value);
+            
+            const sourceData = hot.getSourceData();
+            
+            if (!sourceData || sourceData.length === 0) {
+                return;
+            }
+            
+            // Filter chỉ lấy các row có userId trong danh sách (nếu có)
+            let dataToSave = sourceData;
+            if (userIds && userIds.length > 0) {
+                dataToSave = sourceData.filter(row => userIds.includes(row.userId));
+            }
+            
+            if (dataToSave.length === 0) {
+                return;
+            }
+            
+            // Map dữ liệu sang format của API
+            const rows = dataToSave.map(row => {
+                const performanceData = [];
+                
+                // Duyệt qua các cột hiện tại để lấy ID của TypeWorkDays
+                // currentColumns chứa cấu hình cột, ta có thể tìm các cột bắt đầu bằng rating_ hoặc day_
+                // Tuy nhiên, đơn giản hơn là duyệt qua các key của row data
+                
+                // Tạo một map tạm để gom nhóm rate và days theo typeWorkDaysId
+                const tempMap = {};
+                
+                Object.keys(row).forEach(key => {
+                    if (key.startsWith('rating_')) {
+                        const id = parseInt(key.split('_')[1]);
+                        if (!tempMap[id]) tempMap[id] = { typeWorkDays: id, rate: 0, days: 0 };
+                        tempMap[id].rate = parseFloat(row[key]) || 0;
+                    } else if (key.startsWith('day_')) {
+                        const id = parseInt(key.split('_')[1]);
+                        if (!tempMap[id]) tempMap[id] = { typeWorkDays: id, rate: 0, days: 0 };
+                        tempMap[id].days = parseFloat(row[key]) || 0;
+                    }
+                });
+                
+                // Chuyển map thành array
+                Object.values(tempMap).forEach(item => {
+                    performanceData.push(item);
+                });
+
+                return {
+                    userId: row.userId,
+                    data: performanceData,
+                    note: row.note || ''
+                };
+            });
+            
+            const requestData = {
+                departmentId: departmentId,
+                month: month,
+                year: year,
+                rows: rows
+            };
+            
+            // Gọi API để lưu
+            fetch('/WorkPerformance/Save', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(requestData)
+            })
+            .then(response => response.json())
+            .then(result => {
+                if (result.success) {
+                    const message = userIds && userIds.length > 1 
+                        ? `Đã cập nhật ${userIds.length} nhân viên thành công!`
+                        : 'Đã lưu thành công!';
+                    showUpdateNotification('success', message);
+                } else {
+                    showUpdateNotification('error', 'Lỗi khi lưu: ' + result.message);
+                }
+            })
+            .catch(error => {
+                console.error('Lỗi khi lưu dữ liệu:', error);
+                showUpdateNotification('error', 'Có lỗi xảy ra khi lưu dữ liệu');
+            });
+        }
+        
+        
+
+        // Hàm hiển thị thông báo cập nhật
+        function showUpdateNotification(type, message) {
+            try {
+                let alertClass, icon;
+                if (type === 'success') {
+                    alertClass = 'alert-success';
+                    icon = 'fa-check-circle';
+                } else if (type === 'info') {
+                    alertClass = 'alert-info';
+                    icon = 'fa-info-circle';
+                } else {
+                    alertClass = 'alert-danger';
+                    icon = 'fa-exclamation-triangle';
+                }
+                
+                const notification = $(`
+                    <div class="alert ${alertClass} alert-dismissible fade show update-notification" role="alert" style="position: fixed; top: 20px; right: 20px; z-index: 99999; min-width: 300px; max-width: 400px;">
+                        <i class="fa ${icon}"></i> ${message}
+                        <button type="button" class="close" data-dismiss="alert">
+                            <span>&times;</span>
+                        </button>
+                    </div>
+                `);
+                
+                $('body').append(notification);
+                
+                setTimeout(() => {
+                    try {
+                        notification.alert('close');
+                    } catch (e) {
+                        notification.remove();
+                    }
+                }, 2000);
+            } catch (error) {
+                alert(message);
+            }
+        }
+        
+        // Hàm tính chiều cao phù hợp
+        function calculateHotHeight() {
+            const windowHeight = window.innerHeight;
+            const offset = 290;
+            const calculated = windowHeight - offset;
+            return Math.max(calculated, 320);
+        }
+
+
+        
+        // Xử lý thay đổi dropdown
+        monthSelect.addEventListener('change', function () {
+            loadDataFromServer();
+        });
+        
+        yearSelect.addEventListener('change', function () {
+            loadDataFromServer();
+        });
+        
+        phongBanSelect.addEventListener('change', function () {
+            loadDataFromServer();
+        });
+
+        // Export Excel
+        document.getElementById('btnExportExcel').addEventListener('click', function () {
+            const departmentId = phongBanSelect.value || 0;
+            const month = parseInt(monthSelect.value);
+            const year = parseInt(yearSelect.value);
+            
+            const url = `/WorkPerformance/ExportWorkPerformance?departmentId=${departmentId}&month=${month}&year=${year}`;
+            window.location.href = url;
+        });
+        
+        // Load dữ liệu ban đầu được gọi sau khi build header xong
+        // loadDataFromServer(); // Đã được gọi trong initializeOrUpdateHot hoặc sau khi build header
+    });
+</script>

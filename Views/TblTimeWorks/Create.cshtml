@@ -1,0 +1,216 @@
+@{
+    ViewData["Title"] = "Thêm mới thời gian làm việc";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    int currentYear = DateTime.Now.Year;
+}
+
+<style>
+    .timework-table th {
+        background: #f0f4ff;
+        color: #2c3e6b;
+        font-weight: 700;
+        font-size: 13px;
+        text-align: center;
+        vertical-align: middle;
+        white-space: nowrap;
+    }
+    .timework-table td {
+        vertical-align: middle;
+        font-size: 14px;
+    }
+    .timework-table .month-col {
+        font-weight: 600;
+        color: #3d4c6b;
+        text-align: center;
+        width: 120px;
+    }
+    .timework-table .maxday-col {
+        text-align: center;
+        color: #888;
+        width: 160px;
+    }
+    .timework-table .input-col {
+        text-align: center;
+        width: 200px;
+    }
+    .workday-input {
+        width: 120px;
+        padding: 7px 12px;
+        font-size: 15px;
+        font-weight: 600;
+        text-align: center;
+        border-radius: 6px;
+        border: 1.5px solid #ced4da;
+        transition: border-color 0.2s, box-shadow 0.2s;
+        margin: 0 auto;
+        display: block;
+    }
+    .workday-input:focus {
+        outline: none;
+        border-color: #4a6cf7;
+        box-shadow: 0 0 0 3px rgba(74,108,247,0.12);
+    }
+    .workday-input.is-invalid {
+        border-color: #dc3545;
+    }
+    .error-msg {
+        color: #dc3545;
+        font-size: 11px;
+        margin-top: 3px;
+        display: none;
+    }
+    .year-bar {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        margin-bottom: 18px;
+    }
+    .year-bar label {
+        font-weight: 700;
+        color: #2c3e6b;
+        font-size: 15px;
+        margin: 0;
+    }
+    .year-bar select {
+        padding: 7px 14px;
+        border-radius: 7px;
+        border: 1.5px solid #ced4da;
+        font-size: 15px;
+        font-weight: 600;
+        color: #2c3e6b;
+        min-width: 110px;
+    }
+    .btn-save {
+        background: linear-gradient(135deg, #4a6cf7, #3558e8);
+        color: #fff;
+        border: none;
+        padding: 9px 30px;
+        border-radius: 7px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: opacity 0.2s, box-shadow 0.2s;
+    }
+    .btn-save:hover { opacity: 0.9; box-shadow: 0 4px 12px rgba(74,108,247,0.25); }
+    .row-error { background: #fff5f5 !important; }
+</style>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+
+                <form method="post" action="@Url.Action("CreateBulk", "TblTimeWorks")" id="bulkCreateForm">
+                    @Html.AntiForgeryToken()
+
+                    <div class="year-bar">
+                        <label>Chọn năm:</label>
+                        <select id="cboYear" name="year" onchange="updateTable()">
+                            @for (int i = currentYear + 2; i >= currentYear; i--)
+                            {
+                                <option value="@i" selected="@(i == currentYear + 1 ? "selected" : null)">@i</option>
+                            }
+                        </select>
+                        <small class="text-muted ms-2">Các tháng đã tồn tại sẽ được bỏ qua khi lưu.</small>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table table-bordered timework-table" id="monthTable">
+                            <thead>
+                                <tr>
+                                    <th style="width:50px;">#</th>
+                                    <th>Tháng</th>
+                                    <th>Số ngày làm việc <code>*</code></th>
+                                </tr>
+                            </thead>
+                            <tbody id="monthTableBody">
+                                @for (int m = 1; m <= 12; m++)
+                                {
+                                    int defaultYear = currentYear + 1;
+                                    int daysInMonth = DateTime.DaysInMonth(defaultYear, m);
+                                    <tr id="tr_@m">
+                                        <td class="text-center">@m</td>
+                                        <td class="month-col">Tháng @m</td>
+                                        <td class="input-col">
+                                            <input type="number"
+                                                   class="workday-input"
+                                                   id="workday_@m"
+                                                   name="workdays[@m]"
+                                                   value="@daysInMonth"
+                                                   min="1"
+                                                   max="@daysInMonth"
+                                                   data-month="@m"
+                                                   data-max="@daysInMonth"
+                                                   oninput="validateRow(@m)"
+                                                   onblur="validateRow(@m)" />
+                                            <div class="error-msg" id="err_@m"></div>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="mt-3 d-flex align-items-center gap-3">
+                        <button type="submit" class="btn btn-success waves-effect waves-light m-r-10" id="submitBtn">
+                        <i class="fa fa-save"></i> Ghi dữ liệu
+                    </button>
+                        <a href="@Url.Action("Index", "TblTimeWorks")" class="btn btn-outline-secondary">Quay lại</a>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function getDaysInMonth(year, month) {
+        return new Date(year, month, 0).getDate();
+    }
+
+    function updateTable() {
+        var year = parseInt($('#cboYear').val(), 10);
+        for (var m = 1; m <= 12; m++) {
+            var days = getDaysInMonth(year, m);
+            $('#maxday_' + m).text(days + ' ngày');
+            var input = $('#workday_' + m);
+            input.attr('max', days).attr('data-max', days);
+            if (parseInt(input.val(), 10) > days) input.val(days);
+            validateRow(m);
+        }
+    }
+
+    function validateRow(m) {
+        var input = $('#workday_' + m);
+        var val = parseInt(input.val(), 10);
+        var max = parseInt(input.attr('data-max'), 10);
+        var err = $('#err_' + m);
+        var tr = $('#tr_' + m);
+
+        if (isNaN(val) || val < 1) {
+            err.text('Phải nhập ít nhất 1 ngày').show();
+            input.addClass('is-invalid');
+            tr.addClass('row-error');
+        } else if (val > max) {
+            err.text('Không vượt quá ' + max + ' ngày').show();
+            input.addClass('is-invalid');
+            tr.addClass('row-error');
+        } else {
+            err.hide().text('');
+            input.removeClass('is-invalid');
+            tr.removeClass('row-error');
+        }
+    }
+
+    $('#bulkCreateForm').on('submit', function (e) {
+        for (var m = 1; m <= 12; m++) validateRow(m);
+        if ($('.workday-input.is-invalid').length > 0) {
+            e.preventDefault();
+            alert('Vui lòng kiểm tra lại các tháng có lỗi trước khi lưu.');
+        }
+    });
+
+    $(document).ready(function () {
+        updateTable();
+    });
+</script>

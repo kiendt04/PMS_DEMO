@@ -1,0 +1,381 @@
+﻿@model PMS.Models.TimeKeepingResponse
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/handsontable@14.3.0/dist/handsontable.full.min.css" />
+<style>
+    /* Tăng font-size và màu chữ */
+    .handsontable td {
+        color: #333333 !important;
+        font-size: 14px !important;
+    }
+    .handsontable span.colHeader {
+        color: #333333 !important;
+        font-weight: 700 !important;
+    }
+    /* Ẩn scrollbar dọc của Handsontable, giữ scrollbar ngang ở dưới */
+    #nightHotContainer .wtHolder {
+        overflow-x: auto !important;
+        overflow-y: visible !important;
+        height: auto !important;
+    }
+    #nightHotContainer .ht_master .wtHolder {
+        overflow-x: auto !important;
+        overflow-y: visible !important;
+    }
+    /* Ẩn scrollbar của header clone - chỉ giữ 1 scroll ở dưới */
+    #nightHotContainer .ht_clone_top .wtHolder {
+        overflow: hidden !important;
+    }
+
+</style>
+<div id="nightTimekeeping" style="overflow:visible;">
+    <div id="nightHotContainer"></div>
+    <script src="https://cdn.jsdelivr.net/npm/handsontable@14.3.0/dist/handsontable.full.min.js"></script>
+    <script>
+        (function () {
+            const container = document.getElementById('nightHotContainer');
+            
+            if (!container) {
+                return;
+            }
+            
+            // Lấy dữ liệu từ model
+            const nightShiftData = @Html.Raw(Json.Serialize(Model));
+            
+            if (!nightShiftData || !nightShiftData.departmentGroups) {
+                return;
+            }
+
+            // Lấy thông tin quý từ ViewBag
+            const selectedQuarter = @ViewBag.SelectedQuarter;
+            const selectedYear = @ViewBag.SelectedYear;
+            
+            // Queue để xử lý batch updates khi paste nhiều cells
+            let updateQueue = [];
+            let updateTimer = null;
+
+            // Tạo danh sách tháng theo quý được chọn
+            let monthNumbers = [];
+            if (selectedQuarter === 0) {
+                // Cả năm - hiển thị tất cả 12 tháng
+                monthNumbers = Array.from({ length: 12 }, (_, i) => i + 1);
+            } else {
+                // Quý cụ thể - chỉ hiển thị 3 tháng
+                const startMonth = (selectedQuarter - 1) * 3 + 1;
+                monthNumbers = [startMonth, startMonth + 1, startMonth + 2];
+            }
+
+            const monthLabels = monthNumbers.map(m => `T${m}`);
+            const columns = [];
+
+            // Cấu hình cột
+            columns.push({ data: 0, type: 'numeric', width: 50 ,readOnly: true, className: "htCenter"});  // STT
+            columns.push({ data: 1, type: 'text', width: 250, readOnly: true });     // Họ và tên
+            for (let i = 0; i < monthNumbers.length; i++) {
+                columns.push({
+                    data: 2 + i,
+                    type: 'numeric',
+                    numericFormat: { pattern: '0' },
+                    allowInvalid: false,
+                    width: 50,
+                    readOnly: true
+                });
+            }
+            columns.push({
+                data: 2 + monthNumbers.length,
+                type: 'numeric',
+                readOnly: true,
+                width: 80
+            }); // Tổng khoảng thời gian
+
+            const periodLabel = selectedQuarter === 0 ? 'TỔNG HỢP CẢ NĂM' : `TỔNG HỢP Q${selectedQuarter}`;
+            const nestedHeaders = [
+                ['Số TT', 'Họ và tên', ...monthLabels, periodLabel]
+            ];
+
+            // Hàm tạo dòng nhóm (ví dụ: "Người Quản lý")
+            function makeGroupRow(label) {
+                const row = new Array(2 + monthNumbers.length + 1).fill('');
+                row[1] = label;
+                return row;
+            }
+
+            // Hàm tạo dòng nhân viên với dữ liệu thực
+            function makeEmployeeRow(index, employee) {
+                const row = new Array(2 + monthNumbers.length + 1).fill('');
+                row[0] = index;
+                row[1] = employee.fullName;
+                
+                // Điền dữ liệu theo tháng được chọn
+                monthNumbers.forEach((month, index) => {
+                    const monthData = employee.monthlyData[month];
+                    if (monthData) {
+                        row[2 + index] = monthData.lv || ''; // Sử dụng LV để lưu giá trị ca đêm
+                    }
+                });
+                
+                // Tổng khoảng thời gian
+                row[2 + monthNumbers.length] = employee.yearlyTotalLV || '';
+                return row;
+            }
+
+            // Tạo dữ liệu từ model thực
+            const data = [];
+            let globalIndex = 1;
+            
+            nightShiftData.departmentGroups.forEach(dept => {
+                // Thêm dòng nhóm
+                data.push(makeGroupRow(dept.departmentName));
+                
+                // Thêm dòng nhân viên
+                dept.employees.forEach(emp => {
+                    data.push(makeEmployeeRow(globalIndex++, emp));
+                });
+            });
+
+
+            const hot = new Handsontable(container, {
+                data: data,
+                columns: columns,
+                colHeaders: false,
+                rowHeaders: false,
+                nestedHeaders: nestedHeaders,
+                height: 'auto',  // Sử dụng scroll dọc của web
+                width: '100%',
+                autoColumnSize: true,
+                manualColumnFreeze: true,
+                manualColumnMove: true,
+                fixedColumnsLeft: 2,
+                rowHeaderWidth: 50,
+                
+                // Bật Copy/Paste từ Excel
+                copyPaste: {
+                    enabled: true,
+                    pasteMode: 'overwrite',
+                    rowsLimit: 1000,
+                    columnsLimit: 50
+                },
+                
+                // Bật fill handle để kéo copy nhanh
+                fillHandle: {
+                    direction: 'vertical',
+                    autoInsertRow: false
+                },
+                
+                contextMenu: {
+                    items: {
+                        row_above: {},
+                        row_below: {},
+                        hsep1: '---------',
+                        copy: { name: 'Sao chép (Ctrl+C)' },
+                        cut: { name: 'Cắt (Ctrl+X)' },
+                        hsep2: '---------',
+                        freeze_column: { name: 'Cố định cột' },
+                        unfreeze_column: { name: 'Bỏ cố định cột' },
+                        hsep3: '---------',
+                        undo: {},
+                        redo: {},
+                        clear_custom: {
+                            name: 'Xóa nội dung các ô đã chọn',
+                            callback() { hot.emptySelectedCells(); }
+                        }
+                    }
+                },
+                filters: false,
+                dropdownMenu: false,
+                licenseKey: 'non-commercial-and-evaluation',
+
+                // Tô style cho dòng nhóm
+                cells: function (row, col) {
+                    const cellProperties = {};
+                    const dataAtRow = this.instance.getDataAtRow(row);
+                    // Nếu dòng là dòng nhóm (chỉ có cột 1 có chữ)
+                    if (dataAtRow[1] && dataAtRow[0] === '') {
+                        cellProperties.readOnly = true;
+                        cellProperties.renderer = function (instance, td, row, col, prop, value, cellProperties) {
+                            td.style.fontStyle = 'italic';
+                            td.style.color = 'blue';
+                            td.style.fontWeight = 'bold';
+                            td.style.background = '#f0f8ff';
+                            td.innerHTML = value;
+                        };
+                    }
+                    return cellProperties;
+                },
+
+                afterChange: function (changes, source) {
+                    if (!changes || source === 'loadData' || source === 'calculation') return;
+                    
+                    const instance = this;
+                    
+                    // Xử lý từng thay đổi
+                    changes.forEach(([row, prop, oldVal, newVal]) => {
+                        if (oldVal === newVal) return;
+                        
+                        if (typeof prop === 'number' && prop >= 2 && prop < 2 + monthNumbers.length) {
+                            // Tính tổng cho từng nhân viên
+                            if (typeof instance.calculateYearlyTotal === 'function') {
+                                instance.calculateYearlyTotal(row);
+                            }
+                            
+                            // Cập nhật database
+                            const rowData = instance.getDataAtRow(row);
+                            
+                            // Kiểm tra nếu đây là dòng nhân viên (không phải dòng group)
+                            if (rowData[0] !== '' && rowData[1] && rowData[1] !== 'Người Quản lý' && rowData[1] !== 'Phòng tổng hợp HĐTV') {
+                                // Tìm userId từ data gốc
+                                const employeeName = rowData[1];
+                                
+                                // Tìm userId từ nightShiftData
+                                let userId = null;
+                                nightShiftData.departmentGroups.forEach(dept => {
+                                    dept.employees.forEach(emp => {
+                                        if (emp.fullName === employeeName) {
+                                            userId = emp.userId;
+                                        }
+                                    });
+                                });
+                                
+                                if (userId) {
+                                    // Tính tháng từ column index  
+                                    const columnIndex = prop - 2;
+                                    const actualMonth = monthNumbers[columnIndex];
+                                    
+                                    // Lấy năm hiện tại từ filter
+                                    const currentYear = parseInt($('#selectYear').val()) || new Date().getFullYear();
+                                    
+                                    // Thêm vào queue để batch update
+                                    updateQueue.push({ userId, month: actualMonth, year: currentYear, value: newVal });
+                                }
+                            }
+                        }
+                    });
+                    
+                    // Debounce batch update - chờ 500ms sau lần thay đổi cuối
+                    if (updateTimer) clearTimeout(updateTimer);
+                    updateTimer = setTimeout(() => {
+                        processBatchUpdates();
+                    }, 500);
+                }
+
+            });
+
+            // Hàm tính tổng cả năm cho một nhân viên
+            hot.calculateYearlyTotal = function(rowIndex) {
+                const rowData = this.getDataAtRow(rowIndex);
+                let yearlyTotal = 0;
+                
+                // Tính tổng cho khoảng thời gian được chọn
+                for (let m = 0; m < monthNumbers.length; m++) {
+                    const columnIndex = 2 + m; // Cột bắt đầu từ index 2
+                    yearlyTotal += parseFloat(rowData[columnIndex]) || 0;
+                }
+                
+                // Cập nhật cột tổng cả năm - hiển thị trống nếu = 0
+                this.setDataAtCell(rowIndex, 2 + monthNumbers.length, yearlyTotal > 0 ? yearlyTotal : '', 'calculation');
+            };
+
+            // Hàm tính chiều cao phù hợp
+            function calculateHotHeight() {
+                const windowHeight = window.innerHeight;
+                const offset = 290; // Trừ phần header, filter, padding, navbar, ...
+                const calculated = windowHeight - offset;
+                return Math.max(calculated, 320); // Tối thiểu 320px
+            }
+
+
+
+            // Hàm xử lý batch updates
+            function processBatchUpdates() {
+                if (updateQueue.length === 0) return;
+                
+                const totalUpdates = updateQueue.length;
+                showUpdateNotification('info', `Đang xử lý ${totalUpdates} thay đổi...`);
+                
+                // Process tất cả updates trong queue
+                const promises = updateQueue.map(update => 
+                    updateNightShiftData(update.userId, update.month, update.year, update.value, true)
+                );
+                
+                Promise.all(promises).then(() => {
+                    showUpdateNotification('success', `Đã cập nhật ${totalUpdates} thay đổi thành công!`);
+                    updateQueue = [];
+                }).catch(error => {
+                    showUpdateNotification('error', 'Có lỗi khi cập nhật một số dữ liệu');
+                    updateQueue = [];
+                });
+            }
+
+        })();
+
+        // Hàm cập nhật dữ liệu NightShift
+        function updateNightShiftData(userId, month, year, value, isBatch = false) {
+            const requestData = {
+                userId: userId,
+                month: month,
+                year: year,
+                value: value === '' || value === null || value === undefined ? null : (parseFloat(value) || 0)
+            };
+
+            return $.ajax({
+                url: '/TimeKeeping/UpdateNightShift',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(requestData),
+                success: function(response) {
+                    if (!isBatch) {
+                        if (response.success) {
+                            showUpdateNotification('success', 'Đã cập nhật ca đêm!');
+                        } else {
+                            showUpdateNotification('error', response.message);
+                        }
+                    }
+                },
+                error: function(xhr, status, error) {
+                    if (!isBatch) {
+                        showUpdateNotification('error', 'Lỗi kết nối: ' + error);
+                    }
+                }
+            });
+        }
+
+        // Hàm hiển thị thông báo cập nhật
+        function showUpdateNotification(type, message) {
+            let alertClass, icon;
+            if (type === 'success') {
+                alertClass = 'alert-success';
+                icon = 'fa-check-circle';
+            } else if (type === 'info') {
+                alertClass = 'alert-info';
+                icon = 'fa-info-circle';
+            } else {
+                alertClass = 'alert-danger';
+                icon = 'fa-exclamation-triangle';
+            }
+            
+            const notification = $(`
+                <div class="alert ${alertClass} alert-dismissible fade show update-notification" role="alert" style="position: fixed; top: 20px; right: 20px; z-index: 99999; min-width: 300px;">
+                    <i class="fa ${icon}"></i> ${message}
+                    <button type="button" class="close" data-dismiss="alert">
+                        <span>&times;</span>
+                    </button>
+                </div>
+            `);
+            
+            $('body').append(notification);
+            
+            // Tự động ẩn sau 3 giây
+            setTimeout(() => {
+                notification.alert('close');
+            }, 3000);
+        }
+
+        // Hàm khởi tạo với dữ liệu mẫu (fallback)
+        function initializeWithSampleData() {
+            document.getElementById('nightHotContainer').innerHTML = '<div class="alert alert-info">Không có dữ liệu ca đêm để hiển thị.</div>';
+        }
+
+
+
+
+    </script>
+</div>

@@ -1,0 +1,156 @@
+@{
+    ViewData["Title"] = "XEM LƯƠNG NHÂN VIÊN";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    #selectMonth { width: 50px; }
+    #selectYear { width: 100px; }
+    #selectFilterType { width: 180px; }
+    @@media (max-width: 576px) {
+        #selectMonth { width: 50px; }
+        #selectYear { width: 90px; }
+        #selectFilterType { width: 150px; }
+    }
+</style>
+
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-lg-5">
+                        <h4 class="card-title" style="margin-bottom:0px;">Thông tin chi tiết</h4>
+                    </div>
+                </div>
+
+                <!-- Bộ lọc -->
+                <div class="row align-items-center mt-2 mb-2">
+                    <div class="col-auto d-flex align-items-center mr-3 mb-2">
+                        <label class="fw-bold me-3 mb-0" style="min-width: 120px;">Chọn phần:</label>
+                        <select class="form-control form-select-sm" id="selectFilterType">
+                            <option value="regime" selected>Lương chế độ</option>
+                            <option value="nightshift">Ca đêm</option>
+                            <option value="overtime">Thêm giờ</option>
+                            <option value="meal">Phụ cấp/Ăn ca</option>
+                            <option value="other">Truy lĩnh/Truy thu</option>
+                        </select>
+                    </div>
+                    <div class="col-auto d-flex align-items-center mr-3 mb-2">
+                        <label class="fw-bold me-3 mb-0" style="min-width: 90px;">Tháng:</label>
+                        <select class="form-control form-select-sm" id="selectMonth" style="width:120px;">
+                            @{
+                                var defaultMonth = ViewBag.DefaultMonth as int? ?? DateTime.Now.Month;
+                            }
+                            @for (int i = 1; i <= 12; i++)
+                            {
+                                if (i == defaultMonth)
+                                {
+                                    <option value="@i" selected>@i</option>
+                                }
+                                else
+                                {
+                                    <option value="@i">@i</option>
+                                }
+                            }
+                        </select>
+                    </div>
+                    <div class="col-auto d-flex align-items-center mr-3 mb-2">
+                        <label class="fw-bold me-3 mb-0" style="min-width: 90px;">Năm:</label>
+                        <select class="form-control form-select-sm" id="selectYear" style="width:120px;">
+                            @{
+                                var availableYears = ViewBag.AvailableYears as List<int> ?? new List<int>();
+                                var defaultYear = ViewBag.DefaultYear as int? ?? DateTime.Now.Year;
+                            }
+                            @foreach (var year in availableYears)
+                            {
+                                if (year == defaultYear)
+                                {
+                                    <option value="@year" selected>@year</option>
+                                }
+                                else
+                                {
+                                    <option value="@year">@year</option>
+                                }
+                            }
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Kết quả load AJAX -->
+                <div class="table-responsive mt-3" id="bangKetQua">
+                    <div class="text-center p-3">
+                        <i class="fa fa-spinner fa-spin"></i> Đang tải dữ liệu...
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/assets/node_modules/datatables/jquery.dataTables.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            var currentMonth = @(ViewBag.DefaultMonth ?? DateTime.Now.Month);
+            var currentYear = @(ViewBag.DefaultYear ?? DateTime.Now.Year);
+            
+            function loadBangLuong() {
+                var filterType = $('#selectFilterType').val();
+                var month = parseInt($('#selectMonth').val()) || currentMonth;
+                var year = parseInt($('#selectYear').val()) || currentYear;
+                
+                // Đảm bảo month và year luôn có giá trị hợp lệ
+                if (month <= 0 || month > 12) {
+                    month = currentMonth;
+                }
+                if (year <= 0) {
+                    year = currentYear;
+                }
+                
+                $.ajax({
+                    url: '/EmployeeSalary/RenderLoaiLuong',
+                    type: 'GET',
+                    data: { 
+                        filterType: filterType, 
+                        month: month, 
+                        year: year, 
+                        _: new Date().getTime() 
+                    },
+                    success: function (data) {
+                        $('#bangKetQua').html(data);
+                        // Khởi tạo lại DataTable sau khi load
+                        initializeDataTable();
+                    },
+                    error: function (xhr, status, error) {
+                        alert("Lỗi khi tải dữ liệu: " + error);
+                    }
+                });
+            }
+
+            function initializeDataTable() {
+                // Hủy DataTable cũ nếu có
+                if ($.fn.DataTable.isDataTable('#myTable')) {
+                    $('#myTable').DataTable().destroy();
+                }
+                
+                // Khởi tạo DataTable mới
+                $('#myTable').DataTable({
+                    "pageLength": 10,
+                    "ordering": true,
+                    "searching": true,
+                    "lengthChange": true
+                });
+            }
+
+            // Khi thay đổi filter → tự động gọi
+            $('#selectFilterType, #selectMonth, #selectYear').change(function () {
+                loadBangLuong();
+            });
+
+            // Tự động load dữ liệu khi trang được tải
+            loadBangLuong();
+        });
+    </script>
+}

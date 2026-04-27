@@ -1,0 +1,197 @@
+﻿@model IEnumerable<PMS.Models.TblUser>
+
+@{
+    ViewData["Title"] = "Quản lý người dùng";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                @* <div class="row">
+                    <div class="col-lg-5">
+                        <h4 class="card-title" style="margin-bottom:0px;">Danh sách người dùng</h4>
+                    </div>
+                    <div class="col-lg-7" style="text-align: right;">
+                        <a class="btn btn-sm btn-primary" href="@Url.Action("Create", "tblUsers")">Thêm mới</a>
+                    </div>
+                </div> *@
+
+                 <div class="table-responsive">
+                        <table id="myTable" class="table table-bordered table-striped">
+                            <thead>
+                                <tr>
+                                <th class="text-center">#</th>
+                                <th class="text-center">Mã <br> nhân viên </br></th>
+                                <th class="text-center">Tên <br> người dùng </br> </th>
+                                <th class="text-center">Phòng ban</th>
+                                <th class="text-center">Chức vụ</th>
+                                <th class="text-center">Ngày sinh</th>
+                                <th class="text-center">Tên tài khoản</th>
+                                <th class="text-center">Số tài khoản</th>
+                                <th class="text-center">Hệ số</th>
+                                <th class="text-center">Địa chỉ email</th>
+                                <th class="text-center">Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (Model != null)
+                                {
+                                    int i = 1;
+                                    foreach (var item in Model)
+                                    {
+                                        <tr>
+                                            <td style="text-align:center">
+                                                @(i++)
+                                            </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.UserCode)
+                                        </td>
+                                            <td>
+                                                @Html.DisplayFor(modelItem => item.Name)
+                                            </td>
+                                        <td class="text-center">
+                                            @{
+                                                var validDepts = item.TblUserDepartments.Where(x => x.Status == 1);
+                                                var primaryDept = validDepts.OrderByDescending(x => x.OrderNumber == 2)
+                                                                            .ThenByDescending(x => x.OrderNumber == 1)
+                                                                            .FirstOrDefault()?.Department?.Name;
+                                            }
+                                            @primaryDept
+                                        </td>
+                                        <td>
+                                            @{
+                                                var validPos = item.TblUserPositions.Where(x => x.Status == 1);
+                                                var primaryPos = validPos.OrderByDescending(x => x.OrderNumber == 2)
+                                                                         .ThenByDescending(x => x.OrderNumber == 1)
+                                                                         .FirstOrDefault()?.Position?.Name;
+                                            }
+                                            @primaryPos
+                                        </td>
+                                        <td class="text-center">
+                                            @(item.Dob.HasValue ? item.Dob.Value.ToString("dd/MM/yyyy") : "")
+                                        </td>
+                                             <td>
+                                            @Html.DisplayFor(modelItem => item.AccountName)
+                                            </td>
+                                        <td class="text-center">
+                                                @Html.DisplayFor(modelItem => item.BankNo)
+                                            </td>
+                                        <td class="text-center">
+                                                @String.Format("{0:F3}", item.SalaryConfficient)
+                                            </td>
+                                            <td>
+                                                @Html.DisplayFor(modelItem => item.EmailAddress)
+                                            </td>
+
+                                            <td class="text-center">
+                                            <a href="@Url.Action("Edit", "tblUsers", new { id = item.Id })" data-toggle="tooltip" data-original-title="Sửa">
+                                                    <i class="fa fa-pencil text-inverse m-r-10"></i>
+                                                </a>
+                                            <a onclick="return confirm('Bạn có muốn xóa dữ liệu không?')" href="@Url.Action("Delete", "tblUsers", new { id = item.Id })" data-toggle="tooltip" data-original-title="Xóa">
+                                                    <i class="fa fa-close text-danger"></i>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    }
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="~/assets/node_modules/datatables/jquery.dataTables.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('#myTable').DataTable({
+            "pageLength": 10,
+            "ordering": true,
+            "searching": true,
+            "lengthChange": true,
+
+            // DOM với 3 phần cùng hàng
+            "dom":
+                '<"d-flex justify-content-between align-items-center mb-3"<"d-flex align-items-center"l><"d-flex align-items-center"f>>' +
+                '<"row"<"col-sm-12"tr>>' +
+                '<"row"<"col-sm-5"i><"col-sm-7"p>>',
+
+            "language": {
+                "lengthMenu": "Hiển thị _MENU_ bản ghi",
+                "search": "Tìm kiếm:"
+            },
+
+            "initComplete": function () {
+                // 1. Lấy container bên trái (chứa "Hiển thị")
+                var leftContainer = $('.dataTables_wrapper .d-flex.align-items-center').first();
+
+                // 2. Thêm nút "Thêm mới" vào container bên trái
+            var addButton = '<a class="btn btn-sm btn-primary ms-5" href="@Url.Action("Create", "tblUsers")">Thêm mới</a>';
+                leftContainer.append(addButton);
+
+                // 3. Điều chỉnh khoảng cách
+                leftContainer.css('gap', '20px');
+
+                // 4. Điều chỉnh label
+                $('.dataTables_length label, .dataTables_filter label').css({
+                    'margin-bottom': '0',
+                    'margin-right': '8px'
+                });
+            }
+        });
+            $(document).ready(function () {
+                var table = $('#example').DataTable({
+                    "columnDefs": [{
+                        "visible": false,
+                        "targets": 2
+                    }],
+                    "order": [
+                        [2, 'asc']
+                    ],
+                    "displayLength": 25,
+                    "drawCallback": function (settings) {
+                        var api = this.api();
+                        var rows = api.rows({
+                            page: 'current'
+                        }).nodes();
+                        var last = null;
+                        api.column(2, {
+                            page: 'current'
+                        }).data().each(function (group, i) {
+                            if (last !== group) {
+                                $(rows).eq(i).before('<tr class="group"><td colspan="5">' + group + '</td></tr>');
+                                last = group;
+                            }
+                        });
+                    }
+                });
+                // Order by the grouping
+                $('#example tbody').on('click', 'tr.group', function () {
+                    var currentOrder = table.order()[0];
+                    if (currentOrder[0] === 2 && currentOrder[1] === 'asc') {
+                        table.order([2, 'desc']).draw();
+                    } else {
+                        table.order([2, 'asc']).draw();
+                    }
+                });
+            });
+        });
+        $('#example23').DataTable({
+            dom: 'Bfrtip',
+            buttons: [
+                'copy', 'csv', 'excel', 'pdf', 'print'
+            ]
+        });
+    </script>
+<style>
+    .dataTables_wrapper .d-flex.justify-content-between {
+        flex-wrap: nowrap;
+        justify-content: flex-start !important; /* Thay space-between */
+        gap: 80px; /* Khoảng cách cố định 20px */
+    }
+
+</style>

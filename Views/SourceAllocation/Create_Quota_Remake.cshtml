@@ -1,0 +1,642 @@
+﻿@model PMS.Models.TblSoureAllocation
+
+@{
+    ViewData["Title"] = "THÊM MỚI PHÂN BỔ NGUỒN";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            @* <div class="card-header bg-success text-white">
+                <h4 class="card-title mb-0">
+                    <i class="fa fa-plus"></i> THÊM MỚI PHÂN BỔ NGUỒN
+                </h4>
+            </div> *@
+            <div class="card-body">
+                <form asp-action="Create" id="createForm">
+                    <div class="row">
+                        @Html.AntiForgeryToken()
+                        <!-- Cột 1: Thông tin cơ bản -->
+                        <div class="col-md-6">
+                            <div class="form-group mb-3">
+                                <label asp-for="BudgetPlanId" class="form-label fw-bold">Năm ngân sách *</label>
+                                <select asp-for="BudgetPlanId" class="form-control" id="BudgetPlanId" required>
+                                    <option value="">-- Chọn năm ngân sách --</option>
+                                </select>
+                                <span asp-validation-for="BudgetPlanId" class="text-danger"></span>
+                                <small class="form-text text-muted">Chọn năm để tự động load ngân sách</small>
+                            </div>
+
+                            <div class="form-group mb-3">
+                                <label asp-for="Quarter" class="form-label fw-bold">Quý *</label>
+                                <select asp-for="Quarter" class="form-control" id="Quarter" required>
+                                    <option value="">-- Chọn quý --</option>
+                                    <option value="1">Quý 1</option>
+                                    <option value="2">Quý 2</option>
+                                    <option value="3">Quý 3</option>
+                                    <option value="4">Quý 4</option>
+                                </select>
+                                <span asp-validation-for="Quarter" class="text-danger"></span>
+                            </div>
+
+                            <div class="form-group mb-3">
+                                <label asp-for="MonthNumber" class="form-label fw-bold">Tháng *</label>
+                                <select asp-for="MonthNumber" class="form-control" id="MonthNumber" required>
+                                    <option value="">-- Chọn tháng --</option>
+                                    @for (int i = 1; i <= 12; i++)
+                                    {
+                                        <option value="@i">Tháng @i</option>
+                                    }
+                                </select>
+                                <span asp-validation-for="MonthNumber" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <!-- Cột 2: Ngân sách và phân bổ -->
+                        <div class="col-md-6">
+                            <div class="form-group mb-3">
+                                <label class="form-label fw-bold">Tổng ngân sách *</label>
+                                <input type="text" class="form-control formatted-number"
+                                       id="TotalBudget" readonly />
+                                <small class="form-text text-muted">Tự động load từ năm được chọn</small>
+                            </div>
+
+                            <div class="form-group mb-3">
+                                <label class="form-label fw-bold">Chi cho NLĐ *</label>
+                                <input type="text" class="form-control formatted-number"
+                                       id="EmployeeBudget" readonly />
+                                <small class="form-text text-muted">Tự động load từ năm được chọn</small>
+                            </div>
+
+                            <div class="form-group mb-3">
+                                <label class="form-label fw-bold">Chi cho NQL *</label>
+                                <input type="text" class="form-control formatted-number"
+                                       id="ManagerBudget" readonly />
+                                <small class="form-text text-muted">Tự động load từ năm được chọn</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Phân bổ theo quý -->
+                    <div class="row mt-3">
+                        <div class="col-12">
+                            <div class="card bg-light">
+                                <div class="card-header">
+                                    <h6 class="mb-0">PHÂN BỔ THEO QUÝ</h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="form-group mb-3">
+                                                <label asp-for="QuarterEmployee" class="form-label">Cho NLĐ (Quý)</label>
+                                                <input id="q_e" asp-for="QuarterEmployee" class="form-control number-input" type="text" />
+                                                <span asp-validation-for="QuarterEmployee" class="text-danger"></span>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group mb-3">
+                                                <label asp-for="QuarterManager" class="form-label">Cho NQL (Quý)</label>
+                                                <input id="q_n" asp-for="QuarterManager" class="form-control number-input" type="text" />
+                                                <span asp-validation-for="QuarterManager" class="text-danger"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Phân bổ theo tháng -->
+                    <div class="row mt-3">
+                        <div class="col-12">
+                            <div class="card bg-light">
+                                <div class="card-header">
+                                    <h6 class="mb-0">PHÂN BỔ THEO THÁNG</h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <div class="form-group mb-3">
+                                                <label asp-for="MonthEmployee" class="form-label">NLĐ (Tháng)</label>
+                                                <input id="m_e" asp-for="MonthEmployee" class="form-control number-input" type="text" />
+                                                <span asp-validation-for="MonthEmployee" class="text-danger"></span>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="form-group mb-3">
+                                                <label asp-for="MonthManager" class="form-label">NQL (Tháng)</label>
+                                                <input id="m_n" asp-for="MonthManager" class="form-control number-input" type="text" />
+                                                <span asp-validation-for="MonthManager" class="text-danger"></span>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="form-group mb-3">
+                                                <label class="form-label">Tổng tháng</label>
+                                                <input type="text" id="TotalMonth" class="form-control formatted-number" readonly />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Ghi chú -->
+                    <div class="row mt-3">
+                        <div class="col-12">
+                            <div class="form-group mb-3">
+                                <label asp-for="Note" class="form-label">Ghi chú</label>
+                                <textarea asp-for="Note" class="form-control" rows="3"></textarea>
+                                <span asp-validation-for="Note" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Nút hành động -->
+                    <div class="row mt-4">
+                        <div class="col-12 text-end">
+                            <div class="btn-group">
+                                <a href="@Url.Action("Index")" class="btn btn-secondary">
+                                    <i class="fa fa-arrow-left"></i> Quay lại
+                                </a>
+                                <button type="submit" class="btn btn-success">
+                                    <i class="fa fa-save"></i> Thêm mới
+                                </button>
+                                <button type="button" class="btn btn-primary" onclick="calculateAuto()">
+                                    <i class="fa fa-calculator"></i> Tính toán tự động
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        // Biến cờ để kiểm tra đang submit
+        let isSubmitting = false;
+
+        // Đối tượng ánh xạ quý -> tháng
+        const quarterToMonths = {
+            '1': [1, 2, 3],
+            '2': [4, 5, 6],
+            '3': [7, 8, 9],
+            '4': [10, 11, 12]
+        };
+
+        // Hàm định dạng số theo chuẩn Việt Nam: 500,000.2
+        function formatNumber(number) {
+            if (number === null || number === undefined || number === '' || isNaN(number)) {
+                return '';
+            }
+
+            // Chuyển thành số
+            const numValue = parseFloat(number);
+
+            // Tách phần nguyên và phần thập phân
+            const parts = numValue.toString().split('.');
+            let integerPart = parts[0];
+            const decimalPart = parts.length > 1 ? '.' + parts[1] : '';
+
+            // Thêm dấu phẩy phân cách hàng nghìn
+            integerPart = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+
+            return integerPart + decimalPart;
+        }
+
+        // Hàm parse số từ chuỗi đã định dạng: "500,000.2" -> 500000.2
+        function parseFormattedNumber(formattedString) {
+            if (!formattedString || formattedString.trim() === '') {
+                return 0;
+            }
+
+            // Xóa tất cả dấu phẩy (phân cách hàng nghìn)
+            const cleanString = formattedString.replace(/,/g, '');
+
+            // Chuyển đổi sang số
+            const number = parseFloat(cleanString);
+
+            // Trả về số, nếu NaN thì trả về 0
+            return isNaN(number) ? 0 : number;
+        }
+
+        // Hàm định dạng input khi blur
+        function formatInputOnBlur(inputElement) {
+            const rawValue = inputElement.value.trim();
+            if (rawValue !== '') {
+                const parsedValue = parseFormattedNumber(rawValue);
+                if (!isNaN(parsedValue) && parsedValue !== 0) {
+                    inputElement.value = formatNumber(parsedValue);
+                }
+            }
+        }
+
+        // Hàm xóa định dạng khi focus (chỉ hiển thị số thuần)
+        function removeFormatOnFocus(inputElement) {
+            const rawValue = inputElement.value.trim();
+            if (rawValue !== '') {
+                const parsedValue = parseFormattedNumber(rawValue);
+                if (!isNaN(parsedValue)) {
+                    // Hiển thị số mà không có định dạng, giữ lại số thập phân
+                    inputElement.value = parsedValue.toString();
+                }
+            }
+        }
+
+        // Hàm kiểm tra và xử lý input chỉ được nhập số
+        function validateNumberInput(inputElement) {
+            // Lấy giá trị hiện tại
+            let value = inputElement.value;
+
+            // Chỉ cho phép số, dấu chấm (thập phân), và dấu phẩy (phân cách)
+            value = value.replace(/[^0-9.,]/g, '');
+
+            // Chỉ cho phép một dấu chấm thập phân
+            const dotCount = (value.match(/\./g) || []).length;
+            if (dotCount > 1) {
+                // Giữ lại dấu chấm đầu tiên, xóa các dấu chấm sau
+                const parts = value.split('.');
+                value = parts[0] + '.' + parts.slice(1).join('');
+            }
+
+            // Xóa dấu phẩy (sẽ thêm lại sau khi định dạng)
+            value = value.replace(/,/g, '');
+
+            inputElement.value = value;
+        }
+
+        // Hàm cập nhật hiển thị tháng theo quý
+        function updateMonthVisibility(quarter) {
+            const monthSelect = document.getElementById('MonthNumber');
+            const allOptions = monthSelect.options;
+
+            for (let i = 1; i < allOptions.length; i++) {
+                allOptions[i].style.display = '';
+            }
+
+            if (quarter && quarterToMonths[quarter]) {
+                const allowedMonths = quarterToMonths[quarter];
+                for (let i = 1; i < allOptions.length; i++) {
+                    const monthValue = parseInt(allOptions[i].value);
+                    if (!allowedMonths.includes(monthValue)) {
+                        allOptions[i].style.display = 'none';
+                    }
+                }
+
+                const currentMonth = parseInt(monthSelect.value);
+                if (currentMonth && !allowedMonths.includes(currentMonth)) {
+                    monthSelect.value = '';
+                }
+            }
+        }
+
+        // Hàm tính tổng tháng
+        function calculateTotalMonth() {
+            const monthEmployee = parseFormattedNumber($('#m_e').val());
+            const monthManager = parseFormattedNumber($('#m_n').val());
+            const total = monthEmployee + monthManager;
+            $('#TotalMonth').val(formatNumber(total));
+        }
+
+        // Hàm xóa các trường ngân sách
+        function clearBudgetFields() {
+            $('.number-input').each(function() {
+                $(this).val('');
+            });
+            $('#TotalMonth').val('');
+            $('#q_e, #q_n, #m_e, #m_n, #TotalMonth').prop('disabled', false);
+        }
+
+        // Hàm tính toán tự động
+        function calculateAuto() {
+            const totalBudget = parseFormattedNumber($('#TotalBudget').val());
+            const employeeBudget = parseFormattedNumber($('#EmployeeBudget').val());
+            const managerBudget = parseFormattedNumber($('#ManagerBudget').val());
+
+            if (totalBudget > 0) {
+                // Tính toán
+                const quarterEmployee = employeeBudget / 4;
+                const quarterManager = managerBudget / 4;
+                const monthEmployee = employeeBudget / 12;
+                const monthManager = managerBudget / 12;
+
+                // Định dạng và hiển thị
+                $('#q_e').val(formatNumber(quarterEmployee));
+                $('#q_n').val(formatNumber(quarterManager));
+                $('#m_e').val(formatNumber(monthEmployee));
+                $('#m_n').val(formatNumber(monthManager));
+
+                // Tính tổng tháng
+                calculateTotalMonth();
+
+                toastr.success('Đã tính toán tự động phân bổ');
+            } else {
+                toastr.warning('Vui lòng chọn năm ngân sách trước');
+            }
+        }
+
+        $(document).ready(function () {
+            // Load danh sách năm khi trang được tải
+            loadBudgetPlans();
+
+            // Khởi tạo hiển thị tháng theo quý
+            updateMonthVisibility($('#Quarter').val());
+
+            // Sự kiện khi thay đổi quý
+            $('#Quarter').change(function() {
+                updateMonthVisibility($(this).val());
+                loadBudgetPlanDetails_pre();
+            });
+
+            // Thêm sự kiện cho các input số
+            $('.number-input').each(function() {
+                const input = this;
+
+                // Khi focus - xóa định dạng
+                $(input).on('focus', function() {
+                    removeFormatOnFocus(this);
+                });
+
+                // Khi blur - định dạng lại
+                $(input).on('blur', function() {
+                    formatInputOnBlur(this);
+
+                    // Nếu là trường tháng, tính tổng
+                    if (this.id === 'm_e' || this.id === 'm_n') {
+                        calculateTotalMonth();
+                    }
+                });
+
+                // Khi nhập - validate
+                $(input).on('input', function() {
+                    validateNumberInput(this);
+                });
+
+                // Khi keypress - chỉ cho phép số và một số ký tự đặc biệt
+                $(input).on('keypress', function(e) {
+                    const charCode = e.which ? e.which : e.keyCode;
+                    const charStr = String.fromCharCode(charCode);
+
+                    // Cho phép: số (0-9), dấu chấm (.)
+                    if (!/[0-9.]/.test(charStr)) {
+                        e.preventDefault();
+                        return false;
+                    }
+
+                    // Kiểm tra nếu đã có dấu chấm mà lại nhập thêm dấu chấm
+                    if (charStr === '.' && this.value.includes('.')) {
+                        e.preventDefault();
+                        return false;
+                    }
+
+                    return true;
+                });
+
+                // Paste event - xử lý khi người dùng paste
+                $(input).on('paste', function(e) {
+                    // Cho phép paste, nhưng sẽ được validate trong input event
+                    setTimeout(() => {
+                        validateNumberInput(this);
+                    }, 0);
+                });
+            });
+
+            // Tính toán tổng tháng khi thay đổi
+            $('#m_e, #m_n').on('input blur change', function() {
+                calculateTotalMonth();
+            });
+
+            // Load thông tin khi thay đổi năm/quý/tháng
+            $('#BudgetPlanId, #Quarter, #MonthNumber').change(function() {
+                loadBudgetPlanDetails_pre();
+            });
+
+            // XỬ LÝ FORM SUBMIT
+            $('#createForm').on('submit', function(e) {
+                e.preventDefault();
+                if (!isSubmitting) {
+                    submitFormAJAX();
+                }
+                return false;
+            });
+
+            // Hiển thị thông báo
+            @if (TempData["SuccessMessage"] != null)
+            {
+                        <text>toastr.success('@Html.Raw(TempData["SuccessMessage"])');</text>
+            }
+            @if (TempData["ErrorMessage"] != null)
+            {
+                        <text>toastr.error('@Html.Raw(TempData["ErrorMessage"])');</text>
+            }
+        });
+
+        // Hàm submit form bằng AJAX
+        function submitFormAJAX() {
+            if (isSubmitting) {
+                toastr.warning('Đang xử lý, vui lòng đợi...');
+                return;
+            }
+
+            // Lấy và parse giá trị từ các input đã định dạng
+            const q_e = parseFormattedNumber($('#q_e').val());
+            const q_n = parseFormattedNumber($('#q_n').val());
+            const m_e = parseFormattedNumber($('#m_e').val());
+            const m_n = parseFormattedNumber($('#m_n').val());
+
+            // Validate dữ liệu
+            const allocationErrors = [];
+            if (q_e <= 0) allocationErrors.push('Vui lòng nhập phân bổ Quý cho NLĐ (phải > 0).');
+            if (q_n <= 0) allocationErrors.push('Vui lòng nhập phân bổ Quý cho NQL (phải > 0).');
+            if (m_e <= 0) allocationErrors.push('Vui lòng nhập phân bổ Tháng cho NLĐ (phải > 0).');
+            if (m_n <= 0) allocationErrors.push('Vui lòng nhập phân bổ Tháng cho NQL (phải > 0).');
+
+            if (allocationErrors.length > 0) {
+                allocationErrors.forEach(function (err) { toastr.error(err); });
+                return;
+            }
+
+            isSubmitting = true;
+
+            // Disable nút submit
+            const $submitBtn = $('button[type="submit"]');
+            const originalText = $submitBtn.html();
+            $submitBtn.prop('disabled', true).html('<i class="fa fa-spinner fa-spin"></i> Đang xử lý...');
+
+            // Validate dữ liệu cơ bản
+            const errors = [];
+            const budgetPlanId = $('#BudgetPlanId').val();
+            const quarter = $('#Quarter').val();
+            const monthNumber = $('#MonthNumber').val();
+
+            if (!budgetPlanId) errors.push("Vui lòng chọn năm ngân sách");
+            if (!quarter) errors.push("Vui lòng chọn quý");
+            if (!monthNumber) errors.push("Vui lòng chọn tháng");
+
+            if (errors.length > 0) {
+                errors.forEach(function(error) {
+                    toastr.error(error);
+                });
+                isSubmitting = false;
+                $submitBtn.prop('disabled', false).html(originalText);
+                return;
+            }
+
+            toastr.info('Đang lưu dữ liệu...');
+
+            // Lấy dữ liệu form
+            const formData = new FormData();
+            formData.append('BudgetPlanId', budgetPlanId);
+            formData.append('Quarter', quarter);
+            formData.append('MonthNumber', monthNumber);
+            formData.append('QuarterEmployee', q_e);
+            formData.append('QuarterManager', q_n);
+            formData.append('MonthEmployee', m_e);
+            formData.append('MonthManager', m_n);
+            formData.append('Note', $('#Note').val());
+
+            // Gửi AJAX
+            $.ajax({
+                url: '@Url.Action("Create", "SourceAllocation")',
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                headers: {
+                    'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val(),
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                success: function(response) {
+                    if (response.success) {
+                        toastr.success(response.message);
+                        // Chuyển hướng sau 1.5 giây
+                        const redirect = response.redirectUrl || '@Url.Action("Index", "SourceAllocation")';
+                        setTimeout(function() {
+                            window.location.href = redirect;
+                        }, 1500);
+                    } else {
+                        isSubmitting = false;
+                        $submitBtn.prop('disabled', false).html(originalText);
+
+                        if (response.errors) {
+                            for (const key in response.errors) {
+                                if (response.errors.hasOwnProperty(key)) {
+                                    toastr.error(response.errors[key]);
+                                }
+                            }
+                        } else if (response.message) {
+                            toastr.error(response.message);
+                        }
+                    }
+                },
+                error: function(xhr) {
+                    isSubmitting = false;
+                    $submitBtn.prop('disabled', false).html(originalText);
+
+                    try {
+                        const errorResponse = JSON.parse(xhr.responseText);
+                        if (errorResponse.errors) {
+                            for (const key in errorResponse.errors) {
+                                if (errorResponse.errors.hasOwnProperty(key)) {
+                                    toastr.error(errorResponse.errors[key]);
+                                }
+                            }
+                        } else if (errorResponse.message) {
+                            toastr.error(errorResponse.message);
+                        }
+                    } catch (e) {
+                        toastr.error('Có lỗi xảy ra khi lưu dữ liệu');
+                    }
+                }
+            });
+        }
+
+        // Load danh sách năm từ BudgetPlan
+        function loadBudgetPlans() {
+            $.ajax({
+                url: '@Url.Action("GetBudgetPlans", "SourceAllocation")',
+                type: 'GET',
+                success: function(data) {
+                    const dropdown = $('#BudgetPlanId');
+                    dropdown.empty();
+                    dropdown.append('<option value="">-- Chọn năm ngân sách --</option>');
+
+                    $.each(data, function(index, item) {
+                        dropdown.append($('<option>', {
+                            value: item.value,
+                            text: item.text
+                        }));
+                    });
+                },
+                error: function() {
+                    toastr.error('Có lỗi xảy ra khi tải danh sách năm');
+                }
+            });
+        }
+
+        // Load thông tin phân bổ
+        function loadBudgetPlanDetails_pre() {
+            const budgetPlanId = $('#BudgetPlanId').val();
+            const quarter = $('#Quarter').val();
+            const monthNumber = $('#MonthNumber').val();
+
+            if (budgetPlanId && quarter && monthNumber) {
+                $.ajax({
+                    url: '@Url.Action("CheckQuarterAllocation", "SourceAllocation")',
+                    type: 'GET',
+                    data: {
+                        id: budgetPlanId,
+                        quarter: quarter,
+                        monthNumber: monthNumber
+                    },
+                    success: function(response) {
+                        if (response.success === true) {
+                            // Hiển thị thông tin ngân sách với định dạng
+                            $('#TotalBudget').val(formatNumber(response.data._TotalBudget));
+                            $('#EmployeeBudget').val(formatNumber(response.data._EmployeeBudget));
+                            $('#ManagerBudget').val(formatNumber(response.data._ManagerBudget));
+
+                            // Hiển thị thông tin phân bổ với định dạng
+                            $('#q_e').val(formatNumber(response.data.quarter_e));
+                            $('#q_n').val(formatNumber(response.data.quarter_n));
+                            $('#m_e').val(formatNumber(response.data.mon_e));
+                            $('#m_n').val(formatNumber(response.data.mon_n));
+                            $('#TotalMonth').val(formatNumber(response.data.total_e_n));
+
+                            // Disable các trường nhập liệu
+                            $('#q_e, #q_n, #m_e, #m_n, #TotalMonth').prop('disabled', true);
+
+                            toastr.success(`Đã được phân bổ cho quý ${response.data.quarter} năm ${response.data.year}`);
+                        } else {
+                            // Chỉ hiển thị thông tin ngân sách
+                            $('#TotalBudget').val(formatNumber(response.data._TotalBudget));
+                            $('#EmployeeBudget').val(formatNumber(response.data._EmployeeBudget));
+                            $('#ManagerBudget').val(formatNumber(response.data._ManagerBudget));
+
+                            // Enable các trường nhập liệu
+                            $('#q_e, #q_n, #m_e, #m_n, #TotalMonth').prop('disabled', false);
+
+                            // Xóa dữ liệu phân bổ cũ
+                            $('#q_e, #q_n, #m_e, #m_n').val('');
+                            $('#TotalMonth').val('');
+                        }
+                    },
+                    error: function() {
+                        toastr.error('Có lỗi xảy ra khi tải thông tin ngân sách');
+                        clearBudgetFields();
+                    }
+                });
+            } else {
+                clearBudgetFields();
+            }
+        }
+    </script>
+}

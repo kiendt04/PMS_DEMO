@@ -1,0 +1,326 @@
+﻿@model PMS.Models.TimeKeepingResponse
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/handsontable@14.3.0/dist/handsontable.full.min.css" />
+<style>
+    /* Tăng font-size và màu chữ */
+    .handsontable td {
+        color: #333333 !important;
+        font-size: 14px !important;
+    }
+    .handsontable span.colHeader {
+        color: #333333 !important;
+        font-weight: 700 !important;
+    }
+    /* Ẩn scrollbar dọc của Handsontable, giữ scrollbar ngang ở dưới */
+    #timeHotContainer .wtHolder {
+        overflow-x: auto !important;
+        overflow-y: visible !important;
+        height: auto !important;
+    }
+    #timeHotContainer .ht_master .wtHolder {
+        overflow-x: auto !important;
+        overflow-y: visible !important;
+    }
+    #timeHotContainer .ht_clone_top .wtHolder {
+        overflow: hidden !important;
+    }
+</style>
+<div id="timeTimekeeping" style="overflow:visible;">
+    <div id="timeHotContainer"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/handsontable@14.3.0/dist/handsontable.full.min.js"></script>
+    
+    <script>
+        (function () {
+            const container = document.getElementById('timeHotContainer');
+            
+            // Lấy dữ liệu từ model
+            const timeKeepingData = @Html.Raw(Json.Serialize(Model));
+            if (!timeKeepingData || !timeKeepingData.departmentGroups) {
+                return;
+            }
+
+            // Lấy thông tin quý từ ViewBag
+            const selectedQuarter = @ViewBag.SelectedQuarter;
+            const selectedYear = @ViewBag.SelectedYear;
+
+
+            // Tạo danh sách tháng theo quý được chọn
+            let monthNumbers = [];
+            if (selectedQuarter === 0) {
+                // Cả năm - hiển thị tất cả 12 tháng
+                monthNumbers = Array.from({ length: 12 }, (_, i) => i + 1);
+            } else {
+                // Quý cụ thể - chỉ hiển thị 3 tháng
+                const startMonth = (selectedQuarter - 1) * 3 + 1;
+                monthNumbers = [startMonth, startMonth + 1, startMonth + 2];
+            }
+
+            const monthLabels = monthNumbers.map(m => `T${m}`);
+            const subColumns = ['LV', 'H', 'P', 'L', 'OTS', 'CD', 'KL'];
+
+
+            // Nested headers: 2 rows
+            const periodLabel = selectedQuarter === 0 ? 'Tổng hợp cả năm' : `Tổng hợp Q${selectedQuarter}`;
+            const nestedHeaders = [
+                ['Số TT', 'Họ và tên', 'Số TK', ...monthLabels.map(m => ({ label: m, colspan: subColumns.length })), { label: periodLabel, colspan: 1 }],
+                ['', '', '', ...monthLabels.flatMap(() => subColumns), 'Tổng']
+            ];
+
+            // Build columns metadata
+            const baseColumnCount = 3; // STT, Họ và tên, Số TK
+            const totalMonthCols = monthNumbers.length * subColumns.length;
+            const totalColCount = baseColumnCount + totalMonthCols + 1; // +1 for yearly total
+
+            const columns = [];
+            // Base columns (read-only)
+            columns.push({ data: 0, type: 'numeric', width: 60, readOnly: true, className: 'htCenter'});
+            columns.push({ data: 1, type: 'text', width: 180, readOnly: true });
+            columns.push({ data: 2, type: 'text', width: 120, readOnly: true });
+            // Monthly numeric columns (read-only - dữ liệu tự động từ DailyAttendance)
+            for (let i = 0; i < totalMonthCols; i++) {
+                columns.push({ data: baseColumnCount + i, type: 'numeric', numericFormat: { pattern: '0' }, allowInvalid: false, width: 45, readOnly: true });
+            }
+            // Yearly total (read-only)
+            columns.push({ data: baseColumnCount + totalMonthCols, type: 'numeric', readOnly: true, width: 70 });
+
+            // Hàm tạo dòng nhóm (in nghiêng, màu xanh)
+            function makeGroupRow(label) {
+                const row = new Array(totalColCount).fill('');
+                row[1] = label;
+                return row;
+            }
+
+            // Hàm tạo dòng nhân viên với dữ liệu thực
+            function makeEmployeeRow(index, employee) {
+                const row = new Array(totalColCount).fill('');
+                row[0] = index;
+                row[1] = employee.fullName;
+                row[2] = employee.bankNo || '';
+                
+                // Điền dữ liệu theo tháng được chọn
+                monthNumbers.forEach((month, index) => {
+                    const monthData = employee.monthlyData[month];
+                    if (monthData) {
+                        const offset = baseColumnCount + index * subColumns.length;
+                        // LV sẽ lấy giá trị từ monthData.lv (đã được xử lý ở backend)
+                        row[offset + 0] = monthData.lv || '';      // LV
+                        row[offset + 1] = monthData.h || '';        // H
+                        row[offset + 2] = monthData.p || '';        // P
+                        row[offset + 3] = monthData.l || '';        // L
+                        row[offset + 4] = monthData.ots || '';      // OT
+                        row[offset + 5] = monthData.cd || '';       // CD
+                        row[offset + 6] = monthData.kl || '';       // KL
+                    }
+                });
+                
+                // Tổng cả năm (LV)
+                row[baseColumnCount + totalMonthCols] = employee.yearlyTotalLV || '';
+                return row;
+            }
+
+            // Hàm tính chiều cao phù hợp (định nghĩa trước để sử dụng)
+            function calculateHotHeight(rowCount) {
+                const rowHeight = 25; // Chiều cao mỗi dòng (điều chỉnh để chính xác hơn)
+                const headerHeight = 60; // Chiều cao header nested
+                const minHeight = 400; // Chiều cao tối thiểu (tăng lên để hiển thị nhiều dòng hơn)
+                const availableHeight = window.innerHeight - 250; // Chiều cao có sẵn (giảm offset để có thêm không gian)
+                
+                // Tính chiều cao dựa trên số dòng
+                const calculatedByRows = rowCount * rowHeight + headerHeight;
+                
+                // Ưu tiên hiển thị tất cả dữ liệu nếu có thể
+                // Nếu không đủ không gian, dùng chiều cao có sẵn (sẽ có scrollbar)
+                let finalHeight;
+                if (calculatedByRows <= availableHeight) {
+                    // Đủ không gian: hiển thị tất cả dữ liệu
+                    finalHeight = calculatedByRows;
+                } else {
+                    // Không đủ không gian: dùng chiều cao có sẵn, đảm bảo ít nhất hiển thị được 70% số dòng
+                    const minVisibleRows = Math.ceil(rowCount * 0.7);
+                    const minRequiredHeight = minVisibleRows * rowHeight + headerHeight;
+                    finalHeight = Math.max(minRequiredHeight, availableHeight);
+                }
+                
+                // Đảm bảo không nhỏ hơn chiều cao tối thiểu
+                return Math.max(finalHeight, minHeight);
+            }
+
+            // Tạo dữ liệu từ model thực
+            const data = [];
+            let globalIndex = 1;
+            
+            timeKeepingData.departmentGroups.forEach(dept => {
+                // Thêm dòng nhóm
+                data.push(makeGroupRow(dept.departmentName));
+                
+                // Thêm dòng nhân viên
+                dept.employees.forEach(emp => {
+                    data.push(makeEmployeeRow(globalIndex++, emp));
+                });
+            });
+
+            const hot = new Handsontable(container, {
+                data: data,
+                columns: columns,
+                colHeaders: false,
+                rowHeaders: false,
+                nestedHeaders: nestedHeaders,
+                height: 'auto',  // Sử dụng scroll dọc của web
+                width: '100%',
+                // Tránh lệch header khi hiển thị theo quý: không kéo giãn cột theo bảng
+                stretchH: 'none',
+                manualColumnFreeze: true,
+                manualColumnMove: true,
+                fixedColumnsLeft: 3,
+                autoColumnSize: true,
+                preventOverflow: 'horizontal',
+
+                // fix score
+                overflow: 'hidden',          // Ẩn scrollbar
+                preventOverflow: 'vertical', // Chỉ ngăn tràn theo chiều dọc
+                viewportColumnRenderingOffset: 0, // Giảm vùng render
+                viewportRowRenderingOffset: 0,   // Giảm vùng render
+
+                // Tắt tính năng scroll dọc, giữ scroll ngang
+                scrollbarModel: {
+                    horizontal: true,      // Giữ scrollbar ngang
+                    vertical: false         // Tắt scrollbar dọc
+                },
+
+                // Đảm bảo table fit với container
+                renderAllRows: true,        // Render tất cả rows (nếu ít dữ liệu)
+                renderAllColumns: true,     // Render tất cả columns
+
+                // CSS override
+                className: 'no-scroll-handsontable',
+
+                
+                // Tắt Copy/Paste vì dữ liệu chỉ xem
+                copyPaste: false,
+                
+                // Tắt fill handle vì chỉ xem
+                fillHandle: false,
+                
+                contextMenu: {
+                    items: {
+                        copy: { name: 'Sao chép (Ctrl+C)' },
+                        hsep1: '---------',
+                        freeze_column: { name: 'Cố định cột' },
+                        unfreeze_column: { name: 'Bỏ cố định cột' }
+                    }
+                },
+                filters: false,
+                dropdownMenu: false,
+                licenseKey: 'non-commercial-and-evaluation',
+
+                // Tô style cho dòng nhóm
+                cells: function (row, col) {
+                    const cellProperties = {};
+                    const dataAtRow = this.instance.getDataAtRow(row);
+                    // Nếu dòng là dòng nhóm (chỉ có cột 1 có chữ, cột 0 và 2 trống)
+                    if (dataAtRow[1] && dataAtRow[0] === '' && dataAtRow[2] === '') {
+                        cellProperties.readOnly = true;
+                        cellProperties.renderer = function (instance, td, row, col, prop, value, cellProperties) {
+                            td.style.fontStyle = 'italic';
+                            td.style.color = 'blue';
+                            td.style.fontWeight = 'bold';
+                            td.style.background = '#f0f8ff';
+                            td.innerHTML = value;
+                        };
+                    }
+                    return cellProperties;
+                },
+
+                // Không cần afterChange vì dữ liệu chỉ xem, tự động cập nhật từ DailyAttendance
+                afterChange: function (changes, source) {
+                    // Chỉ tính lại tổng nếu cần (nhưng không cho phép edit)
+                    return;
+                },
+
+                afterInit: function() {
+                    // Cập nhật STT ban đầu
+                    if (typeof this.updateRowNumbers === 'function') {
+                        this.updateRowNumbers();
+                    }
+                }
+            });
+
+            // Hàm cập nhật STT tự động cho từng nhóm
+            hot.updateRowNumbers = function() {
+                let currentGroupIndex = 1;
+                const data = this.getData();
+                
+                this.batch(() => {
+                    for (let i = 0; i < data.length; i++) {
+                        const row = data[i];
+                        if (row[1] && row[0] === '' && row[2] === '') {
+                            currentGroupIndex = 1;
+                        } else if (row[0] !== '') {
+                            this.setDataAtCell(i, 0, currentGroupIndex++, 'calculation');
+                        }
+                    }
+                });
+            };
+
+            // Hàm tính tổng cả năm cho một nhân viên
+            hot.calculateYearlyTotal = function(rowIndex) {
+                const rowData = this.getDataAtRow(rowIndex);
+                let yearlyTotal = 0;
+                
+                // Tính tổng LV (Làm việc) cho khoảng thời gian được chọn
+                for (let m = 0; m < monthNumbers.length; m++) {
+                    const offset = baseColumnCount + m * subColumns.length;
+                    yearlyTotal += parseFloat(rowData[offset + 0]) || 0; // LV column
+                }
+                
+                // Cập nhật cột tổng cả năm - hiển thị trống nếu = 0
+                this.setDataAtCell(rowIndex, baseColumnCount + totalMonthCols, yearlyTotal > 0 ? yearlyTotal : '', 'calculation');
+            };
+
+
+
+            // ===== KHỞI TẠO TOOLTIP CÔNG THỨC =====
+            HandsontableFormula.init(hot, null, {
+                getFormula: function(row, col, value, hotInstance) {
+                    const baseColumnCount = 3;
+                    
+                    // Không hiển thị cho cột STT, Họ tên, Số TK
+                    if (col < baseColumnCount) {
+                        return null;
+                    }
+                    
+                    // Tính toán tháng và loại cột
+                    const columnIndex = col - baseColumnCount;
+                    
+                    // Kiểm tra nếu là cột tổng cả năm/quý
+                    if (col === baseColumnCount + totalMonthCols) {
+                        const periodLabel = selectedQuarter === 0 ? 'cả năm' : `quý ${selectedQuarter}`;
+                        return `= Tổng số ngày làm việc ${periodLabel}`;
+                    }
+                    
+                    const monthIndex = Math.floor(columnIndex / subColumns.length);
+                    const fieldIndex = columnIndex % subColumns.length;
+                    const monthLabel = monthLabels[monthIndex];
+                    const fieldNames = ['Làm việc', 'Đi học', 'Nghỉ phép', 'Nghỉ lễ', 'Ốm / Thai sản', 'Nghỉ chế độ', 'Nghỉ không lương'];
+                    const fieldName = fieldNames[fieldIndex];
+                    
+                    return `= ${fieldName} (${monthLabel})`;
+                },
+                shouldShow: function(row, col, value, hotInstance) {
+                    // Không hiển thị cho cột STT, Họ tên, Số TK
+                    if (col < 3) return false;
+                    
+                    // Hiển thị cho các cột còn lại
+                    return true;
+                }
+            });
+    
+        })();
+            
+        // Hàm khởi tạo với dữ liệu mẫu (fallback)
+        function initializeWithSampleData() {
+            document.getElementById('timeHotContainer').innerHTML = '<div class="alert alert-info">Không có dữ liệu để hiển thị.</div>';
+        }
+    </script>
+</div>

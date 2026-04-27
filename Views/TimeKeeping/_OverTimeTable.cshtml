@@ -1,0 +1,516 @@
+﻿@model PMS.Models.TimeKeepingResponse
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/handsontable@14.3.0/dist/handsontable.full.min.css" />
+<style>
+    /* Tăng font-size và màu chữ */
+    .handsontable td {
+        color: #333333 !important;
+        font-size: 14px !important;
+    }
+    .handsontable span.colHeader {
+        color: #333333 !important;
+        font-weight: 700 !important;
+    }
+    /* Ẩn scrollbar dọc của Handsontable, giữ scrollbar ngang ở dưới */
+    #overtimeHotContainer .wtHolder {
+        overflow-x: auto !important;
+        overflow-y: visible !important;
+        height: auto !important;
+    }
+    #overtimeHotContainer .ht_master .wtHolder {
+        overflow-x: auto !important;
+        overflow-y: visible !important;
+    }
+    /* Ẩn scrollbar của header clone - chỉ giữ 1 scroll ở dưới */
+    #overtimeHotContainer .ht_clone_top .wtHolder {
+        overflow: hidden !important;
+    }
+</style>
+<div id="overtimeTimekeeping" style="overflow:visible;">
+    <div id="overtimeHotContainer"></div>
+    <script src="https://cdn.jsdelivr.net/npm/handsontable@14.3.0/dist/handsontable.full.min.js"></script>
+    <script>
+        (function () {
+            const container = document.getElementById('overtimeHotContainer');
+            
+            // Lấy dữ liệu từ model
+            const overtimeData = @Html.Raw(Json.Serialize(Model));
+            
+            if (!overtimeData || !overtimeData.departmentGroups) {
+                return;
+            }
+
+            // Lấy thông tin quý từ ViewBag
+            const selectedQuarter = @ViewBag.SelectedQuarter;
+            const selectedYear = @ViewBag.SelectedYear;
+            
+            // Queue để xử lý batch updates khi paste nhiều cells
+            let updateQueue = [];
+            let updateTimer = null;
+
+            // Tạo danh sách tháng theo quý được chọn
+            let monthNumbers = [];
+            if (selectedQuarter === 0) {
+                // Cả năm - hiển thị tất cả 12 tháng
+                monthNumbers = Array.from({ length: 12 }, (_, i) => i + 1);
+            } else {
+                // Quý cụ thể - chỉ hiển thị 3 tháng
+                const startMonth = (selectedQuarter - 1) * 3 + 1;
+                monthNumbers = [startMonth, startMonth + 1, startMonth + 2];
+            }
+
+            // Tạo header con cho mỗi tháng: "giờ" và "công"
+            const months = monthNumbers.map(m => `T${m}`);
+            const periodLabel = selectedQuarter === 0 ? 'Tổng hợp cả năm' : `Tổng hợp Q${selectedQuarter}`;
+            const nestedHeaders = [
+                [
+                    'Số TT', 'Họ và tên',
+                    ...months.flatMap(m => ({ label: m, colspan: 2 })), // Mỗi tháng có 2 cột con
+                    { label: periodLabel, colspan: 2 } // Tổng hợp có 2 cột con
+                ],
+                [
+                    '', '',
+                    ...Array(monthNumbers.length).fill(['giờ', 'công']).flat(),
+                    'giờ', 'công'
+                ]
+            ];
+
+            // Cấu hình cột dynamic theo số tháng được chọn
+            const totalMonthCols = monthNumbers.length * 2; // mỗi tháng có 2 cột (giờ, công)
+            const columns = [
+                { data: 0, type: 'numeric', width: 50, className: "htCenter" }, // STT
+                { data: 1, type: 'text', width: 250 },   // Họ và tên
+            ];
+
+            for (let i = 0; i < totalMonthCols; i++) { // Dynamic số cột theo tháng
+                const isHoursColumn = i % 2 === 0; // Cột chẵn (0,2,4,...) là "giờ", cột lẻ (1,3,5,...) là "công"
+                
+                columns.push({
+                    data: 2 + i,
+                    type: 'numeric',
+                    numericFormat: { pattern: '0.00' },
+                    allowInvalid: false,
+                    width: 60,
+                    readOnly: !isHoursColumn // Cột "công" (lẻ) sẽ là readonly
+                });
+            }
+
+            columns.push({ data: 2 + totalMonthCols, type: 'numeric', readOnly: true, width: 80 }); // Tổng giờ
+            columns.push({ data: 2 + totalMonthCols + 1, type: 'numeric', readOnly: true, width: 80 }); // Tổng công
+
+            // Tạo dòng nhóm (in nghiêng, màu xanh)
+            function makeGroupRow(label) {
+                const row = new Array(2 + totalMonthCols + 2).fill(''); // STT + Tên + tháng + 2 tổng
+                row[1] = label;
+                return row;
+            }
+
+            // Tạo dòng nhân viên với dữ liệu thực
+            function makeEmployeeRow(index, employee) {
+                const row = new Array(2 + totalMonthCols + 2).fill(''); // STT + Tên + tháng + 2 tổng
+                row[0] = index;
+                row[1] = employee.fullName;
+                
+                // Điền dữ liệu theo tháng được chọn (giờ và công)
+                monthNumbers.forEach((month, monthIndex) => {
+                    const monthData = employee.monthlyData[month];
+                    if (monthData) {
+                        const offset = 2 + monthIndex * 2;
+                        row[offset] = monthData.lv || '';      // Giờ
+                        row[offset + 1] = monthData.h || '';   // Công lấy từ Value (H)
+                    }
+                });
+                
+                // Tổng giờ và công cho khoảng thời gian được chọn
+                row[2 + totalMonthCols] = employee.yearlyTotalLV || '';     // Tổng giờ
+                row[2 + totalMonthCols + 1] = employee.yearlyTotalH || '';  // Tổng công (Value)
+                return row;
+            }
+
+            // Tạo dữ liệu từ model thực
+            const data = [];
+            let globalIndex = 1;
+            
+            overtimeData.departmentGroups.forEach(dept => {
+                // Thêm dòng nhóm
+                data.push(makeGroupRow(dept.departmentName));
+                
+                // Thêm dòng nhân viên
+                dept.employees.forEach(emp => {
+                    data.push(makeEmployeeRow(globalIndex++, emp));
+                });
+            });
+
+
+            const hot = new Handsontable(container, {
+                data: data,
+                columns: columns,
+                nestedHeaders: nestedHeaders,
+                colHeaders: false,
+                rowHeaders: false,
+                fixedColumnsLeft: 2, // cố định 2 cột STT + Họ tên
+                manualColumnMove: true,
+                manualColumnFreeze: true,
+                height: 'auto',  // Sử dụng scroll dọc của web
+                width: '100%',
+                autoColumnSize: true,
+                rowHeaderWidth: 50,
+                
+                // Bật Copy/Paste từ Excel
+                copyPaste: {
+                    enabled: true,
+                    pasteMode: 'overwrite',
+                    rowsLimit: 1000,
+                    columnsLimit: 50
+                },
+                
+                // Bật fill handle để kéo copy nhanh
+                fillHandle: {
+                    direction: 'vertical',
+                    autoInsertRow: false
+                },
+                
+                contextMenu: {
+                    items: {
+                        row_above: {},
+                        row_below: {},
+                        hsep1: '---------',
+                        copy: { name: 'Sao chép (Ctrl+C)' },
+                        cut: { name: 'Cắt (Ctrl+X)' },
+                        hsep2: '---------',
+                        undo: {},
+                        redo: {},
+                        clear_custom: {
+                            name: 'Xóa nội dung các ô đã chọn',
+                            callback() { hot.emptySelectedCells(); }
+                        }
+                    }
+                },
+                
+                filters: false,
+                dropdownMenu: false,
+                licenseKey: 'non-commercial-and-evaluation',
+
+                // Callback sau khi render để tính toán tự động
+                afterRender: function() {
+                    // Chỉ chạy một lần khi khởi tạo
+                    if (!this._calculationsInitialized) {
+                        this._calculationsInitialized = true;
+                        setTimeout(() => {
+                            initializeCalculations();
+                        }, 50);
+                    }
+                },
+
+                            // Tô style cho dòng nhóm và cột readonly
+            cells: function (row, col) {
+                const cellProperties = {};
+                const dataAtRow = this.instance.getDataAtRow(row);
+                
+                // Nếu dòng là dòng nhóm (chỉ có cột 1 có chữ)
+                if (dataAtRow[1] && dataAtRow[0] === '') {
+                    cellProperties.readOnly = true;
+                    cellProperties.renderer = function (instance, td, row, col, prop, value, cellProperties) {
+                        td.style.fontStyle = 'italic';
+                        td.style.color = 'blue';
+                        td.style.fontWeight = 'bold';
+                        td.style.background = '#f0f8ff';
+                        td.innerHTML = value;
+                    };
+                }
+                // Style cho cột "công" (readonly)
+                else if (col >= 2 && col < 2 + totalMonthCols && (col - 2) % 2 === 1) {
+                    // Cột "công" (lẻ) - readonly
+                    cellProperties.renderer = function (instance, td, row, col, prop, value, cellProperties) {
+                        td.style.backgroundColor = '#f8f9fa';
+                        td.style.color = '#6c757d';
+                        td.style.cursor = 'not-allowed';
+                        Handsontable.renderers.NumericRenderer.apply(this, arguments);
+                    };
+                }
+                
+                return cellProperties;
+            },
+
+            afterChange: function (changes, source) {
+                if (!changes || source === 'loadData' || source === 'calculation') return;
+                
+                const instance = this;
+                
+                // Xử lý từng thay đổi
+                changes.forEach(([row, prop, oldVal, newVal]) => {
+                    if (oldVal === newVal) return;
+                    
+                    if (typeof prop === 'number' && prop >= 2 && prop < 2 + totalMonthCols) {
+                        // Tính tổng cho từng nhân viên
+                        if (typeof instance.calculateYearlyTotal === 'function') {
+                            instance.calculateYearlyTotal(row);
+                        }
+                        
+                        // Cập nhật database
+                        const rowData = instance.getDataAtRow(row);
+                        
+                        // Kiểm tra nếu đây là dòng nhân viên (không phải dòng group)
+                        if (rowData[0] !== '' && rowData[1] && rowData[1] !== 'Người Quản lý' && rowData[1] !== 'Phòng tổng hợp HĐTV') {
+                            // Tìm userId từ data gốc
+                            const employeeName = rowData[1];
+                            
+                            // Tìm userId từ overtimeData
+                            let userId = null;
+                            overtimeData.departmentGroups.forEach(dept => {
+                                dept.employees.forEach(emp => {
+                                    if (emp.fullName === employeeName) {
+                                        userId = emp.userId;
+                                    }
+                                });
+                            });
+                            
+                            if (userId) {
+                                // Tính tháng từ column index
+                                const columnRelativeIndex = Math.floor((prop - 2) / 2);
+                                const actualMonth = monthNumbers[columnRelativeIndex];
+                                const isHoursColumn = (prop - 2) % 2 === 0;
+                                
+                                // Chỉ xử lý khi sửa cột "giờ" (cột "công" đã readonly)
+                                if (isHoursColumn) {
+                                    // Lấy năm hiện tại từ filter
+                                    const currentYear = parseInt($('#selectYear').val()) || new Date().getFullYear();
+                                    
+                                    // Nếu sửa cột "giờ" → tự động tính cột "công" = giờ ÷ 8
+                                    const hoursValue = parseFloat(newVal) || 0;
+                                    const calculatedWorkDays = Math.round((hoursValue / 8) * 100) / 100;
+                                    
+                                    // Cập nhật cột "công" liền kề
+                                    const workDaysColumn = prop + 1;
+                                    instance.setDataAtCell(row, workDaysColumn, calculatedWorkDays, 'calculation');
+                                    
+                                    // Thêm vào queue để batch update
+                                    updateQueue.push({ userId, month: actualMonth, year: currentYear, value: hoursValue, fieldType: 'Hours' });
+                                    updateQueue.push({ userId, month: actualMonth, year: currentYear, value: calculatedWorkDays, fieldType: 'Value' });
+                                    
+                                    // Cập nhật database cho "giờ"
+                                    updateOvertimeData(userId, actualMonth, currentYear, hoursValue, calculatedWorkDays);
+                                    
+                                    // Tính lại tổng hợp sau khi sửa
+                                    setTimeout(() => {
+                                        instance.calculateYearlyTotal(row);
+                                    }, 100);
+                                }
+                            }
+                        }
+                    }
+                });
+                
+                // Debounce batch update - chờ 500ms sau lần thay đổi cuối
+                if (updateTimer) clearTimeout(updateTimer);
+                updateTimer = setTimeout(() => {
+                    processBatchUpdates();
+                }, 500);
+            }
+
+            });
+
+            // Hàm tính tổng ban đầu cho tất cả nhân viên
+            function initializeCalculations() {
+                const data = hot.getData();
+                for (let i = 0; i < data.length; i++) {
+                    const rowData = data[i];
+                    // Chỉ tính tổng cho dòng nhân viên (không phải dòng nhóm)
+                    if (rowData[0] !== '' && rowData[1] && rowData[1] !== 'Người Quản lý' && rowData[1] !== 'Phòng tổng hợp HĐTV') {
+                        // Tính toán cột công cho từng tháng trước khi tính tổng
+                        for (let m = 0; m < monthNumbers.length; m++) {
+                            const hoursColumn = 2 + m * 2; // Cột giờ (chẵn)
+                            const workDaysColumn = 2 + m * 2 + 1; // Cột công (lẻ)
+                            
+                            const hoursValue = rowData[hoursColumn];
+                            const workDaysValue = rowData[workDaysColumn];
+                            
+                            // Nếu có giờ nhưng chưa có công, tự động tính công
+                            if ((hoursValue !== '' && hoursValue !== null && hoursValue !== undefined) && 
+                                (workDaysValue === '' || workDaysValue === null || workDaysValue === undefined)) {
+                                const hours = parseFloat(hoursValue) || 0;
+                                const calculatedWorkDays = Math.round((hours / 8) * 100) / 100;
+                                hot.setDataAtCell(i, workDaysColumn, calculatedWorkDays, 'calculation');
+                            }
+                        }
+                        
+                        // Sau đó tính tổng
+                        hot.calculateYearlyTotal(i);
+                    }
+                }
+            };
+
+            // Gọi hàm khởi tạo sau khi Handsontable được tạo
+            setTimeout(initializeCalculations, 200);
+
+            // Thêm button debug để test
+            const debugButton = document.createElement('button');
+            debugButton.textContent = 'Debug: Tính lại công';
+            debugButton.style.cssText = 'position: fixed; top: 10px; right: 10px; z-index: 9999; background: #28a745; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; font-size: 12px;';
+            debugButton.onclick = function() {
+                console.log('Bắt đầu tính toán lại...');
+                initializeCalculations();
+                console.log('Hoàn thành tính toán!');
+            };
+            document.body.appendChild(debugButton);
+
+            // Hàm tính tổng cả năm cho một nhân viên
+            hot.calculateYearlyTotal = function(rowIndex) {
+                const rowData = this.getDataAtRow(rowIndex);
+                let yearlyTotalHours = 0;
+                let yearlyTotalWorkDays = 0;
+                
+                // Tính tổng giờ và công cho khoảng thời gian được chọn
+                for (let m = 0; m < monthNumbers.length; m++) {
+                    const hoursColumn = 2 + m * 2; // Cột giờ (chẵn)
+                    const workDaysColumn = 2 + m * 2 + 1; // Cột công (lẻ)
+                    
+                    const hoursValue = rowData[hoursColumn];
+                    const workDaysValue = rowData[workDaysColumn];
+                    
+                    // Chỉ cộng nếu có giá trị thực sự (không phải chuỗi rỗng)
+                    if (hoursValue !== '' && hoursValue !== null && hoursValue !== undefined) {
+                        const hours = parseFloat(hoursValue) || 0;
+                        yearlyTotalHours += hours;
+                        
+                        // Tự động tính công = giờ ÷ 8 nếu cột công trống
+                        if (workDaysValue === '' || workDaysValue === null || workDaysValue === undefined) {
+                            const calculatedWorkDays = Math.round((hours / 8) * 100) / 100;
+                            this.setDataAtCell(rowIndex, workDaysColumn, calculatedWorkDays, 'calculation');
+                            yearlyTotalWorkDays += calculatedWorkDays;
+                        } else {
+                            yearlyTotalWorkDays += parseFloat(workDaysValue) || 0;
+                        }
+                    } else if (workDaysValue !== '' && workDaysValue !== null && workDaysValue !== undefined) {
+                        yearlyTotalWorkDays += parseFloat(workDaysValue) || 0;
+                    }
+                }
+                
+                // Cập nhật cột tổng giờ và công - hiển thị trống nếu = 0
+                this.setDataAtCell(rowIndex, 2 + totalMonthCols, yearlyTotalHours > 0 ? yearlyTotalHours : '', 'calculation');
+                this.setDataAtCell(rowIndex, 2 + totalMonthCols + 1, yearlyTotalWorkDays > 0 ? yearlyTotalWorkDays : '', 'calculation');
+            };
+
+            // Hàm tính chiều cao phù hợp
+            function calculateHotHeight() {
+                const windowHeight = window.innerHeight;
+                const offset = 290; // Trừ phần header, filter, padding, navbar, ...
+                const calculated = windowHeight - offset;
+                return Math.max(calculated, 320); // Tối thiểu 320px
+            }
+
+
+
+            // Hàm xử lý batch updates
+            function processBatchUpdates() {
+                if (updateQueue.length === 0) return;
+                
+                const totalUpdates = updateQueue.length;
+                showUpdateNotification('info', `Đang xử lý ${totalUpdates} thay đổi...`);
+                
+                // Process tất cả updates trong queue
+                const promises = updateQueue.map(update => {
+                    if (update.fieldType === 'Hours') {
+                        return updateOvertimeHours(update.userId, update.month, update.year, update.value);
+                    } else {
+                        return updateOvertimeValue(update.userId, update.month, update.year, update.value);
+                    }
+                });
+                
+                Promise.all(promises).then(() => {
+                    showUpdateNotification('success', `Đã cập nhật ${totalUpdates} thay đổi thành công!`);
+                    updateQueue = [];
+                }).catch(error => {
+                    showUpdateNotification('error', 'Có lỗi khi cập nhật một số dữ liệu');
+                    updateQueue = [];
+                });
+            }
+
+        })();
+
+        // Hàm cập nhật dữ liệu Overtime cho Hours
+        function updateOvertimeHours(userId, month, year, hoursValue) {
+            const requestData = {
+                userId: userId,
+                month: month,
+                year: year,
+                fieldType: 'Hours',
+                value: hoursValue === '' || hoursValue === null || hoursValue === undefined ? null : (parseFloat(hoursValue) || 0)
+            };
+
+            return $.ajax({
+                url: '/TimeKeeping/UpdateOvertime',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(requestData)
+            });
+        }
+
+        // Hàm cập nhật dữ liệu Overtime cho Value
+        function updateOvertimeValue(userId, month, year, workDaysValue) {
+            const requestData = {
+                userId: userId,
+                month: month,
+                year: year,
+                fieldType: 'Value',
+                value: workDaysValue === '' || workDaysValue === null || workDaysValue === undefined ? null : (parseFloat(workDaysValue) || 0)
+            };
+
+            return $.ajax({
+                url: '/TimeKeeping/UpdateOvertime',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(requestData)
+            });
+        }
+
+        // Hàm cập nhật cả giờ và công
+        function updateOvertimeData(userId, month, year, hoursValue, workDaysValue) {
+            // Cập nhật cả giờ và công
+            return Promise.all([
+                updateOvertimeHours(userId, month, year, hoursValue),
+                updateOvertimeValue(userId, month, year, workDaysValue)
+            ]).then(() => {
+                showUpdateNotification('success', 'Đã cập nhật thêm giờ!');
+            }).catch(error => {
+                showUpdateNotification('error', 'Lỗi kết nối: ' + error);
+            });
+        }
+
+        // Hàm hiển thị thông báo cập nhật
+        function showUpdateNotification(type, message) {
+            let alertClass, icon;
+            if (type === 'success') {
+                alertClass = 'alert-success';
+                icon = 'fa-check-circle';
+            } else if (type === 'info') {
+                alertClass = 'alert-info';
+                icon = 'fa-info-circle';
+            } else {
+                alertClass = 'alert-danger';
+                icon = 'fa-exclamation-triangle';
+            }
+            
+            const notification = $(`
+                <div class="alert ${alertClass} alert-dismissible fade show update-notification" role="alert" style="position: fixed; top: 20px; right: 20px; z-index: 99999; min-width: 300px;">
+                    <i class="fa ${icon}"></i> ${message}
+                    <button type="button" class="close" data-dismiss="alert">
+                        <span>&times;</span>
+                    </button>
+                </div>
+            `);
+            
+            $('body').append(notification);
+            
+            // Tự động ẩn sau 3 giây
+            setTimeout(() => {
+                notification.alert('close');
+            }, 3000);
+        }
+
+        // Hàm khởi tạo với dữ liệu mẫu (fallback)
+        function initializeWithSampleData() {
+            document.getElementById('overtimeHotContainer').innerHTML = '<div class="alert alert-info">Không có dữ liệu thêm giờ để hiển thị.</div>';
+        }
+    </script>
+</div>

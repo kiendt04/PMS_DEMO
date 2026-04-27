@@ -1894,6 +1894,154 @@ tbody tr:hover td { background: #FAFAFA; }
 
 
 
+/* ════════════════════════════════════════════════════
+   NGHỈ PHÉP — #npHotContainer
+   ════════════════════════════════════════════════════ */
+#npHotContainer {
+  border: 1px solid #CBD5E1; border-radius: 10px;
+  overflow: hidden; margin-top: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,.07);
+}
+#npHotContainer .handsontable thead th {
+  background: #1E3A5F !important; color: #E0EAFF !important;
+  font-weight: 600; font-size: 11px; text-align: center !important;
+  padding: 0 3px !important; height: 28px !important; line-height: 28px !important;
+  border-right: 1px solid #2D5A8E !important; border-bottom: 1px solid #2D5A8E !important;
+  white-space: nowrap; overflow: hidden;
+}
+#npHotContainer .handsontable thead tr:first-child th {
+  background: #162C4A !important; font-size: 12px; font-weight: 700;
+  border-bottom: 2px solid #2D5A8E !important;
+}
+#npHotContainer .handsontable td {
+  font-size: 12px; color: #1E293B;
+  border-right: 1px solid #E2E8F0 !important; border-bottom: 1px solid #E9EEF5 !important;
+  height: 26px !important; line-height: 26px !important; padding: 0 4px !important;
+}
+#npHotContainer .handsontable.ht_clone_left td { border-right: 2px solid #B0C4DE !important; }
+#npHotContainer .handsontable td.np-even-row { background: #F0F7FF; }
+#npHotContainer .wtHolder::-webkit-scrollbar { height: 6px; width: 6px; }
+#npHotContainer .wtHolder::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 3px; }
+
+/* ════════════════════════════════════════════════════
+   ĂN CA — #acHotContainer
+   ════════════════════════════════════════════════════ */
+#acHotContainer {
+  border: 1px solid #CBD5E1; border-radius: 10px;
+  overflow: hidden; margin-top: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,.07);
+}
+#acHotContainer .handsontable thead th {
+  background: #1E3A5F !important; color: #E0EAFF !important;
+  font-weight: 600; font-size: 11px; text-align: center !important;
+  padding: 0 3px !important; height: 28px !important; line-height: 28px !important;
+  border-right: 1px solid #2D5A8E !important; border-bottom: 1px solid #2D5A8E !important;
+  white-space: nowrap; overflow: hidden;
+}
+#acHotContainer .handsontable thead tr:first-child th {
+  background: #162C4A !important; font-size: 12px; font-weight: 700;
+  border-bottom: 2px solid #2D5A8E !important;
+}
+#acHotContainer .handsontable td {
+  font-size: 12px; color: #1E293B;
+  border-right: 1px solid #E2E8F0 !important; border-bottom: 1px solid #E9EEF5 !important;
+  height: 26px !important; line-height: 26px !important; padding: 0 4px !important;
+}
+#acHotContainer .handsontable.ht_clone_left td { border-right: 2px solid #B0C4DE !important; }
+#acHotContainer .handsontable td.ac-even-row { background: #F0F7FF; }
+#acHotContainer .handsontable td.ac-total {
+  background: #EFF6FF; font-weight: 700; color: #1D4ED8;
+  border-left: 2px solid #BFDBFE !important;
+}
+#acHotContainer .wtHolder::-webkit-scrollbar { height: 6px; width: 6px; }
+#acHotContainer .wtHolder::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 3px; }
+
+/* ════════════════════════════════════════════════════
+   QUYẾT TOÁN — #qtHotContainer
+   ════════════════════════════════════════════════════ */
+#qtHotContainer {
+  border: 1px solid #CBD5E1; border-radius: 10px;
+  overflow: hidden; margin-top: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,.07);
+}
+#qtHotContainer .handsontable thead th {
+  background: #1E3A5F !important; color: #E0EAFF !important;
+  font-weight: 600; font-size: 11px; text-align: center !important;
+  padding: 0 3px !important; height: 28px !important; line-height: 28px !important;
+  border-right: 1px solid #2D5A8E !important; border-bottom: 1px solid #2D5A8E !important;
+  white-space: nowrap; overflow: hidden;
+}
+#qtHotContainer .handsontable thead tr:first-child th {
+  background: #162C4A !important; font-size: 12px; font-weight: 700;
+  border-bottom: 2px solid #2D5A8E !important;
+}
+#qtHotContainer .handsontable td {
+  font-size: 12px; color: #1E293B;
+  border-right: 1px solid #E2E8F0 !important; border-bottom: 1px solid #E9EEF5 !important;
+  height: 26px !important; line-height: 26px !important; padding: 0 5px !important;
+}
+#qtHotContainer .handsontable.ht_clone_left td { border-right: 2px solid #B0C4DE !important; }
+#qtHotContainer .handsontable td.qt-even-row { background: #F0F7FF; }
+#qtHotContainer .handsontable td.qt-total {
+  background: #EFF6FF; font-weight: 700; color: #1D4ED8;
+  border-left: 2px solid #BFDBFE !important;
+}
+#qtHotContainer .wtHolder::-webkit-scrollbar { height: 6px; width: 6px; }
+#qtHotContainer .wtHolder::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 3px; }
+
+/* ════════════════════════════════════════════════════
+   CHI LƯƠNG — #clHotContainer
+   ════════════════════════════════════════════════════ */
+#clHotContainer {
+  border: 1px solid #CBD5E1; border-radius: 10px;
+  overflow: hidden; margin-top: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,.07);
+}
+#clHotContainer .handsontable thead th {
+  background: #1E3A5F !important; color: #E0EAFF !important;
+  font-weight: 600; font-size: 11px; text-align: center !important;
+  padding: 0 3px !important; height: 30px !important; line-height: 30px !important;
+  border-right: 1px solid #2D5A8E !important; border-bottom: 1px solid #2D5A8E !important;
+  white-space: nowrap; overflow: hidden;
+}
+#clHotContainer .handsontable td {
+  font-size: 12px; color: #1E293B;
+  border-right: 1px solid #E2E8F0 !important; border-bottom: 1px solid #E9EEF5 !important;
+  height: 26px !important; line-height: 26px !important; padding: 0 5px !important;
+}
+#clHotContainer .handsontable.ht_clone_left td { border-right: 2px solid #B0C4DE !important; }
+#clHotContainer .handsontable td.cl-even-row { background: #F0F7FF; }
+#clHotContainer .handsontable td.cl-total {
+  background: #EFF6FF; font-weight: 700; color: #1D4ED8;
+  border-left: 2px solid #BFDBFE !important;
+}
+#clHotContainer .wtHolder::-webkit-scrollbar { height: 6px; width: 6px; }
+#clHotContainer .wtHolder::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 3px; }
+
+/* ════════════════════════════════════════════════════
+   HỆ SỐ LƯƠNG — #hslHotContainer
+   ════════════════════════════════════════════════════ */
+#hslHotContainer {
+  border: 1px solid #CBD5E1; border-radius: 10px;
+  overflow: hidden; margin-top: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,.07);
+}
+#hslHotContainer .handsontable thead th {
+  background: #1E3A5F !important; color: #E0EAFF !important;
+  font-weight: 600; font-size: 11px; text-align: center !important;
+  padding: 0 3px !important; height: 30px !important; line-height: 30px !important;
+  border-right: 1px solid #2D5A8E !important; border-bottom: 1px solid #2D5A8E !important;
+}
+#hslHotContainer .handsontable td {
+  font-size: 12px; color: #1E293B;
+  border-right: 1px solid #E2E8F0 !important; border-bottom: 1px solid #E9EEF5 !important;
+  height: 26px !important; line-height: 26px !important; padding: 0 5px !important;
+}
+#hslHotContainer .handsontable.ht_clone_left td { border-right: 2px solid #B0C4DE !important; }
+#hslHotContainer .handsontable td.hsl-even-row { background: #F0F7FF; }
+#hslHotContainer .wtHolder::-webkit-scrollbar { height: 6px; width: 6px; }
+#hslHotContainer .wtHolder::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 3px; }
+
 /* Force center headers and cells for STT column */
 .handsontable th.htCenter, 
 .handsontable td.htCenter {

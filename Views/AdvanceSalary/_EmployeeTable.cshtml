@@ -1,0 +1,468 @@
+﻿@model IEnumerable<object[]>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/handsontable@14.3.0/dist/handsontable.full.min.css" />
+<style>
+    .handsontable td {
+        color: #333333 !important;
+        font-size: 14px !important;
+    }
+
+    .handsontable .htDimmed {
+        color: #333333 !important;
+    }
+
+    .handsontable span.colHeader {
+        color: #333333 !important;
+        font-weight: 700 !important;
+    }
+    /* Ẩn scrollbar dọc của Handsontable, giữ scrollbar ngang ở dưới */
+    #employeeTable .wtHolder {
+        overflow-x: auto !important;
+        overflow-y: visible !important;
+        height: auto !important;
+    }
+    #employeeTable .ht_master .wtHolder {
+        overflow-x: auto !important;
+        overflow-y: visible !important;
+    }
+    /* Ẩn scrollbar của header clone - chỉ giữ 1 scroll ở dưới */
+    #employeeTable .ht_clone_top .wtHolder {
+        overflow: hidden !important;
+    }
+</style>
+<div id="employeeTableWrapper" style="overflow:visible;">
+    <div id="employeeTable"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/handsontable@14.3.0/dist/handsontable.full.min.js"></script>
+    <script src="~/js/handsontable-formula.js?v=2.1"></script>
+    <script>
+        (function () {
+            const container = document.getElementById('employeeTable');
+
+            //headers cho NLD (có thể khác với NQL)
+            const nestedHeaders = [
+                [
+                    'TT', 'Họ và tên', 'Mã cán bộ', 'Số TK',
+                    'Hệ số <br/> lương', 'Hệ số <br/> PC', 'Tổng <br/> hệ số',
+                    'Lương chế độ <br/> 1 tháng', 'Tạm ứng <br/> lương <br/> chế độ',
+                    { label: 'Mức lương CSDN @((ViewBag.BaseSalary ?? 3180000).ToString("N0"))đ/hsl; <br/> thu mức 10.5%', colspan: 3 },
+                    'Truy lĩnh', 'Truy thu', 'TỔNG LĨNH', 'Ghi chú'
+                ],
+                [
+                    '', '', '', '', '', '', '', '', '',
+                    'BHXH<br/>(8%)', 'BHYT<br/>(1.5%)', 'BHTN<br/>(1%)',
+                    '', '', '', ''
+                ]
+            ];
+
+            //mapping column index
+            const columns = [
+                { data: 0, type: 'numeric', width: 30, readOnly: true, className: "htCenter" },   // TT
+                { data: 1, type: 'text', width: 160, readOnly: true },     // Họ và tên
+                { data: 2, type: 'text', width: 100, readOnly: true, className: "htCenter" },     // Mã cán bộ
+                { data: 3, type: 'text', width: 120, readOnly: true, className: "htCenter" },     // Số TK
+                { data: 4, type: 'numeric', numericFormat: { pattern: '0.000' }, width: 60, readOnly: true }, // Hệ số lương
+                { data: 5, type: 'numeric', numericFormat: { pattern: '0.000' }, width: 60, readOnly: true }, // Hệ số PC (tự động tính từ Position)
+                { data: 6, type: 'numeric', numericFormat: { pattern: '0.000' }, width: 60, readOnly: true }, // Tổng hệ số
+                { data: 7, type: 'numeric', numericFormat: { pattern: '0,0' }, width: 80, readOnly: true },  // Lương chế độ 1 tháng
+                { data: 8, type: 'numeric', numericFormat: { pattern: '0,0' }, width: 80, readOnly: true },  // Tạm ứng lương chế độ (tự tính)
+                { data: 9, type: 'numeric', numericFormat: { pattern: '0,0' }, width: 80, readOnly: true },  // BHXH
+                { data: 10, type: 'numeric', numericFormat: { pattern: '0,0' }, width: 80, readOnly: true }, // BHYT
+                { data: 11, type: 'numeric', numericFormat: { pattern: '0,0' }, width: 80, readOnly: true }, // BHTN
+                { data: 12, type: 'numeric', numericFormat: { pattern: '0,0' }, width: 80 }, // Truy lĩnh
+                { data: 13, type: 'numeric', numericFormat: { pattern: '0,0' }, width: 80 }, // Truy thu
+                { data: 14, type: 'numeric', numericFormat: { pattern: '0,0' }, width: 120 }, // Tổng lĩnh
+                { data: 15, type: 'text', width: 100 },    // Ghi chú
+                { data: 16, type: 'numeric', width: 0, readOnly: true },   // UserId (ẩn)
+            ];
+
+            // dưx lieu từ controller
+            const data = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model));
+            
+            // Lương cơ sở từ database
+            const baseSalary = @(ViewBag.BaseSalary ?? 3180000);
+
+            // Hàm tính tạm ứng theo công thức phân tầng
+            // Công thức: ROUND((luong-MOD(luong,100000))/2 + MOD(luong,100000),0)
+            function calculateAdvanceSalary(luongCheDoThang) {
+                // MOD(luong,100000) - Lấy phần dư dưới 100,000
+                const remainder = luongCheDoThang % 100000;
+                
+                // (luong - MOD(luong,100000))/2 - Phần trên 100,000 chia đôi (50%)
+                const above100k = (luongCheDoThang - remainder) / 2;
+                
+                // + MOD(luong,100000) - Cộng phần dưới 100,000 (100%)
+                const advance = above100k + remainder;
+                
+                // ROUND(...,0) - Làm tròn đến số nguyên
+                return Math.round(advance);
+            }
+
+            // State management để tránh infinite loop
+            let isCalculating = false;
+            let isSaving = false;
+            let saveTimeout = null;
+            
+            // Queue để xử lý batch updates khi paste nhiều cells
+            let updateQueue = [];
+            let updateTimer = null;
+
+            const hot = new Handsontable(container, {
+                data: data,
+                columns: columns,
+                colHeaders: false,
+                rowHeaders: false,
+                nestedHeaders: nestedHeaders,
+                height: 'auto',  // Sử dụng scroll dọc của web
+                width: '100%',
+                stretchH: 'all',
+                autoColumnSize: true,
+                manualColumnFreeze: true,
+                manualColumnMove: true,
+                fixedColumnsLeft: 2,
+                
+                // Bật Copy/Paste từ Excel
+                copyPaste: {
+                    enabled: true,
+                    pasteMode: 'overwrite',
+                    rowsLimit: 1000,
+                    columnsLimit: 50
+                },
+                
+                // Bật fill handle để kéo copy nhanh
+                fillHandle: {
+                    direction: 'vertical',
+                    autoInsertRow: false
+                },
+                
+                contextMenu: {
+                    items: {
+                        row_above: {},
+                        row_below: {},
+                        hsep1: '---------',
+                        copy: { name: 'Sao chép (Ctrl+C)' },
+                        cut: { name: 'Cắt (Ctrl+X)' },
+                        hsep2: '---------',
+                        freeze_column: { name: 'Cố định cột' },
+                        unfreeze_column: { name: 'Bỏ cố định cột' },
+                        hsep3: '---------',
+                        undo: {},
+                        redo: {},
+                        clear_custom: {
+                            name: 'Xóa nội dung các ô đã chọn',
+                            callback() { hot.emptySelectedCells(); }
+                        }
+                    }
+                },
+                filters: false,
+                dropdownMenu: false,
+                hiddenColumns: { columns: [16], indicators: false },
+                licenseKey: 'non-commercial-and-evaluation',
+
+                // Cải thiện afterChange để tránh infinite loop và auto-save
+                afterChange: function (changes, source) {
+                    // Bỏ qua nếu đang tính toán hoặc load data
+                    if (source === 'loadData' || !changes || isCalculating) {
+                        return;
+                    }
+
+                    // Set flag để tránh loop
+                    isCalculating = true;
+
+                    try {
+                        changes.forEach(([row, prop, oldVal, newVal]) => {
+                            // Chỉ tính toán nếu giá trị thực sự thay đổi
+                            if (oldVal === newVal) return;
+
+                            // Hệ số PC (cột 5) là readOnly, được tính tự động từ Position
+                            // Không cần xử lý thay đổi cho cột này
+
+                            // Tự động tính tạm ứng và bảo hiểm khi lương chế độ thay đổi (cột 7)
+                            if (prop === 7) { // Cột lương chế độ 1 tháng
+                                const luongCheDo = parseFloat(newVal) || 0;
+                                const tamUngTinhToan = calculateAdvanceSalary(luongCheDo);
+                                // hot.setDataAtCell(row, 8, tamUngTinhToan, 'calculation');
+
+                                // Bảo hiểm theo tỉ lệ chuẩn
+                                const bhxhCalc = Math.round(luongCheDo * 0.08);
+                                const bhytCalc = Math.round(luongCheDo * 0.015);
+                                const bhtnCalc = Math.round(luongCheDo * 0.01);
+                                // hot.setDataAtCell(row, 9, bhxhCalc, 'calculation');
+                                // hot.setDataAtCell(row, 10, bhytCalc, 'calculation');
+                                // hot.setDataAtCell(row, 11, bhtnCalc, 'calculation');
+                            }
+
+                            // Lấy các giá trị hiện tại
+                            const luong = parseFloat(hot.getDataAtCell(row, 7)) || 0;
+                            const tamUng = parseFloat(hot.getDataAtCell(row, 8)) || 0;
+                            const bhxh = parseFloat(hot.getDataAtCell(row, 9)) || 0;
+                            const bhyt = parseFloat(hot.getDataAtCell(row, 10)) || 0;
+                            const bhtn = parseFloat(hot.getDataAtCell(row, 11)) || 0;
+                            const truyLinh = parseFloat(hot.getDataAtCell(row, 12)) || 0;
+                            const truyThu = parseFloat(hot.getDataAtCell(row, 13)) || 0;
+
+                            // Tính tổng lĩnh = Tạm ứng lương chế độ - BHXH - BHYT - BHTN + Truy lĩnh - Truy thu
+                            const tongLinh = tamUng - bhxh - bhyt - bhtn + truyLinh - truyThu;
+
+                            // Cập nhật cột tổng (không trigger afterChange vì readOnly)
+                            hot.setDataAtCell(row, 14, tongLinh, 'calculation');
+                            hot.render();   // Render lại bảng để hiển thị giá trị mới
+
+                            // Thêm vào queue để batch update - chỉ cho các cột có thể edit
+                            if ((prop === 12 || prop === 13 || prop === 15) && prop !== 14) { // Truy lĩnh, Truy thu, Ghi chú
+                                const rowData = hot.getSourceDataAtRow(row);
+                                console.log('Row data:', rowData);
+                                
+                                // Thử nhiều cách lấy userId
+                                let userId = null;
+                                if (rowData && rowData.UserId) {
+                                    userId = rowData.UserId;
+                                } else if (rowData && rowData.userId) {
+                                    userId = rowData.userId;
+                                } else if (rowData && rowData.length > 16) {
+                                    userId = parseInt(rowData[16]); // UserId ở cột 16 (index cuối)
+                                }
+                                
+                                console.log('Found userId:', userId);
+                                
+                                if (userId && userId > 0) {
+                                    // Xác định field type từ column index
+                                    let fieldType = '';
+                                    if (prop === 12) fieldType = 'Arrears';      // Truy lĩnh
+                                    else if (prop === 13) fieldType = 'Recovery'; // Truy thu
+                                    else if (prop === 15) fieldType = 'Notes';    // Ghi chú
+                                    
+                                    updateQueue.push({
+                                        userId: userId,
+                                        fieldType: fieldType,
+                                        value: newVal,
+                                        rowData: rowData
+                                    });
+                                    
+                                    console.log('Added to queue:', {
+                                        userId, fieldType, value: newVal, row, prop
+                                    });
+                                } else {
+                                    console.log('No valid userId found for row:', row, 'rowData:', rowData);
+                                }
+                            }
+                        });
+                        
+                        // Debounce batch update - chờ 500ms sau lần thay đổi cuối
+                        if (updateTimer) clearTimeout(updateTimer);
+                        updateTimer = setTimeout(() => {
+                            processBatchUpdates();
+                        }, 500);
+
+                    } finally {
+                        // Đặt lại flag sau một chút để đảm bảo hoàn thành
+                        setTimeout(() => {
+                            isCalculating = false;
+                        }, 100);
+                    }
+                }
+            });
+
+            // Khởi tạo giá trị tạm ứng và tổng lĩnh theo công thức sau khi bảng tạo xong
+            (function initializeCalculatedColumns() {
+                isCalculating = true;
+                try {
+                    const rowCount = hot.countRows();
+                    for (let r = 0; r < rowCount; r++) {
+                        const luong = parseFloat(hot.getDataAtCell(r, 7)) || 0;
+                        const tamUng = calculateAdvanceSalary(luong);
+                        // hot.setDataAtCell(r, 8, tamUng, 'calculation');
+
+                        // Khởi tạo bảo hiểm theo lương chế độ
+                        const bhxh = Math.round(luong * 0.08);
+                        const bhyt = Math.round(luong * 0.015);
+                        const bhtn = Math.round(luong * 0.01);
+                        // hot.setDataAtCell(r, 9, bhxh, 'calculation');
+                        // hot.setDataAtCell(r, 10, bhyt, 'calculation');
+                        // hot.setDataAtCell(r, 11, bhtn, 'calculation');
+                        const truyLinh = parseFloat(hot.getDataAtCell(r, 12)) || 0;
+                        const truyThu = parseFloat(hot.getDataAtCell(r, 13)) || 0;
+                        const tongLinh = tamUng - bhxh - bhyt - bhtn + truyLinh - truyThu;
+                        // hot.setDataAtCell(r, 14, tongLinh, 'calculation');
+
+                    }
+                } finally {
+                    setTimeout(() => { isCalculating = false; }, 100);
+                }
+            })();
+
+            function calculateHotHeight() {
+                const windowHeight = window.innerHeight;
+                const offset = 360;
+                const calculated = windowHeight - offset;
+                return Math.max(calculated, 400);
+            }
+
+
+
+
+            // Hàm lấy UserId theo row index
+            function getUserIdByRowIndex(rowIndex) {
+                try {
+                    const rowData = hot.getDataAtRow(rowIndex);
+                    if (rowData && rowData.length > 16) {
+                        return parseInt(rowData[16]); // UserId ở cột 16 (index cuối)
+                    }
+                } catch (error) {
+                    console.error('Lỗi lấy UserId:', error);
+                }
+                return null;
+            }
+
+            // Hàm xử lý batch updates
+            function processBatchUpdates() {
+                if (updateQueue.length === 0) return;
+                
+                const totalUpdates = updateQueue.length;
+                showUpdateNotification('info', `Đang xử lý ${totalUpdates} thay đổi...`);
+                
+                // Process tất cả updates trong queue
+                const promises = updateQueue.map(update => 
+                    updateAdvanceSalaryData(update.userId, update.fieldType, update.value, update.rowData, true)
+                );
+                
+                Promise.all(promises).then(() => {
+                    showUpdateNotification('success', `Đã cập nhật ${totalUpdates} thay đổi thành công!`);
+                    updateQueue = []; // Clear queue
+                }).catch(error => {
+                    showUpdateNotification('error', 'Có lỗi khi cập nhật một số dữ liệu');
+                    updateQueue = []; // Clear queue
+                });
+            }
+            
+            // Hàm cập nhật dữ liệu AdvanceSalary (giống TimeKeeping)
+            function updateAdvanceSalaryData(userId, fieldType, value, rowData, isBatch = false) {
+                // Lấy tháng và năm từ select box trong Index.cshtml
+                const selectedMonth = $('#selectMonth').val();
+                const selectedYear = $('#selectYear').val();
+                
+                // Nếu không chọn tháng/năm, dùng tháng/năm hiện tại
+                const currentMonth = selectedMonth && selectedMonth !== '' ? parseInt(selectedMonth) : new Date().getMonth() + 1;                       
+                const currentYear = selectedYear && selectedYear !== '' ? parseInt(selectedYear) : new Date().getFullYear();
+                
+                const requestData = {   
+                    userId: userId,
+                    month: selectedMonth,
+                    year: selectedYear,
+                    fieldType: fieldType,
+                    value: value === '' || value === null || value === undefined ? null : (parseFloat(value) || 0) 
+                };
+
+                console.log('Sending request:', requestData);
+
+                return $.ajax({
+                    url: '/AdvanceSalary/UpdateAdvanceSalaryField', 
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(requestData),
+                    success: function(response) {
+                        console.log('Response received:', response);
+                        if (!isBatch) {
+                            if (response && response.success) {
+                                showUpdateNotification('success', 'Đã cập nhật!');
+                            } else {
+                                showUpdateNotification('error', response ? response.message : 'Lỗi không xác định');
+                            }
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('AJAX Error:', { xhr, status, error, responseText: xhr.responseText });
+                        if (!isBatch) {
+                            let errorMessage = 'Lỗi kết nối';
+                            if (xhr.responseText) {
+                                try {
+                                    const errorResponse = JSON.parse(xhr.responseText);
+                                    errorMessage = errorResponse.message || errorMessage;
+                                } catch (e) {
+                                    errorMessage = xhr.responseText.substring(0, 100);
+                                }
+                            }
+                            showUpdateNotification('error', errorMessage + ': ' + error);
+                        }
+                    }
+                });
+            }
+
+            // ===== HIỂN THỊ CÔNG THỨC TRONG SEARCH-BOX =====
+            HandsontableFormula.init(hot, 'formulaInput', {
+                getFormula: function(row, col, value, hotInstance) {
+                    const headers = ['TT', 'Họ và tên', 'Mã cán bộ', 'Số TK',
+                                   'Hệ số lương', 'Hệ số PC', 'Tổng hệ số',
+                                   'Lương chế độ 1 tháng', 'Tạm ứng lương chế độ',
+                                   'BHXH (8%)', 'BHYT (1.5%)', 'BHTN (1%)',
+                                   'Truy lĩnh', 'Truy thu', 'TỔNG LĨNH', 'Ghi chú'];
+                    
+                    const colName = headers[col] || `Cột ${col}`;
+                    
+                    // Công thức đặc biệt cho các cột tính toán
+                    if (col === 5) { // Hệ số PC
+                        return `= Hệ số chức vụ + Hệ số trách nhiệm`;
+                    } else if (col === 6) { // Tổng hệ số
+                        return `= Hệ số lương + Hệ số PC`;
+                    } else if (col === 7) { // Tổng hệ số
+                        return `= Tổng hệ số * Lương cơ sở`;
+                    } else if (col === 8) { // Tạm ứng
+                        return `= ROUND((Lương chế độ - MOD(Lương chế độ,100000))/2 + MOD(Lương chế độ,100000), 0)`;
+                    } else if (col === 9) { // BHXH
+                        return `= Lương chế độ × 8%`;
+                    } else if (col === 10) { // BHYT
+                        return `= Lương chế độ × 1.5%`;
+                    } else if (col === 11) { // BHTN
+                        return `= Lương chế độ × 1%`;
+                    } else if (col === 14) { // Tổng lĩnh
+                        return `= Lương tạm ứng - BHXH - BHYT - BHTN + Truy lĩnh - Truy thu`;
+                    }
+                    return `= ${value}`;
+                },
+                
+                shouldShow: function(row, col, value) {
+                    // Hiển thị cho tất cả các cột trừ cột TT và UserId
+                    return col > 0 && col < 16;
+                }
+            });
+
+            // Hàm hiển thị thông báo cập nhật (như TimeKeeping)
+            function showUpdateNotification(type, message) {
+                try {
+                    let alertClass, icon;
+                    if (type === 'success') {
+                        alertClass = 'alert-success';
+                        icon = 'fa-check-circle';
+                    } else if (type === 'info') {
+                        alertClass = 'alert-info';
+                        icon = 'fa-info-circle';
+                    } else {
+                        alertClass = 'alert-danger';
+                        icon = 'fa-exclamation-triangle';
+                    }
+                    
+                    const notification = $(`
+                        <div class="alert ${alertClass} alert-dismissible fade show update-notification" role="alert" style="position: fixed; top: 20px; right: 20px; z-index: 99999; min-width: 300px; max-width: 400px;">
+                            <i class="fa ${icon}"></i> ${message}
+                            <button type="button" class="close" data-dismiss="alert">
+                                <span>&times;</span>
+                            </button>
+                        </div>
+                    `);
+                    
+                    $('body').append(notification);
+                    
+                    setTimeout(() => {
+                        try {
+                            notification.alert('close');
+                        } catch (e) {
+                            notification.remove();
+                        }
+                    }, 3000);
+                } catch (error) {
+                    alert(message);
+                }
+            }
+        })();
+    </script>
+</div>

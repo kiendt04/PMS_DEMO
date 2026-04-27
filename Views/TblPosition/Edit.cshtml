@@ -1,0 +1,152 @@
+@model PMS.Models.TblPosition
+
+@{
+    ViewData["Title"] = "Chỉnh sửa chức vụ";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@using (Html.BeginForm("Edit", "TblPosition", FormMethod.Post))
+{
+    @Html.AntiForgeryToken()
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title">Thông tin chi tiết chức vụ</h4>
+                    <p class="card-subtitle text-muted">
+                        Lưu ý: <code>*</code> là các trường bắt buộc
+                    </p>
+
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+                    @Html.HiddenFor(model => model.Id)
+
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <div class="form-group">
+                                <div class="boldText">Tên chức vụ:<code>*</code></div>
+                                @Html.EditorFor(model => model.Name, new { htmlAttributes = new { @class = "form-control", placeholder = "Nhập tên chức vụ" } })
+                                @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="form-group">
+                                <div class="boldText">Tên viết tắt:</div>
+                                @Html.EditorFor(model => model.ShortName, new { htmlAttributes = new { @class = "form-control", placeholder = "Nhập tên viết tắt" } })
+                                @Html.ValidationMessageFor(model => model.ShortName, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <div class="form-group">
+                                <div class="boldText">Loại đối tượng:<code>*</code></div>
+                                <div>
+                                    <label class="mr-4">
+                                        @Html.RadioButtonFor(model => model.TypeObject, 1) Nhà quản lý
+                                    </label>
+                                    <label>
+                                        @Html.RadioButtonFor(model => model.TypeObject, 2) Người lao động
+                                    </label>
+                                </div>
+                                @Html.ValidationMessageFor(model => model.TypeObject, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="form-group">
+                                <div class="boldText">Ngày hiệu lực:<code>*</code></div>
+                                @Html.TextBoxFor(model => model.DateIssued, "{0:yyyy-MM-dd}", new { @class = "form-control", type = "date" })
+                                @Html.ValidationMessageFor(model => model.DateIssued, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-lg-3">
+                            <div class="form-group">
+                                <div class="boldText">Hệ số cơ bản chức vụ:</div>
+                                @Html.TextBoxFor(model => model.BasicPosiontConfficient, new { @class = "form-control", type = "number", step = "0.01", placeholder = "Nhập hệ số" })
+                                @Html.ValidationMessageFor(model => model.BasicPosiontConfficient, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                        <div class="col-lg-3">
+                            <div class="form-group">
+                                <div class="boldText">Hệ số trách nhiệm:</div>
+                                @Html.TextBoxFor(model => model.ResponsibilityCoefficient, new { @class = "form-control", type = "number", step = "0.01", placeholder = "Nhập hệ số" })
+                                @Html.ValidationMessageFor(model => model.ResponsibilityCoefficient, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                        <div class="col-lg-3">
+                            <div class="form-group">
+                                <div class="boldText">Hệ số chức vụ:</div>
+                                @Html.TextBoxFor(model => model.PosiontConfficient, new { @class = "form-control", type = "number", step = "0.01", placeholder = "Nhập hệ số" })
+                                @Html.ValidationMessageFor(model => model.PosiontConfficient, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                        <div class="col-lg-3">
+                            <div class="form-group">
+                                <div class="boldText">Độ ưu tiên:</div>
+                                @Html.TextBoxFor(model => model.Order, new { @class = "form-control", type = "number", step = "0.01", placeholder = "Nhập hệ số" })
+                                @Html.ValidationMessageFor(model => model.Order, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <div class="form-group">
+                                <div class="boldText">Mô tả:</div>
+                                @Html.TextAreaFor(model => model.Description, new { @class = "form-control", rows = "3", placeholder = "Nhập mô tả" })
+                                @Html.ValidationMessageFor(model => model.Description, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="form-group">
+                                <div class="boldText">Ghi chú:</div>
+                                @Html.TextAreaFor(model => model.Note, new { @class = "form-control", rows = "3", placeholder = "Nhập ghi chú" })
+                                @Html.ValidationMessageFor(model => model.Note, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <div class="form-group">
+                                <div class="boldText">Trạng thái:<code>*</code></div>
+                                @Html.DropDownListFor(model => model.Status,
+                                         new List<SelectListItem> {
+                            new SelectListItem { Text = "Hoạt động", Value = "1", Selected = Model.Status == 1 },
+                            new SelectListItem { Text = "Ngưng hoạt động", Value = "0", Selected = Model.Status == 0 }
+                            },
+                                         new { @class = "form-control" })
+                                @Html.ValidationMessageFor(model => model.Status, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-success waves-effect waves-light m-r-10">
+                        <i class="fa fa-save"></i> Lưu thay đổi
+                    </button>
+                    @Html.ActionLink("Quay lại", "Index", null, new { @class = "btn btn-secondary" })
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@section Scripts {
+    <script>
+        // Tự động tạo ShortName dựa trên Name
+        $(document).ready(function () {
+            $('#Name').on('input', function () {
+                let name = $(this).val().trim();
+                if (!name) {
+                    $('#ShortName').val('');
+                    return;
+                }
+                let words = name.split(/\s+/);
+                let shortName = words.map(w => w[0]?.toUpperCase()).join('');
+                $('#ShortName').val(shortName);
+            });
+        });
+    </script>
+}

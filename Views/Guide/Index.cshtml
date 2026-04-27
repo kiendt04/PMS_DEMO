@@ -1,0 +1,91 @@
+﻿@{
+    ViewData["Title"] = "GIỚI THIỆU HỆ THỐNG";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background: #f9f9f9;
+        margin: 20px;
+    }
+
+    h2 {
+        text-align: center;
+        color: #2c3e50;
+    }
+
+    table {
+        border-collapse: collapse;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        background: #fff;
+        border-radius: 8px;
+        overflow: hidden;
+    }
+
+    th, td {
+        padding: 12px 16px;
+        border-bottom: 1px solid #ddd;
+        text-align: left;
+    }
+
+    th {
+        width: 30%;
+        background: #2c3e50;
+        color: #fff;
+    }
+
+    tr:last-child td {
+        border-bottom: none;
+    }
+
+    tr:nth-child(even) td {
+        background: #f4f6f8;
+    }
+</style>
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-body">
+                <h4 class="card-title">Hệ thống Quản lý lương</h4>
+                <hr>
+                <table>
+                    <tr>
+                        <th>Tên hệ thống</th>
+                        <td>Hệ thống Quản lý lương (Payroll Management System)</td>
+                    </tr>
+                    <tr>
+                        <th>Phiên bản</th>
+                        <td>1.0 (09/2025)</td>
+                    </tr>
+                    <tr>
+                        <th>Đơn vị phát triển</th>
+                        <td>Công ty/nhóm thực hiện/nhà trường</td>
+                    </tr>
+                    <tr>
+                        <th>Nền tảng</th>
+                        <td>Ứng dụng Web (ASP.NET Core MVC / ReactJS)</td>
+                    </tr>
+                    <tr>
+                        <th>Cơ sở dữ liệu</th>
+                        <td>SQL Server</td>
+                    </tr>
+                    <tr>
+                        <th>Đối tượng sử dụng</th>
+                        <td>Phòng Nhân sự, Phòng Kế toán, Ban Giám đốc, Nhân viên</td>
+                    </tr>
+                    <tr>
+                        <th>Chức năng chính</th>
+                        <td>
+                            - Quản lý hồ sơ nhân viên <br>
+                            - Tính lương tự động (công, phụ cấp, khấu trừ) <br>
+                            - Quản lý chấm công, bảo hiểm, thuế TNCN <br>
+                            - Xuất báo cáo bảng lương, phiếu lương <br>
+                            - Quản trị người dùng & phân quyền
+                        </td>
+                    </tr>
+                </table>
+              
+            </div>
+        </div>
+    </div>
+</div>

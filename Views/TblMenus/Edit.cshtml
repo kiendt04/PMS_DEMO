@@ -1,0 +1,106 @@
+﻿@model PMS.Models.TblMenu
+
+@{
+    ViewData["Title"] = "Cập nhật menu chức năng";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var lstMenu = (List<PMS.Models.TblMenu>)ViewBag.lstMenu;
+}
+
+@using (Html.BeginForm("Edit", "TblMenus", FormMethod.Post))
+{
+    @Html.AntiForgeryToken()
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title">Thông tin chi tiết</h4>
+
+                    <div class="row">
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <div class="boldText">Tên chức năng:<code>*</code></div>
+                                @Html.EditorFor(model => model.Name, new { htmlAttributes = new { @class = "form-control", placeholder = "Nhập tên chức năng" } })
+                                @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <div class="boldText">Chọn menu cha:<code>*</code></div>
+                                <select id="cboMenu" name="cboMenu" class="form-control">
+                                    <option value="-1">--Menu gốc--</option>
+                                    @if (lstMenu != null && lstMenu.Count > 0)
+                                    {
+                                        foreach (var itemMenu in lstMenu)
+                                        {
+                                            if(itemMenu.Id == Model.ParentId)
+                                            {
+                                                <option value="@itemMenu.Id" selected>@itemMenu.Name</option>
+                                            }
+                                            else
+                                            {
+                                                <option value="@itemMenu.Id">@itemMenu.Name</option>
+                                            }
+                                        }
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <div class="boldText">Nhập đường dẫn chức năng:<code>*</code></div>
+                                @Html.EditorFor(model => model.Url, new { htmlAttributes = new { @class = "form-control", placeholder = "Nhập đường dẫn chức năng" } })
+                                @Html.ValidationMessageFor(model => model.Url, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                        <div class="col-lg-2">
+                            <div class="form-group">
+                                <div class="boldText">Chọn icon:<code>*</code></div>
+                              
+                                @Html.DropDownListFor(model => model.IconUrl,
+                                         new List<SelectListItem>
+                                        {
+                                        new SelectListItem { Text = "Biểu đồ", Value = "ti-bar-chart-alt" },
+                                        new SelectListItem { Text = "Đồng hồ", Value = "icon-speedometer" },
+                                        new SelectListItem { Text = "Lịch", Value = "fa fa-calendar-check-o" },
+                                        new SelectListItem { Text = "Tia sét", Value = "fa fa-bolt" },
+                                        new SelectListItem { Text = "Cái búa", Value = "fa fa-legal" },
+                                        new SelectListItem { Text = "Câu hỏi", Value = "fa fa-question-circle" },
+                                        new SelectListItem { Text = "Tờ tiền", Value = "fa fa-money" },
+                                        new SelectListItem { Text = "Dấu tròn đỏ", Value = "fa fa-circle-o text-danger" },
+                                        new SelectListItem { Text = "Dấu tròn xanh", Value = "fa fa-circle-o text-success" },
+                                        new SelectListItem { Text = "Dấu tròn da cam", Value = "fa fa-circle-o text-warning" }
+                                        },
+                                         "Chọn icon", // option mặc định
+                                         new { @class = "form-control" })
+
+                            </div>
+                        </div>
+                        <div class="col-lg-2">
+                            <div class="form-group">
+                                <div class="boldText">Nhập thứ tự:</div>
+                                @Html.EditorFor(model => model.OrderNumber, new { htmlAttributes = new { @class = "form-control", placeholder = "Nhập thứ tự hiển thị" } })
+                                @Html.ValidationMessageFor(model => model.OrderNumber, "", new { @class = "text-danger" })
+
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-lg-8">
+                            <div class="form-group">
+                                <div class="boldText">Meta title:<code>*</code></div>
+                                @Html.EditorFor(model => model.MetaTitle, new { htmlAttributes = new { @class = "form-control", placeholder = "Nhập MetaTitle" } })
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-success waves-effect waves-light m-r-10">Ghi dữ liệu</button>
+                    @Html.ActionLink("Quay lại", "Index")
+                </div>
+            </div>
+        </div>
+    </div>
+}

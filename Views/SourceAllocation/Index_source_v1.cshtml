@@ -1,0 +1,203 @@
+﻿@model IEnumerable<PMS.Models.TblBudgetPlan>
+
+@{
+    ViewData["Title"] = "DANH MỤC NGUỒN CHÍNH";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                
+                    @* <div class="col-lg-5">
+                        <h4 class="card-title" style="margin-bottom:0px;">Thông tin chi tiết</h4>
+                    </div>
+                    <div class="col-lg-7" style="text-align: right;" >
+                        <a href="@Url.Action("Index")" class="btn btn-sm btn-info mb-2" style="width: 200px">
+                            Danh sách phân bổ
+                        </a>
+                        <div class="row align-items-center justify-content-end mt-2 mb-2">
+                            <div class="col-auto d-flex align-items-center mb-2">
+                                <label class="fw-bold me-2 mb-0" style="min-width: 70px;">Chọn năm:</label>
+                                <select id="selectYear" class="form-control">
+                                    <option value="">Tất cả năm</option>
+                                    @foreach (var yearItem in ViewBag.AvailableYears)
+                                    {
+                                        var isSelected = ViewBag.SelectedYear != null && ViewBag.SelectedYear == yearItem;
+                                        <option value="@yearItem" selected="@isSelected">@yearItem</option>
+                                    }
+                                </select>
+                            </div>
+                            <div class="col-auto mb-2">
+                                <a class="btn btn-sm btn-primary" style="width: 200px;" href="@Url.Action("CreateAllcation")">Thêm mới nguồn chính</a>
+                            </div>
+                        </div>
+                    </div> *@
+                <div class="row align-items-center mb-3">
+                    <!-- Cột tiêu đề -->
+                    <div class="col-lg-6 col-md-6 col-sm-12 mb-2 mb-md-0">
+                        <h4 class="card-title mb-0">Thông tin chi tiết</h4>
+                    </div>
+
+                    <div class="col-lg-4 col-md-4 col-sm-12 text-lg-end text-md-end text-start">
+                    </div>
+
+                    <!-- Cột nút Danh sách ngân sách -->
+                    <div class="col-lg-2 col-md-2 col-sm-12 text-lg-end text-md-end text-start">
+                        <a href="@Url.Action("Index")" class="btn btn-sm btn-info" style="width: 150px;">
+                            Danh sách phân bổ
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Hàng 2: Bộ lọc và nút Thêm mới phân nguồn -->
+                <div class="row align-items-center mb-3">
+                    <!-- Cột bộ lọc -->
+                    <div class="col-lg-6 col-md-6 col-sm-12 mb-2 mb-md-0">
+                        <div class="row g-2 align-items-center">
+                            <div class="col-auto d-flex align-items-center mb-2">
+                                <label class="fw-bold me-2 mb-0" style="min-width: 70px;">Chọn năm:</label>
+                                <select id="selectYear" class="form-control">
+                                    <option value="">Tất cả năm</option>
+                                    @foreach (var yearItem in ViewBag.AvailableYears)
+                                    {
+                                        var isSelected = ViewBag.SelectedYear != null && ViewBag.SelectedYear == yearItem;
+                                        <option value="@yearItem" selected="@isSelected">@yearItem</option>
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-md-4 col-sm-12 text-lg-end text-md-end text-start">
+                    </div>
+
+                    <!-- Cột nút Thêm mới phân nguồn -->
+                    <div class="col-lg-2 col-md-2 col-sm-12 text-lg-end text-md-end text-start">
+                        <a class="btn btn-sm btn-primary" style="width: 150px;" href="@Url.Action("CreateAllcation")">
+                            Thêm mới nguồn chính
+                        </a>
+                    </div>
+                </div>
+                        
+                
+
+                <div class="table-responsive mt-2">
+                    <table id="myTable" class="table table-bordered table-striped">
+                        <thead>
+                            <tr>
+                                <th class="text-center">#</th>
+                                <th>Năm</th>
+                                <th>Tổng ngân sách</th>
+                                <th>Ngân sách nhân viên</th>
+                                <th>Ngân sách quản lý</th>
+                                <th>Người tạo</th>
+                                <th>Ngày tạo</th>
+                                <th>Trạng thái</th>
+                                <th>Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (Model != null)
+                            {
+                                int i = 1;
+                                foreach (var item in Model.OrderBy(a => a.Year))
+                                {
+                                    <tr data-year="@item.Year">
+                                        <td class="text-center">@i</td>
+                                        <td>@item.Year</td>
+                                        <td>@string.Format("{0:N0}", item.TotalBudget)</td>
+                                        <td>@string.Format("{0:N0}", item.EmployeeBudget)</td>
+                                        <td>@string.Format("{0:N0}", item.ManagerBudget)</td>
+                                        <td>@item.CreatedUser</td>
+                                        <td>@item.CreatedDate.ToString("dd/MM/yyyy")</td>
+                                        <td>
+                                            @if (item.Status == 1)
+                                            {
+                                                <span class="badge bg-success">Hoạt động</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-danger">Không hoạt động</span>
+                                            }
+                                        </td>
+                                        <td class="text-nowrap">
+                                            <a href="@Url.Action("Edit_v1", new { id = item.Id })" class="btn btn-sm btn-outline-success">
+                                                <i class="fa fa-pencil"></i>
+                                            </a>
+                                            <form asp-action="Delete_v1" asp-route-id="@item.Id" method="post" class="d-inline"
+                                                  onsubmit="return confirm('Bạn có chắc chắn muốn xóa dữ liệu này không?');">
+                                                <button type="submit" class="btn btn-sm btn-outline-danger">
+                                                    <i class="fa fa-trash"></i>
+                                                </button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                    i++;
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/assets/node_modules/datatables/jquery.dataTables.min.js"></script>
+    <script>
+        var dataTable;
+
+        $(document).ready(function () {
+            initializeDataTable();
+
+            // Lọc theo năm
+            $('#selectYear').change(function () {
+                filterTableData();
+            });
+
+            // Hiển thị thông báo
+            @if (TempData["SuccessMessage"] != null)
+            {
+                    <text>
+                    toastr.success('@TempData["SuccessMessage"]');
+                    </text>
+            }
+        });
+
+        function initializeDataTable() {
+            dataTable = $('#myTable').DataTable({
+                "pageLength": 10,
+                "ordering": true,
+                "searching": true,
+                "lengthChange": true,
+                "language": {
+                    "search": "Tìm kiếm:",
+                    "lengthMenu": "Hiển thị _MENU_ bản ghi",
+                    "info": "Hiển thị _START_ đến _END_ của _TOTAL_ bản ghi",
+                    "paginate": {
+                        "first": "Đầu",
+                        "last": "Cuối",
+                        "next": "Tiếp",
+                        "previous": "Trước"
+                    }
+                }
+            });
+        }
+
+        function filterTableData() {
+            var year = $('#selectYear').val();
+
+            // Xóa tất cả filter cũ
+            dataTable.columns().search('');
+
+            // Filter theo năm (cột 1)
+            if (year !== '') {
+                dataTable.column(1).search('^' + year + '$', true, false);
+            }
+
+            dataTable.draw();
+        }
+    </script>
+}

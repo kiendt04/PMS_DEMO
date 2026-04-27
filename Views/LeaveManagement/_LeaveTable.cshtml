@@ -1,0 +1,220 @@
+﻿@model PMS.Models.LeaveManagementResponse
+
+<style>
+    /* Tăng kích thước chữ */
+    .handsontable td {
+        color: #333333 !important;
+        font-size: 14px !important;
+    }
+    .handsontable span.colHeader {
+        color: #333333 !important;
+        font-weight: 700 !important;
+    }
+    /* Ẩn scrollbar dọc của Handsontable, giữ scrollbar ngang ở dưới */
+    #leaveHotContainer .wtHolder {
+        overflow-x: auto !important;
+        overflow-y: visible !important;
+        height: auto !important;
+    }
+    #leaveHotContainer .ht_master .wtHolder {
+        overflow-x: auto !important;
+        overflow-y: visible !important;
+    }
+    /* Ẩn scrollbar của header clone - chỉ giữ 1 scroll ở dưới */
+    #leaveHotContainer .ht_clone_top .wtHolder {
+        overflow: hidden !important;
+    }
+</style>
+
+<!-- Handsontable Container -->
+<div id="leaveManagementTable" style="overflow: visible;">
+    <div id="leaveHotContainer"></div>
+</div>
+
+<script>
+    (function () {
+        // Hàm khởi tạo Handsontable
+        function initializeHandsontable(leaveData) {
+            const container = document.getElementById('leaveHotContainer');
+            if (!container) return;
+
+            // Xóa table cũ nếu có
+            container.innerHTML = '';
+
+            if (!leaveData || !leaveData.departmentGroups) {
+                console.log('Không có dữ liệu để hiển thị');
+                container.innerHTML = '<div class="alert alert-info">Không có dữ liệu</div>';
+                return;
+            }
+
+            // Cấu hình columns và data (giữ nguyên code của bạn)
+            const monthLabels = Array.from({ length: 12 }, (_, i) => `T${i + 1}`);
+            
+            const nestedHeaders = [
+                [
+                    { label: 'TT', rowspan: 2 },
+                    { label: 'HỌ VÀ TÊN', rowspan: 2 },
+                    { label: 'Mã nhân viên', rowspan: 2 },
+                    { label: 'Ngày tuyển dụng', colspan: 3 },
+                    { label: `Số năm lao động <br/> tính đến 31/12/${leaveData.year}`, colspan: 2 },
+                    { label: 'Số ngày phép <br/> theo chế độ', rowspan: 2 },
+                    { label: 'Số ngày <br/> đã nghỉ cả năm', rowspan: 2 },
+                    { label: 'Số ngày <br/> phép còn lại', rowspan: 2 },
+                    { label: 'Số liệu chi tiết <br/> từng tháng', colspan: 12 },
+                    { label: `Chuyển phép sang <br/> tháng 01/${leaveData.year + 1}`, rowspan: 2 }
+                ],
+                [
+                    '', '', '',
+                    'Ngày', 'Tháng', 'Năm',
+                    'Năm', 'Tháng',
+                    '', '', '',
+                    ...monthLabels,
+                    ''
+                ]
+            ];
+
+            const columns = [
+                { data: 0, type: 'numeric', width: 30, readOnly: true },
+                { data: 1, type: 'text', readOnly: true },
+                { data: 2, type: 'text', readOnly: true },
+                { data: 3, type: 'numeric', width: 35, readOnly: true },
+                { data: 4, type: 'numeric', width: 35, readOnly: true },
+                { data: 5, type: 'numeric', width: 55, readOnly: true },
+                { data: 6, type: 'numeric', width: 55, readOnly: true },
+                { data: 7, type: 'numeric', width: 40, readOnly: true },
+                { data: 8, type: 'numeric', width: 65, readOnly: true },
+                { data: 9, type: 'numeric', width: 65, readOnly: true },
+                { data: 10, type: 'numeric', width: 65, readOnly: true },
+            ];
+
+            for (let i = 0; i < 12; i++) {
+                columns.push({
+                    data: 11 + i,
+                    type: 'numeric',
+                    numericFormat: { pattern: '0' },
+                    width: 45,
+                    readOnly: false
+                });
+            }
+
+            columns.push({
+                data: 23,
+                type: 'numeric',
+                width: 70,
+                readOnly: true
+            });
+
+            // Tạo data (giữ nguyên logic của bạn)
+            const rowUserIdMap = new Map();
+            const data = [];
+            let globalIndex = 1;
+            let currentRowIndex = 0;
+
+            function makeGroupRow(departmentName) {
+                const row = new Array(24).fill('');
+                row[1] = departmentName;
+                return row;
+            }
+
+            function makeEmployeeRow(index, employee) {
+                const row = new Array(24).fill('');
+                row[0] = index;
+                row[1] = employee.fullName;
+                row[2] = employee.userCode;
+
+                if (employee.employmentDate) {
+                    const hireDate = new Date(employee.employmentDate);
+                    if (!isNaN(hireDate.getTime())) {
+                        row[3] = hireDate.getDate();
+                        row[4] = hireDate.getMonth() + 1;
+                        row[5] = hireDate.getFullYear();
+                    }
+                }
+
+                row[6] = employee.workingYearsYear || 0;
+                row[7] = employee.workingYearsMonth || 0;
+                row[8] = employee.totalLeaveDaysByPolicy || 0;
+                row[9] = employee.usedLeaveDays || 0;
+                row[10] = employee.remainingLeaveDays || 0;
+
+                for (let month = 1; month <= 12; month++) {
+                    const monthlyData = employee.monthlyLeaveData;
+                    if (monthlyData && typeof monthlyData === 'object') {
+                        row[10 + month] = monthlyData[month] || 0;
+                    } else {
+                        row[10 + month] = 0;
+                    }
+                }
+
+                row[23] = employee.remainingLeaveDays || 0;
+                return row;
+            }
+
+            leaveData.departmentGroups.forEach(dept => {
+                data.push(makeGroupRow(dept.departmentName));
+                currentRowIndex++;
+
+                dept.employees.forEach(emp => {
+                    const employeeRow = makeEmployeeRow(globalIndex++, emp);
+                    data.push(employeeRow);
+                    rowUserIdMap.set(currentRowIndex, emp.userId);
+                    currentRowIndex++;
+                });
+            });
+
+            // Khởi tạo Handsontable
+            const hot = new Handsontable(container, {
+                data: data,
+                columns: columns,
+                colHeaders: false,
+                rowHeaders: false,
+                nestedHeaders: nestedHeaders,
+                width: '100%',
+                height: 'auto',  // Sử dụng scroll dọc của web
+                stretchH: 'all',
+                autoColumnSize: true,
+                manualColumnFreeze: true,
+                manualColumnMove: true,
+                fixedColumnsLeft: 0,
+                filters: false,
+                dropdownMenu: false,
+                contextMenu: true,
+                licenseKey: 'non-commercial-and-evaluation',
+                
+                // Bôi đen và căn chỉnh dòng phòng ban
+                cells: function (row, col) {
+                    const cellProperties = {};
+                    const dataAtRow = this.instance.getDataAtRow(row);
+
+                    // Nếu là dòng nhóm (phòng ban) - col 0 rỗng, col 1 có tên, col 2 rỗng
+                    if (dataAtRow && dataAtRow[1] && dataAtRow[0] === '' && (!dataAtRow[2] || dataAtRow[2] === '')) {
+                        cellProperties.readOnly = true;
+                        cellProperties.renderer = function (instance, td, row, col, prop, value, cellProperties) {
+                            td.style.fontStyle = 'italic';
+                            td.style.color = 'blue';
+                            td.style.fontWeight = 'bold';
+                            td.style.background = '#f0f8ff';
+                            td.innerHTML = value || '';
+                        };
+                    } else {
+                        // Căn giữa tất cả cột trừ cột "Họ và tên" (col = 1)
+                        if (col !== 1) {
+                            cellProperties.className = 'htCenter';
+                        }
+                    }
+
+                    return cellProperties;
+                }
+            });
+
+            return hot;
+        }
+
+        // Khởi tạo lần đầu
+        const initialData = @Html.Raw(Json.Serialize(Model));
+        if (initialData) {
+            initializeHandsontable(initialData);
+        }
+
+    })();
+</script>

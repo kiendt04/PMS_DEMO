@@ -1,0 +1,50 @@
+@model PMS.ViewModels.EmployeeSalaryViewModel
+
+<div class="table-responsive mt-2">
+    <table id="myTable" class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                <th class="text-center" style="width: 50px;">#</th>
+                <th class="text-center">Tháng/Năm</th>
+                <th class="text-center">Số giờ thêm giờ</th>
+                <th class="text-center">Thêm giờ</th>
+                <th class="text-center">Tổng CD + TG</th>
+                <th class="text-center">Tổng lĩnh</th>
+                <th class="text-center">Ghi chú</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model != null && Model.MonthlyDetails != null && Model.MonthlyDetails.Any())
+            {
+                int i = 1;
+                foreach (var detail in Model.MonthlyDetails.Where(d => d.OvertimeValue.HasValue && d.OvertimeValue.Value > 0))
+                {
+                    <tr>
+                        <td class="text-center">@(i++)</td>
+                        <td><strong>@detail.Month/@detail.Year</strong></td>
+                        <td class="text-right">@(detail.OvertimeHours?.ToString("N2") ?? "0")</td>
+                        <td class="text-right">@(detail.OvertimeValue?.ToString("N0") ?? "0")</td>
+                        <td class="text-right">@(detail.NightShiftOvertime?.ToString("N0") ?? "0")</td>
+                        <td class="text-right"><strong>@(detail.TotalReceived?.ToString("N0") ?? "0")</strong></td>
+                        <td title="@detail.Notes">
+                            @(detail.Notes?.Length > 50 ? detail.Notes.Substring(0, 50) + "..." : detail.Notes ?? "")
+                        </td>
+                    </tr>
+                }
+                @if (!Model.MonthlyDetails.Any(d => d.OvertimeValue.HasValue && d.OvertimeValue.Value > 0))
+                {
+                    <tr>
+                        <td colspan="7" class="text-center">Không có dữ liệu thêm giờ</td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="7" class="text-center">Không có dữ liệu</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+

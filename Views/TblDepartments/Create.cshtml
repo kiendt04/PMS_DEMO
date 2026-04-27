@@ -1,0 +1,217 @@
+﻿@model PMS.Models.TblDepartment
+
+@{
+    ViewData["Title"] = "Thêm mới phòng ban";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@using (Html.BeginForm("Create", "TblDepartments", FormMethod.Post, new { id = "createForm" }))
+{
+    @Html.AntiForgeryToken()
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title">Thông tin chi tiết phòng ban</h4>
+                    <h6 class="card-subtitle text-muted mb-3">
+                        Lưu ý: <span class="text-danger">*</span> là các trường bắt buộc
+                    </h6>
+
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <div class="form-group">
+                                <div class="boldText">Tên phòng ban:<code>*</code></div>
+                                @Html.TextBoxFor(model => model.Name, new {
+                                @class = "form-control",
+                                                        placeholder = "Nhập tên phòng ban",
+                                                        required = "required"
+                                                        })
+                            @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+
+                    <div class="col-lg-3">
+                        <div class="form-group">
+                            <div class="boldText">Tên viết tắt:<code>*</code></div>
+                            @Html.TextBoxFor(model => model.ShortName, new {
+                                                        @class = "form-control",
+                                                        placeholder = "Nhập tên viết tắt",
+                                                        required = "required"
+                                                        })
+                            @Html.ValidationMessageFor(model => model.ShortName, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+
+                    <div class="col-lg-3">
+                        <div class="form-group">
+                            <div class="boldText">Thứ tự hiển thị:<code>*</code></div>
+                            @Html.TextBoxFor(model => model.OrderNumber, new {
+                                                        @class = "form-control",
+                                                        type = "number",
+                                                        placeholder = "Nhập số thứ tự",
+                                                        min = "1"
+                                                        })
+                            @Html.ValidationMessageFor(model => model.OrderNumber, "", new { @class = "text-danger" })
+                            <small class="form-text text-muted">Để trống sẽ tự động tạo</small>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-lg-3">
+                        <div class="form-group">
+                            <div class="boldText">Thuộc phòng ban:<code>*</code></div>
+                            @Html.DropDownListFor(model => model.Type, (SelectList)ViewBag.ParentDepartments, "--- Là phòng ban chung ---", new { @class = "form-control" })
+                            @Html.ValidationMessageFor(model => model.Type, "", new { @class = "text-danger" })
+                            <small class="form-text text-muted">Chọn phòng ban cấp trên (nếu có)</small>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-3">
+                        <div class="form-group">
+                            <div class="boldText">Trạng thái:<code>*</code></div>
+                            @Html.DropDownListFor(model => model.Status, new List<SelectListItem>
+                                                        {
+                                new SelectListItem { Text = "Hoạt động", Value = "1", Selected = true },
+                                                        new SelectListItem { Text = "Không hoạt động", Value = "0" }
+                                                        }, new { @class = "form-control" })
+                            @Html.ValidationMessageFor(model => model.Status, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-lg-6">
+                        <div class="form-group">
+                            <div class="boldText">Mô tả:</div>
+                            @Html.TextAreaFor(model => model.Description, new {
+                                                        @class = "form-control",
+                                                        rows = "3",
+                                                        placeholder = "Nhập mô tả",
+                                                        maxlength = "300"
+                                                        })
+                            @Html.ValidationMessageFor(model => model.Description, "", new { @class = "text-danger" })
+                            <small class="form-text text-muted">Tối đa 300 ký tự</small>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-6">
+                        <div class="form-group">
+                            <div class="boldText">Ghi chú:</div>
+                            @Html.TextAreaFor(model => model.Note, new {
+                                                        @class = "form-control",
+                                                        rows = "3",
+                                                        placeholder = "Nhập ghi chú",
+                                                        maxlength = "500"
+                                                        })
+                            @Html.ValidationMessageFor(model => model.Note, "", new { @class = "text-danger" })
+                            <small class="form-text text-muted">Tối đa 500 ký tự</small>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group mt-4">
+                    <button type="submit" class="btn btn-success waves-effect waves-light m-r-10" id="submitBtn">
+                        <i class="fa fa-save"></i> Ghi dữ liệu
+                    </button>
+                    @Html.ActionLink("Quay lại", "Index", null, new { @class = "btn btn-secondary" })
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+}
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        $(document).ready(function () {
+            // Tự động tạo ShortName từ Name
+            $('#Name').on('input', function () {
+                let name = $(this).val().trim();
+                if (!name) {
+                    $('#ShortName').val('');
+                    return;
+                }
+
+                // Tạo viết tắt: lấy chữ cái đầu mỗi từ
+                let words = name.split(/\s+/).filter(w => w.length > 0);
+                let shortName = '';
+
+                // Nếu có 1 từ và dài, lấy 2-3 ký tự đầu
+                if (words.length === 1) {
+                    if (words[0].length >= 3) {
+                        shortName = words[0].substring(0, 3).toUpperCase();
+                    } else {
+                        shortName = words[0].toUpperCase();
+                    }
+                }
+                // Nếu có nhiều từ, lấy chữ cái đầu mỗi từ (tối đa 3 từ)
+                else {
+                    shortName = words.slice(0, 3).map(w => w[0]?.toUpperCase()).join('');
+                }
+
+                $('#ShortName').val(shortName);
+            });
+
+            // Validate form trước khi submit
+            $('#createForm').on('submit', function(e) {
+                // Kiểm tra dữ liệu cơ bản
+                var name = $('#Name').val().trim();
+                var shortName = $('#ShortName').val().trim();
+
+                if (!name) {
+                    toastr.error('Vui lòng nhập tên phòng ban');
+                    $('#Name').focus();
+                    e.preventDefault();
+                    return false;
+                }
+
+                if (!shortName) {
+                    toastr.error('Vui lòng nhập tên viết tắt');
+                    $('#ShortName').focus();
+                    e.preventDefault();
+                    return false;
+                }
+
+                // Kiểm tra độ dài tên viết tắt
+                if (shortName.length > 50) {
+                    toastr.error('Tên viết tắt không được quá 50 ký tự');
+                    $('#ShortName').focus();
+                    e.preventDefault();
+                    return false;
+                }
+
+                // Kiểm tra độ dài tên
+                if (name.length > 150) {
+                    toastr.error('Tên phòng ban không được quá 150 ký tự');
+                    $('#Name').focus();
+                    e.preventDefault();
+                    return false;
+                }
+
+                // Disable nút submit để tránh click nhiều lần
+                $('#submitBtn').prop('disabled', true)
+                    .html('<i class="fa fa-spinner fa-spin"></i> Đang xử lý...');
+
+                return true;
+            });
+
+            // Hiển thị thông báo từ TempData
+            @if (TempData["SuccessMessage"] != null)
+            {
+                    <text>
+                    toastr.success('@Html.Raw(TempData["SuccessMessage"])');
+                    </text>
+            }
+            @if (TempData["ErrorMessage"] != null)
+            {
+                    <text>
+                    toastr.error('@Html.Raw(TempData["ErrorMessage"])');
+                    </text>
+            }
+        });
+    </script>
+}

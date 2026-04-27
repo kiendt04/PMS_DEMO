@@ -1,0 +1,121 @@
+@model IEnumerable<PMS.Models.TblMealAllowanceQuota>
+
+@{
+    ViewData["Title"] = "DANH MỤC ĐỊNH MỨC ĂN CA";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table id="myTable" class="table table-bordered table-striped">
+                        <thead>
+                            <tr>
+                                <th class="text-nowrap text-center" style="width: 60px;">#</th>
+                                @* <th class="d-none" style="width: 100px;">Số thứ tự</th> *@
+                                <th style="min-width: 150px;">Tên loại</th>
+                                <th style="width: 120px;">Giá trị loại</th>
+                                <th style="min-width: 200px;">Mô tả</th>
+                                <th style="width: 120px;">Ngày hiệu lực</th>
+                                @* <th style="width: 120px;">Ngày kết thúc</th> *@
+                                <th style="width: 110px;">Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (Model != null)
+                            {
+                                var i = 1;
+                                foreach (var item in Model.OrderBy(a => a.OrderNumber))
+                                {
+                                    <tr>
+                                        <td class="text-center">@(i++)</td>
+                                        @* <td class="text-center d-none">@(item.OrderNumber?.ToString() ?? "-")</td> *@
+                                        <td>@Html.DisplayFor(modelItem => item.TypeName)</td>
+                                        <td class="text-right">@item.TypeValue.ToString("N0") </td>
+                                        <td>@Html.DisplayFor(modelItem => item.Description)</td>
+                                        <td class="text-center">@(item.StartDate?.ToString("dd/MM/yyyy") ?? "-")</td>
+                                        @* <td class="text-center">@(item.EndDate?.ToString("dd/MM/yyyy") ?? "-")</td> *@
+                                        <td>
+                                            <a class="btn btn-link p-0 mr-2" title="Sửa" asp-action="Edit" asp-route-id="@item.Id">
+                                                <i class="fa fa-pencil text-warning"></i>
+                                            </a>
+                                            <a class="btn btn-link p-0 mr-2" title="Xóa" asp-action="Delete" asp-route-id="@item.Id" onclick="return confirm('Bạn có muốn xóa dữ liệu không?')">
+                                                <i class="fa fa-times text-danger"></i>
+                                            </a>
+                                            @if (item.Status == 1)
+                                            {
+                                                <a class="btn btn-link p-0" title="Hết hiệu lực" href="#" onclick="confirmDeactivate(@item.Id, '@item.TypeName')">
+                                                    <i class="fa fa-ban text-danger"></i>
+                                                </a>
+                                            }
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Hidden form for deactivate action -->
+<form id="deactivateForm" method="post" style="display: none;">
+    @Html.AntiForgeryToken()
+</form>
+
+@section Scripts {
+    <script src="~/assets/node_modules/datatables/jquery.dataTables.min.js"></script>
+    <script>
+        function confirmDeactivate(id, typeName) {
+            if (confirm('Bạn có chắc chắn muốn đổi trạng thái của định mức ăn ca "' + typeName + '" sang hết hiệu lực không?')) {
+                var form = document.getElementById('deactivateForm');
+                form.action = '@Url.Action("Deactivate", "TblMealAllowanceQuota")/' + id;
+                form.submit();
+            }
+        }
+        $(document).ready(function () {
+            $('#myTable').DataTable({
+
+                "language": {
+                    "url": "//cdn.datatables.net/plug-ins/1.10.24/i18n/Vietnamese.json"
+                },
+                "pageLength": 10,
+                "searching": true,
+                "lengthChange": true,
+                "order": [[1, 'asc'], [2, 'asc']], // Sort by order number asc, then type name asc
+                "dom":
+                    '<"d-flex justify-content-between align-items-center mb-3"<"d-flex align-items-center"l><"d-flex align-items-center"f>>' +
+                    '<"row"<"col-sm-12"tr>>' +
+                    '<"row"<"col-sm-5"i><"col-sm-7"p>>',
+                "initComplete": function () {
+                    // 1. Lấy container bên trái (chứa "Hiển thị")
+                    var leftContainer = $('.dataTables_wrapper .d-flex.align-items-center').first();
+
+                    // 2. Thêm nút "Thêm mới" vào container bên trái
+                    var addButton = '<a class="btn btn-sm btn-primary ms-5" href="@Url.Action("Create")">Thêm mới</a>';
+                    leftContainer.append(addButton);
+
+                    // 3. Điều chỉnh khoảng cách
+                    leftContainer.css('gap', '20px');
+
+                    // 4. Điều chỉnh label
+                    $('.dataTables_length label, .dataTables_filter label').css({
+                        'margin-bottom': '0',
+                        'margin-right': '8px'
+                    });
+                }
+            });
+        });
+    </script>
+}
+<style>
+    .dataTables_wrapper .d-flex.justify-content-between {
+        flex-wrap: nowrap;
+        justify-content: flex-start !important; /* Thay space-between */
+        gap: 80px; /* Khoảng cách cố định 20px */
+    }
+</style>

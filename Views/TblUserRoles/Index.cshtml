@@ -1,0 +1,189 @@
+﻿@model IEnumerable<PMS.Models.TblUserRole>
+
+@{
+    ViewData["Title"] = "Quản lý Người dùng - Quyền";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@{
+    var modelRoles = (IEnumerable<PMS.Models.TblRole>)ViewBag.tblRoles;
+    var modelUsers = (IEnumerable<PMS.Models.TblUser>)ViewBag.tblUsers;
+    var modelUserRoles = (IEnumerable<PMS.Models.TblUserRole>)ViewBag.tblUserRoles;
+}
+
+@using (Html.BeginForm("Index", "TblUserRoles", FormMethod.Post))
+{
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+
+                    @* <h4 class="card-title" style="margin-bottom:0px;">Thông tin chi tiết
+                    </h4> *@
+
+                    <div class="table-responsive">
+                        <table id="myTable" class="table table-bordered table-striped">
+                            <thead>
+                                <tr>
+                                    <th class="text-center">Tên tài khoản</th>
+                                    @foreach (var itemTable in modelRoles)
+                                    {
+                                        <th>@itemTable.Name</th>
+                                    }
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (modelUsers != null)
+                                {
+                                    foreach (var item in modelUsers)
+                                    {
+                                        <tr>
+                                            <td class="text-center">
+                                                @Html.DisplayFor(modelItem => item.Name)
+                                            </td>
+                                            @foreach (var itemDetails in modelRoles)
+                                            {
+                                                var iCheck = false;
+                                                <td style="text-align:center">
+                                                    @foreach (var itemCheck in modelUserRoles)
+                                                    {
+                                                        if (itemCheck.RoleId == itemDetails.Id && itemCheck.UserId == item.Id)
+                                                        {
+                                                            iCheck = true; break;
+                                                        }
+                                                    }
+                                                    @if (iCheck == true)
+                                                    {
+                                                        <input type="checkbox" id="chk_@itemDetails.Id _@item.Id" name="chk_@itemDetails.Id _@item.Id" checked="checked" onchange="ChangeValue(this)" />
+                                                    }
+                                                    else
+                                                    {
+                                                        <input type="checkbox" id="chk_@itemDetails.Id _@item.Id" name="chk_@itemDetails.Id _@item.Id" onchange="ChangeValue(this)" />
+                                                    }
+                                                </td>
+                                            }
+                                        </tr>
+                                    }
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+<script src="~/assets/node_modules/datatables/jquery.dataTables.min.js"></script>
+<script>
+    function ChangeValue(element) {
+        var checkboxId = element.id;        // ví dụ: chk_12_34
+        var isChecked = element.checked;    // true/false
+        $.ajax({
+            url: '/TblUserRoles/UpdateData',   // thay tên Controller/Action
+            type: 'POST',
+            data: {
+                checkboxId: checkboxId,
+                isChecked: isChecked
+            },
+            success: function (res) {
+                if (res.success) {
+                    toastr.success(res.message || "Cập nhật thành công!");
+                } else {
+                    toastr.warning(res.message || "Có lỗi xảy ra!");
+                }
+            },
+            error: function (xhr, status, error) {
+                toastr.warning("Có lỗi xảy ra!" + error);
+            }
+        });
+    }
+
+    $(document).ready(function () {
+        $('#myTable').DataTable({
+            "pageLength": 10,
+            "ordering": true,
+            "searching": true,
+            "lengthChange": true,
+
+            // DOM với 3 phần cùng hàng
+            "dom":
+                '<"d-flex justify-content-between align-items-center mb-3"<"d-flex align-items-center"l><"d-flex align-items-center"f>>' +
+                '<"row"<"col-sm-12"tr>>' +
+                '<"row"<"col-sm-5"i><"col-sm-7"p>>',
+
+            "language": {
+                "lengthMenu": "Hiển thị _MENU_ bản ghi",
+                "search": "Tìm kiếm:"
+            },
+
+            "initComplete": function () {
+                // 1. Lấy container bên trái (chứa "Hiển thị")
+                var leftContainer = $('.dataTables_wrapper .d-flex.align-items-center').first();
+
+                // 2. Thêm nút "Thêm mới" vào container bên trái
+       
+                
+
+                // 3. Điều chỉnh khoảng cách
+                leftContainer.css('gap', '20px');
+
+                // 4. Điều chỉnh label
+                $('.dataTables_length label, .dataTables_filter label').css({
+                    'margin-bottom': '0',
+                    'margin-right': '8px'
+                });
+            }
+        });
+        $(document).ready(function () {
+            var table = $('#example').DataTable({
+                "columnDefs": [{
+                    "visible": false,
+                    "targets": 2
+                }],
+                "order": [
+                    [2, 'asc']
+                ],
+                "displayLength": 25,
+                "drawCallback": function (settings) {
+                    var api = this.api();
+                    var rows = api.rows({
+                        page: 'current'
+                    }).nodes();
+                    var last = null;
+                    api.column(2, {
+                        page: 'current'
+                    }).data().each(function (group, i) {
+                        if (last !== group) {
+                            $(rows).eq(i).before('<tr class="group"><td colspan="5">' + group + '</td></tr>');
+                            last = group;
+                        }
+                    });
+                }
+            });
+            // Order by the grouping
+            $('#example tbody').on('click', 'tr.group', function () {
+                var currentOrder = table.order()[0];
+                if (currentOrder[0] === 2 && currentOrder[1] === 'asc') {
+                    table.order([2, 'desc']).draw();
+                } else {
+                    table.order([2, 'asc']).draw();
+                }
+            });
+        });
+    });
+    $('#example23').DataTable({
+        dom: 'Bfrtip',
+        buttons: [
+            'copy', 'csv', 'excel', 'pdf', 'print'
+        ]
+    });
+</script>
+<style>
+    .dataTables_wrapper .d-flex.justify-content-between {
+        flex-wrap: nowrap;
+        justify-content: flex-start !important; /* Thay space-between */
+        gap: 80px; /* Khoảng cách cố định 20px */
+    }
+
+</style>

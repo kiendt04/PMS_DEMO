@@ -1,0 +1,206 @@
+﻿@model IEnumerable<PMS.Models.TblPhuTros>
+@{
+    var users = ViewBag.Users as List<PMS.Models.TblUser> ?? new List<PMS.Models.TblUser>();
+}
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/handsontable@14.3.0/dist/handsontable.full.min.css" />
+<style>
+    /* Tăng font-size và màu chữ */
+    .handsontable td {
+        color: #333333 !important;
+        font-size: 14px !important;
+        white-space: nowrap !important;
+    }
+    .handsontable span.colHeader {
+        color: #333333 !important;
+        font-weight: 700 !important;
+    }
+    /* Ẩn scrollbar dọc, giữ scrollbar ngang */
+    #tncnTable .wtHolder {
+        overflow-x: auto !important;
+        overflow-y: visible !important;
+        height: auto !important;
+    }
+    #tncnTable .ht_master .wtHolder {
+        overflow-x: auto !important;
+        overflow-y: visible !important;
+    }
+    #tncnTable .ht_clone_top .wtHolder {
+        overflow: hidden !important;
+    }
+</style>
+<div id="tncnTableWrapper" style="overflow:visible;">
+    <div id="tncnTable"></div>
+
+    <script>
+        (function () {
+            const container = document.getElementById('tncnTable');
+
+            // Data từ server
+            const data = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(
+                Model.Select((x, i) => new
+                {
+            STT = i + 1,
+            TenNhanVien = x.TenNhanVien,
+
+            MaNhanVien = x.MaNhanVien,
+            // TenPhongBan = x.TenPhongBan,
+            SoTaiKhoan = x.SoTaiKhoan ?? "Chưa có",
+            HeSoLuong = x.HeSoLuong,
+            ThuNhapChiuThue = x.ThuNhapChiuThue,
+            ThuePhaiNop = x.ThuePhaiNop,
+            TongCong = x.TongCong,
+            UserId = users.FirstOrDefault(u => u.UserCode == x.MaNhanVien)?.Id ?? 0
+                })
+                ));
+
+            const nestedHeaders = [
+                [
+                    'STT',
+                    'Tên nhân viên',
+                    'Mã NV',
+                   
+                    'Tài khoản',
+                    'Hệ số lương',
+                    `Thu nhập chịu thuế tháng ${$('#selectMonth').val()}/${$('#selectYear').val()}`,
+                    'Thuế phải nộp',
+                    'Tổng cộng'
+                ]
+                
+            ];
+
+            const columns = [
+                { data: 'STT', type: 'numeric', readOnly: true, width: 50, className: 'htCenter' },
+                { data: 'TenNhanVien', type: 'text', readOnly: true, width: 160 },
+                { data: 'MaNhanVien', type: 'text', readOnly: true, width: 100 },
+                
+                { data: 'SoTaiKhoan', type: 'text', readOnly: true, width: 120 },
+                { data: 'HeSoLuong', type: 'numeric', numericFormat: { pattern: '0.00' }, readOnly: true, width: 100 },
+                { data: 'ThuNhapChiuThue', type: 'numeric', numericFormat: { pattern: '0,0' }, width: 160 },
+                { data: 'ThuePhaiNop', type: 'numeric', numericFormat: { pattern: '0,0' }, width: 120 },
+                { data: 'TongCong', type: 'numeric', numericFormat: { pattern: '0,0' }, readOnly: true, width: 120 }
+            ];
+
+            let isCalculating = false;
+
+            function calculateTNCN(row) {
+                const thuNhapChiuThue = parseFloat(hot.getDataAtRowProp(row, 'ThuNhapChiuThue')) || 0;
+                const thuePhaiNop = parseFloat(hot.getDataAtRowProp(row, 'ThuePhaiNop')) || 0;
+                const tongCong = thuNhapChiuThue; // Tùy công thức thực tế
+                return { tongCong };
+            }
+
+            function updateCalculatedColumns(row) {
+                if (isCalculating) return;
+                isCalculating = true;
+
+                const { tongCong } = calculateTNCN(row);
+                hot.setDataAtRowProp(row, 'TongCong', tongCong, 'calculation');
+
+                isCalculating = false;
+            }
+
+            const hot = new Handsontable(container, {
+                data: data,
+                columns: columns,
+                nestedHeaders: nestedHeaders,
+                rowHeaders: false,
+                colHeaders: false,
+                width: '100%',
+                height: 'auto',  // Sử dụng scroll dọc của web
+                stretchH: 'all',
+                autoColumnSize: true,
+                manualColumnFreeze: true,
+                manualColumnMove: true,
+                fixedColumnsLeft: 2,
+                filters: false,
+                dropdownMenu: false,
+                contextMenu: true,
+                licenseKey: 'non-commercial-and-evaluation',
+
+                afterChange: function (changes, source) {
+                    if (!changes || source === 'loadData' || source === 'calculation') return;
+
+                    changes.forEach(([row, prop, oldVal, newVal]) => {
+                        const rowData = hot.getSourceDataAtRow(row);
+                        const userId = rowData.UserId;
+                        const month = parseInt($('#selectMonth').val());
+                        const year = parseInt($('#selectYear').val());
+
+                        if ((prop === 'ThuNhapChiuThue' || prop === 'ThuePhaiNop') && oldVal !== newVal) {
+                            updateCalculatedColumns(row);
+                        }
+
+                        if (userId > 0) {
+                            if (prop === 'ThuNhapChiuThue' && oldVal !== newVal) {
+                                $.ajax({
+                                    url: '/PhuTro/UpdateTaxableIncome',
+                                    type: 'POST',
+                                    contentType: 'application/json',
+                                    data: JSON.stringify({ UserId: userId, Month: month, Year: year, TaxableIncome: parseFloat(newVal) || 0 })
+                                });
+                            }
+                            if (prop === 'ThuePhaiNop' && oldVal !== newVal) {
+                                $.ajax({
+                                    url: '/PhuTro/UpdateIncomeTaxAmount',
+                                    type: 'POST',
+                                    contentType: 'application/json',
+                                    data: JSON.stringify({ UserId: userId, Month: month, Year: year, IncomeTaxAmount: parseFloat(newVal) || 0 })
+                                });
+                            }
+                        }
+                    });
+                }
+            });
+
+            $('#btnSaveTNCN').click(function () {
+                const month = parseInt($('#selectMonth').val());
+                const year = parseInt($('#selectYear').val());
+
+                if (!month || !year) {
+                    alert('Vui lòng chọn tháng và năm trước khi lưu!');
+                    return;
+                }
+
+                const sourceData = hot.getSourceData();
+                const saveData = sourceData.filter(r => r.UserId > 0).map(r => ({
+                    UserId: r.UserId,
+                    TaxableIncome: parseFloat(r.ThuNhapChiuThue) || 0,
+                    IncomeTaxAmount: parseFloat(r.ThuePhaiNop) || 0
+                }));
+
+                $(this).prop('disabled', true).html('<i class="fas fa-spinner fa-spin me-1"></i>Đang lưu...');
+
+                $.ajax({
+                    url: '/PhuTro/SavePhuTroTNCN',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({ Month: month, Year: year, Data: saveData }),
+                    complete: function () {
+                        $('#btnSaveTNCN').prop('disabled', false).html('<i class="fas fa-save me-1"></i>Lưu dữ liệu');
+                    }
+                });
+            });
+
+            function calculateHotHeight() {
+                const windowHeight = window.innerHeight;
+                const offset = 360;
+                return Math.max(windowHeight - offset, 400);
+            }
+
+
+
+            // ===== HIỂN THỊ CÔNG THỨC TRONG SEARCH-BOX =====
+            HandsontableFormula.init(hot, 'formulaInput', {
+                getFormula: function(row, col, value, hotInstance) {
+                    const colHeader = hotInstance.getColHeader(col);
+                    
+                    return `${value}`;
+                },
+                shouldShow: function(row, col, value) {
+                    return value != null && value !== '';
+                }
+            });
+        })();
+    </script>
+</div>

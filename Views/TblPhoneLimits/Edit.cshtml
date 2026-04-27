@@ -1,0 +1,148 @@
+﻿@model PMS.Models.TblPhoneLimit
+
+@{
+    ViewData["Title"] = "Chỉnh sửa định mức điện thoại";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@using (Html.BeginForm("Edit", "TblPhoneLimits", FormMethod.Post))
+{
+    @Html.AntiForgeryToken()
+    @Html.HiddenFor(model => model.Id)
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title">Thông tin định mức điện thoại</h4>
+                    <h6 class="card-subtitle text-muted mb-3">
+                        Lưu ý: <span class="text-danger">*</span> là các trường bắt buộc
+                    </h6>
+
+                    @Html.ValidationSummary(true, "", new { @class = "alert alert-danger" })
+
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <div class="form-group">
+                                <div class="boldText">Chức vụ:<code>*</code></div>
+                                @Html.DropDownListFor(model => model.PosionId, ViewBag.PosionId as SelectList, "-- Chọn chức vụ --", new { @class = "form-control" })
+                                @Html.ValidationMessageFor(model => model.PosionId, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="form-group">
+                                <div class="boldText">Giá trị định mức:<code>*</code></div>
+                                
+                                @* Input hiển thị - có format dấu phẩy *@
+                                <input type="text" 
+                                       id="ValueLimit_Display" 
+                                       class="form-control" 
+                                       inputmode="numeric"
+                                       placeholder="Nhập giá trị định mức"
+                                       data-number-format="true"
+                                       data-target="ValueLimit"
+                                       value="@Model.ValueLimit" />
+                                
+                                @* Input thực sự để submit - ẩn đi *@
+                                @Html.HiddenFor(model => model.ValueLimit)
+                                
+                                @Html.ValidationMessageFor(model => model.ValueLimit, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <div class="form-group">
+                                <div class="boldText">Ngày bắt đầu:<code>*</code></div>
+                                @* Sử dụng TextBoxFor với value được format rõ ràng *@
+                                @Html.TextBoxFor(model => model.StartDate, "{0:yyyy-MM-dd}", new
+                                    {
+                                        @class = "form-control",
+                                        @type = "date",
+                                        @readonly = "readonly"
+                                    })
+                                @Html.ValidationMessageFor(model => model.StartDate, "", new { @class = "text-danger" })
+                                <small class="text-muted">Ngày bắt đầu không thể thay đổi</small>
+                            </div>
+                        </div>
+                        @* <div class="col-lg-6">
+                            <div class="form-group">
+                                <div class="boldText">Ngày kết thúc:</div>
+                                Xử lý EndDate có thể null
+                                <input type="date" name="EndDate" class="form-control"
+                                       value="@(Model.EndDate?.ToString("yyyy-MM-dd") ?? "")" />
+                                @Html.ValidationMessageFor(model => model.EndDate, "", new { @class = "text-danger" })
+                                <small class="text-muted">Để trống nếu định mức vẫn đang hoạt động</small>
+                            </div>
+                        </div> *@
+                    </div>
+
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <div class="form-group">
+                                <div class="boldText">Trạng thái:</div>
+                                @Html.DropDownListFor(model => model.Status, new List<SelectListItem>
+                            {
+                            new SelectListItem { Text = "Hoạt động", Value = "1", Selected = (Model.Status == 1) },
+                            new SelectListItem { Text = "Ngưng hoạt động", Value = "0", Selected = (Model.Status == 0) }
+                            }, new { @class = "form-control" })
+                                @Html.ValidationMessageFor(model => model.Status, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="form-group">
+                                <div class="boldText">Ghi chú:</div>
+                                @Html.TextAreaFor(model => model.Note, new { @class = "form-control", rows = "4", placeholder = "Nhập ghi chú" })
+                                @Html.ValidationMessageFor(model => model.Note, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary waves-effect waves-light m-r-10">
+                        <i class="fa fa-save"></i> Lưu thay đổi
+                    </button>
+                    @Html.ActionLink("Quay lại", "Index", null, new { @class = "btn btn-secondary" })
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script src="~/js/number-formatter.js"></script>
+    <script>
+        // Debug và đảm bảo sync trước khi submit
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.querySelector('form');
+            const displayInput = document.getElementById('ValueLimit_Display');
+            const hiddenInput = document.getElementById('ValueLimit');
+            
+            if (form && displayInput && hiddenInput) {
+                form.addEventListener('submit', function(e) {
+                    // Đảm bảo sync lần cuối trước khi submit
+                    if (displayInput.value) {
+                        const rawValue = displayInput.value.replace(/,/g, '');
+                        hiddenInput.value = rawValue;
+                        
+                        // Debug log
+                        console.log('Display Input:', displayInput.value);
+                        console.log('Hidden Input:', hiddenInput.value);
+                        console.log('Raw Value:', rawValue);
+                    }
+                    
+                    // Kiểm tra nếu hidden input vẫn rỗng
+                    if (!hiddenInput.value || hiddenInput.value === '0') {
+                        alert('Vui lòng nhập giá trị định mức!');
+                        e.preventDefault();
+                        return false;
+                    }
+                });
+            }
+        });
+    </script>
+}

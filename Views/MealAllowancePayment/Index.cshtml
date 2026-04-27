@@ -1,0 +1,760 @@
+@{
+    ViewData["Title"] = "QUẢN LÝ CHI TIỀN ĂN CA";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/handsontable@14.3.0/dist/handsontable.full.min.css" />
+<style>
+    /* Rút ngắn chiều ngang combobox tháng, năm */
+    #selectMonth { width: 50px; }
+    #selectYear { width: 100px; }
+    @@media (max-width: 576px) {
+        #selectMonth { width: 50px; }
+        #selectYear { width: 90px; }
+    }
+    
+    /* Tăng font-size và màu chữ */
+    .handsontable td {
+        color: #333333 !important;
+        font-size: 14px !important;
+        white-space: nowrap !important;
+    }
+    .handsontable span.colHeader {
+        color: #333333 !important;
+        font-weight: 700 !important;
+    }
+    
+    /* Ẩn scrollbar dọc của Handsontable, giữ scrollbar ngang ở dưới */
+    #mealAllowanceHot .wtHolder {
+        overflow-x: auto !important;
+        overflow-y: visible !important;
+        height: auto !important;
+    }
+    #mealAllowanceHot .ht_master .wtHolder {
+        overflow-x: auto !important;
+        overflow-y: visible !important;
+    }
+    /* Ẩn scrollbar của header clone - chỉ giữ 1 scroll ở dưới */
+    #mealAllowanceHot .ht_clone_top .wtHolder {
+        overflow: hidden !important;
+    }
+    
+    /* Đặc biệt cho cột "Số công hưởng ăn ca" */
+    .handsontable .htCore td[data-column="4"],
+    .handsontable .htCore td[data-column="5"],
+    .handsontable .htCore td[data-column="6"],
+    .handsontable .htCore td[data-column="7"] {
+        text-align: center;
+        vertical-align: middle;
+    }
+</style>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+
+                <!-- Bộ lọc -->
+                <div class="row align-items-center mt-2 mb-2">
+                    <div class="col-auto d-flex align-items-center mr-3 mb-2">
+                        <label class="fw-bold me-3 mb-0" style="min-width: 90px;">Chọn tháng:</label>
+                        <select class="form-control form-select-sm" id="selectMonth" style="width:80px;">
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                            <option value="5">5</option>
+                            <option value="6">6</option>
+                            <option value="7">7</option>
+                            <option value="8">8</option>
+                            <option value="9">9</option>
+                            <option value="10">10</option>
+                            <option value="11">11</option>
+                            <option value="12">12</option>
+                        </select>
+                    </div>
+                    <div class="col-auto d-flex align-items-center mr-3 mb-2">
+                        <label class="fw-bold me-3 mb-0" style="min-width: 90px;">Chọn năm:</label>
+                        <select class="form-control form-select-sm" id="selectYear">
+                            @if (ViewBag.AvailableYears != null)
+                            {
+                                foreach (int year in ViewBag.AvailableYears)
+                                {
+                                    if (year == ViewBag.DefaultYear)
+                                    {
+                                        <option value="@year" selected>@year</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="@year">@year</option>
+                                    }
+                                }
+                            }
+                        </select>
+                    </div>
+                    <div class="col-auto d-flex align-items-center mb-2">
+                        <label class="fw-bold me-3 mb-0" style="min-width: 120px;">Chọn phòng ban:</label>
+                        <select class="form-control form-select-sm" id="selectPhongBan">
+                            <option value="0">-- Tất cả --</option>
+                            @if (ViewBag.Departments != null)
+                            {
+                                foreach (var dept in ViewBag.Departments)
+                                {
+                                    <option value="@dept.Id">@dept.Name</option>
+                                }
+                            }
+                        </select>
+                    </div>
+                    <div class="col-auto d-flex align-items-center mb-2 ms-auto">
+                        <button id="btnExportExcel" class="btn btn-primary" title="Xuất dữ liệu">
+                            <i class="fa fa-download"></i> Xuất Excel
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Bảng Handsontable -->
+                <div class="table-responsive mt-3" id="mealAllowanceHotWrapper" style="overflow:visible;">
+                    <div id="mealAllowanceHot"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/handsontable@14.3.0/dist/handsontable.full.min.js"></script>
+<script src="~/js/handsontable-formula.js?v=2.1"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        let hot = null;
+        let currentData = [];
+
+        // Load data when filters change
+        function loadMealAllowanceData() {
+            const year = parseInt($('#selectYear').val()) || @ViewBag.DefaultYear;
+            const month = parseInt($('#selectMonth').val()) || 1;
+            const department = parseInt($('#selectPhongBan').val()) || 0;
+
+            console.log('Loading data for:', { year, month, department });
+
+            $.ajax({
+                url: '/MealAllowancePayment/LoadMealAllowanceData',
+                type: 'GET',
+                data: { nam: year, thang: month, phongBan: department },
+                success: function(response) {
+                    if (response.success) {
+                        currentData = response.data;
+                        renderMealAllowanceTable(month, year);
+                    } else {
+                        showUpdateNotification('error', response.message || 'Lỗi khi tải dữ liệu');
+                    }
+                },
+                error: function(xhr, status, error) {
+                    showUpdateNotification('error', 'Lỗi kết nối: ' + error);
+                }
+            });
+        }
+
+        function renderMealAllowanceTable(selectedMonth, selectedYear) {
+            const container = document.getElementById('mealAllowanceHot');
+            
+            // Hàm format số với dấu chấm ngăn cách hàng nghìn
+            function formatNumber(num) {
+                if (num === null || num === undefined || num === '' || num === 0) {
+                    return '';
+                }
+                return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+            }
+
+            // Lấy thông tin MealAllowanceQuota từ ViewBag
+            const mealAllowanceQuotas = @Html.Raw(Json.Serialize(ViewBag.MealAllowanceQuotas));
+            
+            // Tạo headers động từ MealAllowanceQuota (chia đôi description)
+            const mealAllowanceHeaders = mealAllowanceQuotas.map(q => {
+                const description = q.description;
+                const midPoint = Math.ceil(description.length / 2);
+                
+                // Tìm vị trí khoảng trắng gần điểm giữa nhất
+                let breakPoint = midPoint;
+                
+                // Tìm khoảng trắng trước điểm giữa
+                for (let i = midPoint; i >= 0; i--) {
+                    if (description[i] === ' ') {
+                        breakPoint = i;
+                        break;
+                    }
+                }
+                
+                // Nếu không tìm thấy khoảng trắng trước, tìm sau
+                if (breakPoint === midPoint) {
+                    for (let i = midPoint; i < description.length; i++) {
+                        if (description[i] === ' ') {
+                            breakPoint = i;
+                            break;
+                        }
+                    }
+                }
+                
+                // Chia description tại vị trí tìm được
+                if (breakPoint > 0 && breakPoint < description.length) {
+                    return description.substring(0, breakPoint) + '<br/>' + description.substring(breakPoint + 1);
+                }
+                
+                return description; // Giữ nguyên nếu không chia được
+            });
+            
+            // Nested headers - 2 levels
+            const nestedHeaders = [
+                [
+                    'TT', 
+                    'Họ và tên', 
+                    'Mã nhân viên', 
+                    'Số TK',
+                    ...mealAllowanceHeaders, // Sử dụng headers động
+                    { label: 'Các khoản chế độ khác', colspan: 3 },
+                    'Tổng lĩnh',
+                    'Ghi chú'
+                ],
+                [
+                    '', '', '', '',
+                    ...Array(mealAllowanceHeaders.length).fill(''), // Empty headers cho MealAllowance
+                    'Ăn ca',
+                    'Ca đêm',
+                    'Thêm giờ',
+                    '',
+                    ''
+                ]
+            ];
+
+            const baseColumnCount = 4; // TT, Họ tên, Mã NV, Số TK
+            const mealAllowanceColumnCount = mealAllowanceHeaders.length; // Số cột MealAllowance động
+            const otherColumnCount = 5; // Ăn ca, Ca đêm, Thêm giờ, Tổng lĩnh, Ghi chú
+            const totalColCount = baseColumnCount + mealAllowanceColumnCount + otherColumnCount;
+
+            const columns = [];
+
+            // Base columns with dark color styling
+            columns.push({ 
+                data: 0, 
+                type: 'numeric', 
+                width: 60, 
+                readOnly: true,
+                renderer: function (instance, td, row, col, prop, value, cellProperties) {
+                    td.style.color = '#333';
+                    td.style.textAlign = 'center';
+                    td.innerHTML = value || '';
+                }
+            });
+            columns.push({ 
+                data: 1, 
+                type: 'text', 
+                width: 180, 
+                readOnly: true,
+                renderer: function (instance, td, row, col, prop, value, cellProperties) {
+                    const dataAtRow = instance.getDataAtRow(row);
+                    // Kiểm tra nếu là group row thì đã có styling trong cells function
+                    if (!(dataAtRow && dataAtRow[1] && dataAtRow[0] === '' && dataAtRow[2] === '')) {
+                        td.style.color = '#333';
+                    }
+                    td.innerHTML = value || '';
+                }
+            });
+            columns.push({ 
+                data: 2, 
+                type: 'text', 
+                readOnly: true,
+                renderer: function (instance, td, row, col, prop, value, cellProperties) {
+                    td.style.color = '#333';
+                    td.style.textAlign = 'center';
+                    td.innerHTML = value || '';
+                }
+            });
+            columns.push({ 
+                data: 3, 
+                type: 'text', 
+                width: 120, 
+                readOnly: true,
+                renderer: function (instance, td, row, col, prop, value, cellProperties) {
+                    td.style.color = '#333';
+                    td.style.textAlign = 'center';
+                    td.innerHTML = value || '';
+                }
+            });
+
+            // Data columns
+            for (let i = baseColumnCount; i < totalColCount; i++) {
+                let columnWidth = 55; // Default width
+                let isReadOnly = false; // Mặc định cho phép sửa
+                
+                // Thu nhỏ cột "Số công hưởng ăn ca" (cột MealAllowance)
+                const mealAllowanceStart = baseColumnCount;
+                const mealAllowanceEnd = baseColumnCount + mealAllowanceColumnCount - 1;
+                if (i >= mealAllowanceStart && i <= mealAllowanceEnd) {
+                    columnWidth = 35; // Giảm từ 40 xuống 35 để tiết kiệm không gian
+                    
+                    // Cột 1 và Cột 2 là readOnly (tự động từ DailyAttendance)
+                    if (i === baseColumnCount || i === baseColumnCount + 1) {
+                        isReadOnly = true;
+                    }
+                }
+                
+                // 3 cột "Ăn ca", "Ca đêm", "Thêm giờ" có chiều dài giống nhau
+                const otherStart = baseColumnCount + mealAllowanceColumnCount;
+                const otherEnd = otherStart + 2; // Ăn ca, Ca đêm, Thêm giờ
+                if (i >= otherStart && i <= otherEnd) {
+                    columnWidth = 105; // Tăng lên 105px để hiển thị đủ số lớn
+                    isReadOnly = true; // Không cho nhập - tính tự động
+                }
+                
+                // Cột "Tổng lĩnh" cũng readonly (tính tự động) và cần width lớn hơn
+                if (i === otherStart + 3) {
+                    columnWidth = 115; // Tổng lĩnh rộng nhất (115px)
+                    isReadOnly = true;
+                }
+                
+                // Cột "Ghi chú" (cột cuối) là text, không phải numeric
+                const isNoteColumn = (i === totalColCount - 1);
+                
+                columns.push({
+                    data: i,
+                    type: isNoteColumn ? 'text' : 'numeric',
+                    numericFormat: isNoteColumn ? undefined : { pattern: '0' },
+                    allowInvalid: false,
+                    width: isNoteColumn ? 150 : columnWidth,
+                    readOnly: isReadOnly, // Cột 1 và 2 readOnly, còn lại cho phép sửa
+                    renderer: function (instance, td, row, col, prop, value, cellProperties) {
+                        // Cột Ghi chú - hiển thị text bình thường
+                        if (isNoteColumn) {
+                            td.innerHTML = value || '';
+                            td.style.textAlign = 'left';
+                            td.style.padding = '4px 8px';
+                            return;
+                        }
+                        
+                        // Ẩn giá trị 0 hoặc null - chỉ hiển thị khi có giá trị > 0
+                        if (value === null || value === undefined || value === 0 || value === '0' || value === '') {
+                            td.innerHTML = '';
+                            td.style.textAlign = 'center';
+                        } else {
+                            // Cho phép xuống dòng cho cột "Số công hưởng ăn ca"
+                            if (i >= mealAllowanceStart && i <= mealAllowanceEnd) {
+                                td.style.wordWrap = 'break-word';
+                                td.style.whiteSpace = 'normal';
+                                td.style.lineHeight = '1.2';
+                                td.style.fontSize = '13px';
+                                // Không format số cho cột số công (20, 22...)
+                                td.innerHTML = value;
+                            } else {
+                                // Format số với dấu chấm cho các cột tiền (Ăn ca, Ca đêm, Thêm giờ, Tổng lĩnh)
+                                td.innerHTML = formatNumber(value);
+                            }
+                            td.style.textAlign = 'center';
+                            td.style.verticalAlign = 'middle';
+                        }
+                        
+                        // Thêm style cho cột readOnly (màu xám nhạt)
+                        if (isReadOnly) {
+                            td.style.backgroundColor = '#f5f5f5';
+                            td.style.color = '#666';
+                        }
+                    }
+                });
+            }
+
+            // Convert data to table format
+            const tableData = [];
+            let stt = 1;
+
+            if (currentData && currentData.length > 0) {
+                let globalIndex = 1;
+                currentData.forEach(dept => {
+                    // Thêm dòng nhóm phòng ban
+                    tableData.push(makeGroupRow(dept.departmentName, totalColCount));
+                    
+                    // Thêm dòng nhân viên
+                    if (dept.employees && dept.employees.length > 0) {
+                        dept.employees.forEach(emp => {
+                            const row = makeEmployeeRow(globalIndex++, emp);
+                            tableData.push(row);
+                        });
+                    }
+                });
+            }
+
+            // Hàm tạo dòng nhóm (in nghiêng, màu xanh)
+            function makeGroupRow(label, totalColCount) {
+                const row = new Array(totalColCount).fill('');
+                row[1] = label;
+                return row;
+            }
+
+            function makeEmployeeRow(index, employee) {
+                const row = new Array(totalColCount).fill('');
+                row[0] = index;
+                row[1] = employee.fullName || '';
+                row[2] = employee.userCode || '';
+                row[3] = employee.accountNumber || '';
+                
+                // Điền dữ liệu MealAllowance theo thứ tự OrderNumber
+                row[baseColumnCount] = employee.loai1 || 0;     // OrderNumber 1
+                row[baseColumnCount + 1] = employee.loai2 || 0; // OrderNumber 2
+                row[baseColumnCount + 2] = employee.loai3 || 0; // OrderNumber 3
+                row[baseColumnCount + 3] = employee.loai4 || 0; // OrderNumber 4
+                
+                // Điền dữ liệu các khoản khác
+                const otherStart = baseColumnCount + mealAllowanceColumnCount;
+                row[otherStart] = employee.mealCa || 0;           // Ăn ca
+                row[otherStart + 1] = employee.nightShift || 0;   // Ca đêm
+                row[otherStart + 2] = employee.overtime || 0;     // Thêm giờ
+                row[otherStart + 3] = employee.totalAmount || 0;  // Tổng lĩnh
+                row[otherStart + 4] = employee.notes || '';       // Ghi chú
+
+                return row;
+            }
+
+            // Destroy existing table if exists
+            if (hot) {
+                hot.destroy();
+            }
+
+            hot = new Handsontable(container, {
+                data: tableData,
+                columns: columns,
+                nestedHeaders: nestedHeaders,
+                colHeaders: false,
+                rowHeaders: false,
+                height: 'auto',  // Sử dụng scroll dọc của web
+                width: '100%',
+                stretchH: 'none',
+                autoColumnSize: true,
+                manualColumnFreeze: true,
+                manualColumnMove: true,
+                fixedColumnsLeft: 4,
+                contextMenu: {
+                    items: {
+                        row_above: {},
+                        row_below: {},
+                        hsep1: '---------',
+                        freeze_column: { name: 'Cố định cột' },
+                        unfreeze_column: { name: 'Bỏ cố định cột' },
+                        hsep2: '---------',
+                        undo: {},
+                        redo: {},
+                        clear_custom: {
+                            name: 'Xóa nội dung các ô đã chọn',
+                            callback() {
+                                hot.emptySelectedCells();
+                            }
+                        }
+                    }
+                },
+                filters: false,
+                dropdownMenu: false,
+                licenseKey: 'non-commercial-and-evaluation',
+
+                // Tô style cho dòng nhóm
+                cells: function (row, col) {
+                    const cellProperties = {};
+                    const dataAtRow = this.instance.getDataAtRow(row);
+                    // Nếu dòng là dòng nhóm (chỉ có cột 1 có chữ, cột 0 và 2 trống)
+                    if (dataAtRow && dataAtRow[1] && dataAtRow[0] === '' && dataAtRow[2] === '') {
+                        cellProperties.readOnly = true;
+                        cellProperties.renderer = function (instance, td, row, col, prop, value, cellProperties) {
+                            td.style.fontStyle = 'italic';
+                            td.style.color = 'blue';
+                            td.style.fontWeight = 'bold';
+                            td.style.background = '#f0f8ff';
+                            td.innerHTML = value || '';
+                        };
+                    }
+                    return cellProperties;
+                },
+                afterChange: function(changes, source) {
+                    if (source === 'edit' && changes) {
+                        changes.forEach(function([row, prop, oldVal, newVal]) {
+                            if (oldVal !== newVal && prop >= baseColumnCount && prop < totalColCount) {
+                                const employee = tableData[row];
+                                
+                                // Bỏ qua dòng nhóm (group rows)
+                                if (employee && employee[1] && employee[0] === '' && employee[2] === '') {
+                                    return;
+                                }
+                                
+                                const userId = currentData.flatMap(d => d.employees).find(e => e.fullName === employee[1])?.userId;
+                                
+                                if (userId) {
+                                    // Tính field type từ column index
+                                    let fieldType = '';
+                                    
+                                    if (prop >= baseColumnCount && prop < baseColumnCount + mealAllowanceColumnCount) {
+                                        // Cột MealAllowance
+                                        const mealAllowanceIndex = prop - baseColumnCount;
+                                        const fieldTypes = ['loai1', 'loai2', 'loai3', 'loai4'];
+                                        fieldType = fieldTypes[mealAllowanceIndex] || '';
+                                    } else if (prop >= baseColumnCount + mealAllowanceColumnCount) {
+                                        // Cột các khoản khác
+                                        const otherIndex = prop - (baseColumnCount + mealAllowanceColumnCount);
+                                        const otherFieldTypes = ['mealCa', 'nightShift', 'overtime', 'totalAmount', 'notes'];
+                                        fieldType = otherFieldTypes[otherIndex] || '';
+                                    }
+                                    
+                                    if (fieldType) {
+                                        // Gọi API cập nhật
+                                        updateMealAllowanceData(userId, selectedMonth, selectedYear, fieldType, newVal);
+                                    }
+                                }
+                            }
+                        });
+                    }
+                }
+            });
+
+            // ===== KHỞI TẠO TOOLTIP CÔNG THỨC =====
+            HandsontableFormula.init(hot, null, {
+                getFormula: function(row, col, value, hotInstance) {
+                    const baseColumnCount = 4;
+                    const mealAllowanceColumnCount = mealAllowanceHeaders.length;
+                    const otherStart = baseColumnCount + mealAllowanceColumnCount;
+                    
+                    // Công thức cho các cột MealAllowance (Số công hưởng ăn ca)
+                    if (col >= baseColumnCount && col < baseColumnCount + mealAllowanceColumnCount) {
+                        const mealIndex = col - baseColumnCount;
+                        return `= Số công ${mealAllowanceHeaders[mealIndex].replace('<br/>', ' ')}`;
+                    }
+                    // Công thức cho Ăn ca
+                    else if (col === otherStart) {
+                        return `= Tổng (Số công × Đơn giá) của tất cả loại ăn ca`;
+                    }
+                    // Công thức cho Ca đêm
+                    else if (col === otherStart + 1) {
+                        return `= Tiền ca đêm`;
+                    }
+                    // Công thức cho Thêm giờ
+                    else if (col === otherStart + 2) {
+                        return `= Tiền thêm giờ`;
+                    }
+                    // Công thức cho Tổng lĩnh
+                    else if (col === otherStart + 3) {
+                        return `= Ăn ca + Ca đêm + Thêm giờ`;
+                    }
+                    
+                    return `= ${value}`;
+                },
+                shouldShow: function(row, col, value, hotInstance) {
+                    // Không hiển thị cho cột TT, Họ tên, Mã NV, Số TK
+                    if (col < 4) return false;
+                    
+                    // Không hiển thị cho cột Ghi chú (cột cuối)
+                    const totalColCount = hotInstance.countCols();
+                    if (col === totalColCount - 1) return false;
+                    
+                    // Hiển thị cho các cột còn lại (bao gồm cả Tổng lĩnh)
+                    return true;
+                }
+            });
+        }
+
+        // Hàm parse số - loại bỏ dấu chấm ngăn cách
+        function parseNumber(value) {
+            if (value === null || value === undefined || value === '') {
+                return 0;
+            }
+            // Loại bỏ tất cả dấu chấm (.) trước khi parse
+            const cleanValue = value.toString().replace(/\./g, '');
+            return parseFloat(cleanValue) || 0;
+        }
+        
+        // Hàm cập nhật dữ liệu
+        function updateMealAllowanceData(userId, month, year, fieldType, value) {
+            const requestData = {
+                userId: userId,
+                month: month,
+                year: year,
+                fieldType: fieldType,
+                value: parseNumber(value)
+            };
+
+            $.ajax({
+                url: '/MealAllowancePayment/UpdateMealAllowance',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(requestData),
+                success: function(response) {
+                    if (response.success) {
+                        showUpdateNotification('success', 'Đã cập nhật chi tiền ăn ca!');
+                        
+                        // Nếu cập nhật loại 1-4, cập nhật lại cột Ăn ca và Tổng lĩnh
+                        if (response.updatedValues && ['loai1', 'loai2', 'loai3', 'loai4'].includes(response.updatedValues.fieldType)) {
+                            updateUIAfterMealAllowanceChange(userId, response.updatedValues);
+                        }
+                    } else {
+                        showUpdateNotification('error', response.message);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    showUpdateNotification('error', 'Lỗi kết nối: ' + error);
+                }
+            });
+        }
+
+        // Hàm cập nhật UI sau khi thay đổi loại 1-4
+        function updateUIAfterMealAllowanceChange(userId, updatedValues) {
+            try {
+                // Tìm dòng của user trong table
+                if (!hot) {
+                    return;
+                }
+                
+                const data = hot.getData();
+                
+                // Tìm user trong currentData trước
+                let targetUser = null;
+                for (let dept of currentData) {
+                    for (let emp of dept.employees) {
+                        if (emp.userId === userId) {
+                            targetUser = emp;
+                            break;
+                        }
+                    }
+                    if (targetUser) break;
+                }
+                
+                if (!targetUser) {
+                    return;
+                }
+                
+                // Tìm dòng trong table theo fullName
+                for (let row = 0; row < data.length; row++) {
+                    const rowData = data[row];
+                    
+                    // Bỏ qua dòng nhóm (group rows) - dòng có cột đầu tiên rỗng hoặc không có tên
+                    if (!rowData[1] || rowData[1].trim() === '') {
+                        continue;
+                    }
+                    
+                    if (rowData[1] === targetUser.fullName) {
+                        // Tính toán vị trí cột dựa trên cấu trúc hiện tại
+                        const baseColumnCount = 4; // TT, Họ tên, Mã NV, Số TK
+                        
+                        // Lấy mealAllowanceHeaders từ ViewBag (tạo lại như trong renderMealAllowanceTable)
+                        const mealAllowanceQuotas = @Html.Raw(Json.Serialize(ViewBag.MealAllowanceQuotas));
+                        const mealAllowanceHeaders = mealAllowanceQuotas.map(q => {
+                            const description = q.description;
+                            const midPoint = Math.ceil(description.length / 2);
+                            
+                            // Tìm vị trí khoảng trắng gần điểm giữa nhất
+                            let breakPoint = midPoint;
+                            
+                            // Tìm khoảng trắng trước điểm giữa
+                            for (let i = midPoint; i >= 0; i--) {
+                                if (description[i] === ' ') {
+                                    breakPoint = i;
+                                    break;
+                                }
+                            }
+                            
+                            // Nếu không tìm thấy khoảng trắng trước, tìm sau
+                            if (breakPoint === midPoint) {
+                                for (let i = midPoint; i < description.length; i++) {
+                                    if (description[i] === ' ') {
+                                        breakPoint = i;
+                                        break;
+                                    }
+                                }
+                            }
+                            
+                            // Chia description tại vị trí tìm được
+                            if (breakPoint > 0 && breakPoint < description.length) {
+                                return description.substring(0, breakPoint) + '<br/>' + description.substring(breakPoint + 1);
+                            }
+                            
+                            return description; // Giữ nguyên nếu không chia được
+                        });
+                        
+                        const mealAllowanceColumnCount = mealAllowanceHeaders.length; // Số cột MealAllowance
+                        
+                        // Cột "Ăn ca" là cột đầu tiên trong "Các khoản khác"
+                        const mealCaColumn = baseColumnCount + mealAllowanceColumnCount;
+                        
+                        // Cột "Tổng lĩnh" là cột thứ 4 trong "Các khoản khác" (Ăn ca, Ca đêm, Thêm giờ, Tổng lĩnh)
+                        const totalAmountColumn = baseColumnCount + mealAllowanceColumnCount + 3;
+                        
+                        // Cập nhật cột Ăn ca
+                        hot.setDataAtCell(row, mealCaColumn, updatedValues.mealCa || 0);
+                        
+                        // Tính lại Tổng lĩnh = Ăn ca + Ca đêm + Thêm giờ (từ giá trị hiện tại trên giao diện)
+                        const currentMealCa = updatedValues.mealCa || 0;
+                        const currentNightShift = parseFloat(rowData[mealCaColumn + 1]) || 0; // Ca đêm
+                        const currentOvertime = parseFloat(rowData[mealCaColumn + 2]) || 0; // Thêm giờ
+                        const newTotalAmount = currentMealCa + currentNightShift + currentOvertime;
+                        
+                        // Cập nhật cột Tổng lĩnh với giá trị tính lại
+                        hot.setDataAtCell(row, totalAmountColumn, newTotalAmount);
+                        
+                        break;
+                    }
+                }
+            } catch (error) {
+                // Silent error handling
+            }
+        }
+
+        // Hàm hiển thị thông báo cập nhật
+        function showUpdateNotification(type, message) {
+            const alertClass = type === 'success' ? 'alert-success' : 'alert-danger';
+            const icon = type === 'success' ? 'fa-check-circle' : 'fa-exclamation-triangle';
+
+            var html = '<div class="alert ' + alertClass + ' alert-dismissible fade show update-notification" role="alert" style="position: fixed; top: 20px; right: 20px; z-index: 99999; min-width: 300px;">'
+                + '<i class="fa ' + icon + '"></i> ' + message
+                + '<button type="button" class="close" data-dismiss="alert">'
+                + '<span>&times;</span>'
+                + '</button>'
+                + '</div>';
+            const notification = $(html);
+
+            $('body').append(notification);
+
+            // Tự động ẩn sau 3 giây
+            setTimeout(() => {
+                notification.alert('close');
+            }, 3000);
+        }
+
+        // Hàm tính chiều cao phù hợp
+        function calculateHotHeight() {
+            const windowHeight = window.innerHeight;
+            const offset = 290; // Trừ phần header, filter, padding, navbar, ...
+            const calculated = windowHeight - offset;
+            return Math.max(calculated, 320); // Tối thiểu 320px
+        }
+
+        // Event listeners cho filter changes
+        $('#selectMonth, #selectYear, #selectPhongBan').on('change', function() {
+            loadMealAllowanceData();
+        });
+
+        // Export Excel
+        document.getElementById('btnExportExcel').addEventListener('click', function () {
+            const year = parseInt($('#selectYear').val()) || @ViewBag.DefaultYear;
+            const month = parseInt($('#selectMonth').val()) || 1;
+            const department = parseInt($('#selectPhongBan').val()) || 0;
+            
+            const url = `/MealAllowancePayment/ExportMealAllowance?nam=${year}&thang=${month}&phongBan=${department}`;
+            window.location.href = url;
+        });
+
+
+
+        // Set default month to current month on first load
+        (function setDefaultMonth() {
+            const now = new Date();
+            const currentMonth = now.getMonth() + 1; // 1..12
+            const $m = $('#selectMonth');
+            if ($m.length) {
+                $m.val(String(currentMonth));
+            }
+        })();
+
+        // Load data khi page ready
+        loadMealAllowanceData();
+    });
+</script>

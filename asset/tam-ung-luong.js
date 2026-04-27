@@ -117,8 +117,8 @@
     return [
       { data:0,  readOnly:true, type:'text',    width:35,  className:'htCenter htMiddle' },
       { data:1,  readOnly:true, type:'text',    width:138, className:'htLeft   htMiddle' },
-      { data:2,  readOnly:true, type:'text',    width:118, className:'htLeft   htMiddle' },
-      { data:3,  readOnly:true, type:'text',    width:100, className:'htLeft   htMiddle' },
+      { data:2,  readOnly:true, type:'text',    width:118, className:'htCenter htMiddle' },
+      { data:3,  readOnly:true, type:'text',    width:100, className:'htCenter htMiddle' },
       { data:4,  type:'numeric', numericFormat:{pattern:'0.000'}, width:44, className:'htCenter htMiddle' },
       { data:5,  type:'numeric', numericFormat:{pattern:'0.000'}, width:44, className:'htCenter htMiddle' },
       { data:6,  readOnly:true, type:'numeric', numericFormat:{pattern:'0.000'}, width:46, className:'htCenter htMiddle' },
@@ -130,7 +130,7 @@
       { data:12, type:'numeric', numericFormat:{pattern:'0,0'},   width:72,  className:'htRight  htMiddle' },
       { data:13, type:'numeric', numericFormat:{pattern:'0,0'},   width:72,  className:'htRight  htMiddle' },
       { data:14, readOnly:true, type:'numeric', numericFormat:{pattern:'0,0'},   width:100, className:'htRight  htMiddle tu-total' },
-      { data:15, type:'text',    width:90,  className:'htLeft   htMiddle' },
+      { data:15, type:'text',    width:90,  className:'htCenter htMiddle' },
     ];
   }
 
@@ -213,7 +213,10 @@
         const props = {};
         const classes = [];
         if (row % 2 === 0) classes.push('tu-even-row');
-        if (col === 0)  classes.push('htCenter', 'htMiddle');
+        if (col === 1)  classes.push('htLeft');
+        if (col === 0 || col === 2 || col === 3 || col === 4 || col === 5 || col === 6 || col === 15) classes.push('htCenter');
+        if (col >= 7 && col <= 14) classes.push('htRight');
+        classes.push('htMiddle');
         if (col === 14) classes.push('tu-total');
         if (classes.length) props.className = classes.join(' ');
         return props;

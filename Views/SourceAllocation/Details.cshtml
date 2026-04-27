@@ -1,0 +1,48 @@
+﻿@model IEnumerable<TblSoureAllocation>
+
+@{
+    ViewData["Title"] = "Source Allocation";
+    Layout = "_Layout";
+}
+
+<div class="card">
+    <div class="card-header">
+        <h3 class="card-title">Danh sách Source Allocation</h3>
+    </div>
+    <div class="card-body">
+        <table class="table table-bordered table-striped">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Tháng</th>
+                    <th>Năm</th>
+                    <th>Ngân sách nhân viên</th>
+                    <th>Ngân sách quản lý</th>
+                    <th>Người tạo</th>
+                    <th>Ngày tạo</th>
+                    <th>Thao tác</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>@item.Id</td>
+                        <td>@item.MonthNumber</td>
+                        <td>@item.BudgetPlan?.Year</td>
+                        <td>@item.MonthEmployee.ToString("N0")</td>
+                        <td>@item.MonthManager.ToString("N0")</td>
+                        <td>@item.CreatedUser</td>
+                        <td>@item.CreatedDate.ToString("dd/MM/yyyy")</td>
+                        <td>
+                            <a href="@Url.Action("Details", new { id = item.Id })"
+                               class="btn btn-info btn-sm">
+                                <i class="fas fa-eye"></i> Chi tiết
+                            </a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

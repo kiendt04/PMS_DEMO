@@ -1,0 +1,407 @@
+﻿@model IEnumerable<PMS.Models.TblSoureAllocation>
+
+@{
+    ViewData["Title"] = "DANH MỤC PHÂN NGUỒN";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    var currentYear = DateTime.Now.Year;
+    var selectedYear = ViewBag.SelectedYear != null ? ViewBag.SelectedYear : currentYear;
+    var budgetPlans = ViewBag.BudgetPlans as IEnumerable<PMS.Models.TblBudgetPlan> ?? Enumerable.Empty<PMS.Models.TblBudgetPlan>();
+    var availableYears = ViewBag.AvailableYears as IEnumerable<int> ?? new List<int> { currentYear };
+}
+
+<style>
+
+    .form-select {
+        width: 120px;
+        padding: 6px 10px;
+        border-radius: 6px;
+        border: 1px solid #ced4da;
+        background: #fff;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+        appearance: none;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+    }
+    
+
+</style>
+<div class="row">
+    <div class="col-12">
+        <div class="card mb-4">
+            <div class="card-body">
+                <h4 class="card-title mb-3">Nguồn chính theo năm</h4>
+
+                <div class="row align-items-center mb-3">
+                    <div class="col-md-10 col-sm-12 mb-2">
+                        <div class="d-flex align-items-center gap-2">
+                            <label class="fw-bold mb-0" style="">Chọn năm: </label>
+                            <select id="selectYearBudget" class="form-select form-select-sm" style="width:60px;">
+                                <option value="">Tất cả</option>
+                                @foreach (var y in availableYears)
+                                {
+                                    if (y == selectedYear)
+                                    {
+                                        <option value="@y" selected>@y</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="@y">@y</option>
+                                    }
+                                }
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="col-md-2 col-sm-12 text-end">
+                        <a class="btn btn-sm btn-primary me-2" href="@Url.Action("CreateAllcation", "SourceAllocation")" style="width:150px;">
+                            Thêm mới nguồn chính
+                        </a>
+                    </div>
+                </div>
+
+                <div class="table-responsive">
+                    <table id="budgetTable" class="table table-bordered table-striped">
+                        <thead>
+                            <tr>
+                                <th class="text-center">#</th>
+                                <th>Năm</th>
+                                <th class="text-end">Tổng ngân sách(VND)</th>
+                                <th class="text-end">Ngân sách nhân viên(VND)</th>
+                                <th class="text-end">Ngân sách quản lý(VND)</th>
+                                <th>Người tạo</th>
+                                <th>Ngày tạo</th>
+                                <th>Trạng thái</th>
+                                <th>Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (budgetPlans != null && budgetPlans.Any())
+                            {
+                                int i = 1;
+                                foreach (var item in budgetPlans.OrderBy(a => a.Year))
+                                {
+                                    <tr data-year="@item.Year">
+                                        <td class="text-center">@i</td>
+                                        <td>@item.Year</td>
+                                        <td class="text-end">@string.Format("{0:N0}", item.TotalBudget)</td>
+                                        <td class="text-end">@string.Format("{0:N0}", item.EmployeeBudget)</td>
+                                        <td class="text-end">@string.Format("{0:N0}", item.ManagerBudget)</td>
+                                        <td>@item.CreatedUser</td>
+                                        <td>@item.CreatedDate.ToString("dd/MM/yyyy")</td>
+                                        <td>
+                                            @if (item.Status == 1)
+                                            {
+                                                <span class="badge bg-success">Hoạt động</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-danger">Không hoạt động</span>
+                                            }
+                                        </td>
+                                        <td class="text-nowrap">
+                                            <a href="@Url.Action("Edit_v1", new { id = item.Id })" class="btn btn-sm btn-outline-success me-1" data-toggle="tooltip" data-original-title="Sửa">
+                                                <i class="fa fa-pencil"></i>
+                                            </a>
+                                            <form asp-action="Delete_v1" asp-route-id="@item.Id" method="post" class="d-inline" data-toggle="tooltip" data-original-title="Xóa" onsubmit="return confirm('Bạn có chắc chắn muốn xóa dữ liệu này không?');">
+                                                <button type="submit" class="btn btn-sm btn-outline-danger">
+                                                    <i class="fa fa-trash"></i>
+                                                </button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                    i++;
+                                }
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td colspan="9" class="text-center">Không có dữ liệu nguồn chính</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Phần: Phân nguồn theo tháng -->
+        <div class="card">
+            <div class="card-body">
+                <h4 class="card-title mb-3">Phân nguồn theo tháng</h4>
+
+                <div class="row align-items-center mb-3">
+                    <div class="col-md-10 col-sm-12 mb-2">
+                        <div class="row g-2 align-items-center">
+                            <div class="col-auto d-flex align-items-center">
+                                <label class="fw-bold me-2 mb-0" style="min-width:60px;">Chọn quý: </label>
+                                <select id="selectQuarterAlloc" class="form-select form-select-sm" style="width:60px;">
+                                    <option value="0">Tất cả</option>
+                                    <option value="1">Quý 1</option>
+                                    <option value="2">Quý 2</option>
+                                    <option value="3">Quý 3</option>
+                                    <option value="4">Quý 4</option>
+                                </select>
+                            </div>
+                            <div class="col-auto d-flex align-items-center">
+                                <label class="fw-bold me-2 mb-0" style="min-width:60px; border-radius: 8px">Chọn năm: </label>
+                                <select id="selectYearAlloc" class="form-select form-select-sm" style="width:60px;">
+                                    <option value="">Tất cả năm</option>
+                                    @foreach (var y in availableYears)
+                                    {
+                                        if (y == selectedYear)
+                                        {
+                                            <option value="@y" selected>@y</option>
+                                        }
+                                        else
+                                        {
+                                            <option value="@y">@y</option>
+                                        }
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-2 col-sm-12 text-end">
+                        <a class="btn btn-sm btn-primary me-2" href="@Url.Action("Create", "SourceAllocation")" style="width:150px;">Thêm mới phân nguồn</a>
+                    </div>
+                </div>
+
+                <div class="table-responsive">
+                    <table id="allocTable" class="table table-bordered table-striped">
+                        <thead>
+                            <tr>
+                                <th class="text-center">#</th>
+                                <th class="text-center">Năm</th>
+                                <th class="text-center">Quý</th>
+                                <th class="text-center">Tháng</th>
+                                <th class="text-end">NLĐ (VND)</th>
+                                <th class="text-end">NQL (VND)</th>
+                                <th class="text-end">Tổng(VND)</th>
+                                <th class="text-center">Ghi chú</th>
+                                <th class="text-center">Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (Model != null && Model.Any())
+                            {
+                                int i = 1;
+                                foreach (var item in Model.OrderBy(a => a.BudgetPlan.Year).ThenBy(a => a.MonthNumber))
+                                {
+                                    <tr data-quarter="@item.Quarter" data-year="@item.BudgetPlan?.Year">
+                                        <td class="text-center">@i</td>
+                                        <td class="text-center">@item.BudgetPlan?.Year</td>
+                                        <td class="text-center">@item.Quarter</td>
+                                        <td class="text-center">@item.MonthNumber</td>
+                                        <td class="month-employee text-end">@string.Format("{0:N0}", item.MonthEmployee)</td>
+                                        <td class="month-manager text-end">@string.Format("{0:N0}", item.MonthManager)</td>
+                                        <td class="month-total text-end">@string.Format("{0:N0}", item.MonthManager + item.MonthEmployee)</td>
+                                        <td>@item.Note</td>
+                                        <td class="text-center">
+                                            <!-- Nút Sửa -->
+                                            <a href="@Url.Action("Edit_v2", new { id = item.Id })" class="btn btn-sm btn-outline-success me-1" data-toggle="tooltip" data-original-title="Sửa">
+                                                <i class="fa fa-pencil"></i>
+                                            </a>
+
+                                            <!-- Nút Xóa -->
+                                            <form asp-action="Delete_v2" asp-route-id="@item.Id" method="post" class="d-inline" onsubmit="return confirm('Bạn có chắc chắn muốn xóa dữ liệu này không?');">
+                                                <button type="submit" class="btn btn-sm btn-outline-danger" data-toggle="tooltip" data-original-title="Xóa">
+                                                    <i class="fa fa-trash"></i>
+                                                </button>
+                                            </form>
+
+                                            <!-- Nút Chi tiết -->
+                                            <a href="@Url.Action("Distribution", new { id = item.Id })" class="btn btn-info btn-sm ms-1" data-toggle="tooltip" data-original-title="Chi tiết phân nguồn theo từng phòng">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    i++;
+                                }
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td colspan="9" class="text-center">Không có dữ liệu phân nguồn</td>
+                                </tr>
+                            }
+                        </tbody>
+                        <tfoot class="font-weight-bold">
+                            <tr>
+                                <td colspan="4" class="text-end">TỔNG CỘNG:</td>
+                                <td id="total-month-employee" class="text-end">0</td>
+                                <td id="total-month-manager" class="text-end">0</td>
+                                <td id="total-month-total" class="text-end">0</td>
+                                <td colspan="2"></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/assets/node_modules/datatables/jquery.dataTables.min.js"></script>
+    <script>
+        var budgetTable, allocTable;
+        function showTempDataMessages() {
+            @if (TempData["SuccessMessage"] != null)
+            {
+                    <text>toastr.success('@Html.Raw(TempData["SuccessMessage"])');</text>
+            }
+
+            @if (TempData["ErrorMessage"] != null)
+            {
+                    <text>toastr.error('@Html.Raw(TempData["ErrorMessage"])');</text>
+            }
+
+            @if (TempData["WarningMessage"] != null)
+            {
+                    <text>toastr.warning('@Html.Raw(TempData["WarningMessage"])');</text>
+            }
+
+            @if (TempData["InfoMessage"] != null)
+            {
+                    <text>toastr.info('@Html.Raw(TempData["InfoMessage"])');</text>
+            }
+        }
+
+        $(document).ready(function () {
+            // Khởi tạo tooltip cho Bootstrap
+            $('[data-toggle="tooltip"]').tooltip();
+
+            initBudgetTable();
+            initAllocTable();
+
+            // set default selects
+            var currentYear = new Date().getFullYear();
+            if (!$('#selectYearBudget').val()) $('#selectYearBudget').val(currentYear);
+            if (!$('#selectYearAlloc').val()) $('#selectYearAlloc').val(currentYear);
+
+            // filters
+            $('#selectYearBudget').change(function () {
+                filterBudgetTable();
+            });
+
+            $('#selectYearAlloc, #selectQuarterAlloc').change(function () {
+                filterAllocTable();
+                setTimeout(calculateTotals, 50);
+            });
+
+            // initial filter
+            setTimeout(function () {
+                filterBudgetTable();
+                filterAllocTable();
+                calculateTotals();
+            }, 200);
+
+            @if (TempData["SuccessMessage"] != null)
+            {
+                    <text>toastr.success('@TempData["SuccessMessage"]');</text>
+            }
+            @if (TempData["ErrorMessage"] != null)
+            {
+                    <text>toastr.error('@TempData["ErrorMessage"]');</text>
+            }
+
+            @if (TempData["WarningMessage"] != null)
+            {
+                        <text>toastr.warning('@TempData["WarningMessage"]');</text>
+            }
+
+            @if (TempData["InfoMessage"] != null)
+            {
+                        <text>toastr.info('@TempData["InfoMessage"]');</text>
+            }
+            
+        });
+
+        function initBudgetTable() {
+            if ($.fn.dataTable.isDataTable('#budgetTable')) $('#budgetTable').DataTable().destroy();
+            budgetTable = $('#budgetTable').DataTable({
+                pageLength: 10,
+                ordering: true,
+                searching: true,
+                lengthChange: true,
+                language: {
+                    "lengthMenu": "Hiển thị _MENU_ bản ghi",
+                    "search": "Tìm kiếm:",
+                    "info": "Hiển thị _START_ đến _END_ của _TOTAL_ bản ghi",
+                    "paginate": { "first": "Đầu", "last": "Cuối", "next": "Tiếp", "previous": "Trước" }
+                }
+            });
+        }
+
+        function filterBudgetTable() {
+            var year = $('#selectYearBudget').val();
+            budgetTable.columns().search('');
+            if (year && year !== '') {
+                budgetTable.column(1).search('^' + year + '$', true, false);
+            }
+            budgetTable.draw();
+        }
+
+        function initAllocTable() {
+            if ($.fn.dataTable.isDataTable('#allocTable')) $('#allocTable').DataTable().destroy();
+            allocTable = $('#allocTable').DataTable({
+                pageLength: 12,
+                ordering: true,
+                searching: true,
+                lengthChange: true,
+                footerCallback: function (row, data, start, end, display) {
+                    calculateTotals();
+                },
+                language: {
+                    "lengthMenu": "Hiển thị _MENU_ bản ghi",
+                    "search": "Tìm kiếm:"
+                }
+            });
+        }
+
+        function filterAllocTable() {
+            var year = $('#selectYearAlloc').val();
+            var quarter = $('#selectQuarterAlloc').val();
+
+            allocTable.columns().search('');
+
+            if (year && year !== '') {
+                allocTable.column(1).search('^' + year + '$', true, false);
+            }
+
+            // custom quarter filter
+            $.fn.dataTable.ext.search.push(function (settings, data, dataIndex) {
+                var row = allocTable.row(dataIndex).node();
+                var rowQuarter = $(row).data('quarter');
+                if (!quarter || quarter === '0') return true;
+                return String(rowQuarter) === String(quarter);
+            });
+
+            allocTable.draw();
+            $.fn.dataTable.ext.search.pop();
+        }
+
+        function calculateTotals() {
+            var totalEmployee = 0, totalManager = 0, totalAll = 0;
+            $('#allocTable tbody tr:visible').each(function () {
+                var $r = $(this);
+                var employee = parseFloat($r.find('.month-employee').text().replace(/,/g, '')) || 0;
+                var manager = parseFloat($r.find('.month-manager').text().replace(/,/g, '')) || 0;
+                var total = parseFloat($r.find('.month-total').text().replace(/,/g, '')) || 0;
+                totalEmployee += employee;
+                totalManager += manager;
+                totalAll += total;
+            });
+            var fmt = new Intl.NumberFormat('en-US');
+            $('#total-month-employee').text(fmt.format(totalEmployee));
+            $('#total-month-manager').text(fmt.format(totalManager));
+            $('#total-month-total').text(fmt.format(totalAll));
+        }
+
+        // recalc totals on draw
+        $(document).on('draw.dt', function () { calculateTotals(); });
+    </script>
+}

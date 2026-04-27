@@ -1,0 +1,324 @@
+﻿@model PMS.Models.TblSoureAllocation
+
+@{
+    ViewData["Title"] = "CHỈNH SỬA PHÂN BỔ NGUỒN";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h4 class="card-title mb-0">
+                    <i class="fa fa-edit"></i> CHỈNH SỬA PHÂN BỔ NGUỒN - THÁNG @(Model?.MonthNumber ?? 0) - NĂM @(Model?.BudgetPlan.Year ?? 0)
+                </h4>
+            </div>
+            <div class="card-body">
+                <form asp-action="Edit_v2" id="editForm">
+                    <input type="hidden" asp-for="Id" />
+                    <input type="hidden" asp-for="BudgetPlan.Id" />
+                    <input type="hidden" asp-for="CreatedDate" />
+                    <input type="hidden" asp-for="CreatedUser" />
+
+                    <div class="row">
+                        <!-- Cột 1: Thông tin cơ bản -->
+                        <div class="col-md-6">
+                            <div class="form-group mb-3">
+                                <label class="form-label">Tổng Ngan sach</label>
+
+                                <!-- read-only formatted display + hidden model-bound value -->
+                                <input id="BudgetPlanTotal_display" class="form-control" type="text" readonly />
+                                <input type="hidden" asp-for="BudgetPlan.TotalBudget" id="BudgetPlan_TotalBudget" />
+
+                                <span asp-validation-for="BudgetPlanId" class="text-danger"></span>
+                            </div>
+
+                            <div class="form-group mb-3">
+                                <label asp-for="Quarter" class="form-label fw-bold">Quý *</label>
+                                <select asp-for="Quarter" class="form-control" id="Quarter">
+                                    <option value="">-- Chọn quý --</option>
+                                    <option value="1">Quý 1</option>
+                                    <option value="2">Quý 2</option>
+                                    <option value="3">Quý 3</option>
+                                    <option value="4">Quý 4</option>
+                                </select>
+                                <span asp-validation-for="Quarter" class="text-danger"></span>
+                            </div>
+
+                            <div class="form-group mb-3">
+                                <label asp-for="MonthNumber" class="form-label fw-bold">Tháng *</label>
+                                <select asp-for="MonthNumber" class="form-control" id="MonthNumber">
+                                    <option value="">-- Chọn tháng --</option>
+                                    @for (int i = 1; i <= 12; i++)
+                                    {
+                                        <option value="@i">Tháng @i</option>
+                                    }
+                                </select>
+                                <span asp-validation-for="MonthNumber" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <!-- Cột 2: Phân bổ theo quý -->
+                        <div class="col-md-6">
+                            <div class="card bg-light">
+                                <div class="card-header">
+                                    <h6 class="mb-0">PHÂN BỔ THEO QUÝ</h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="form-group mb-3">
+                                        <label class="form-label">Cho NLĐ (Quý) (VND)</label>
+                                        <input id="QuarterEmployee_display" class="form-control" type="text" />
+                                        <input type="hidden" asp-for="QuarterEmployee" id="QuarterEmployee" />
+                                        <span asp-validation-for="QuarterEmployee" class="text-danger"></span>
+                                    </div>
+
+                                    <div class="form-group mb-3">
+                                        <label class="form-label">Cho NQL (Quý) (VND)</label>
+                                        <input id="QuarterManager_display" class="form-control" type="text" />
+                                        <input type="hidden" asp-for="QuarterManager" id="QuarterManager" />
+                                        <span asp-validation-for="QuarterManager" class="text-danger"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Phân bổ theo tháng -->
+                    <div class="row mt-3">
+                        <div class="col-12">
+                            <div class="card bg-light">
+                                <div class="card-header">
+                                    <h6 class="mb-0">PHÂN BỔ THEO THÁNG</h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <div class="form-group mb-3">
+                                                <label class="form-label">NLĐ (Tháng) (VND)</label>
+                                                <input id="MonthEmployee_display" class="form-control" type="text" />
+                                                <input type="hidden" asp-for="MonthEmployee" id="MonthEmployee" />
+                                                <span asp-validation-for="MonthEmployee" class="text-danger"></span>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="form-group mb-3">
+                                                <label class="form-label">NQL (Tháng) (VND)</label>
+                                                <input id="MonthManager_display" class="form-control" type="text" />
+                                                <input type="hidden" asp-for="MonthManager" id="MonthManager" />
+                                                <span asp-validation-for="MonthManager" class="text-danger"></span>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="form-group mb-3">
+                                                <label class="form-label">Tổng tháng (VND)</label>
+                                                <input type="text" id="TotalMonth_display" class="form-control" readonly />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Ghi chú -->
+                    <div class="row mt-3">
+                        <div class="col-12">
+                            <div class="form-group mb-3">
+                                <label asp-for="Note" class="form-label fw-bold">Ghi chú</label>
+                                <textarea asp-for="Note" class="form-control" rows="3"></textarea>
+                                <span asp-validation-for="Note" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Nút hành động -->
+                    <div class="row mt-4">
+                        <div class="col-12 text-end">
+                            <div class="btn-group">
+                                <a href="@Url.Action("Index")" class="btn btn-secondary">
+                                    <i class="fa fa-arrow-left"></i> Quay lại
+                                </a>
+                                <button type="submit" class="btn btn-success">
+                                    <i class="fa fa-save"></i> Lưu thay đổi
+                                </button>
+                                <button type="button" class="btn btn-primary" onclick="calculateAuto()">
+                                    <i class="fa fa-calculator"></i> Tính toán tự động
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        $(document).ready(function () {
+            // toastr from TempData
+            @if (TempData["SuccessMessage"] != null) { <text>toastr.success('@Html.Raw(TempData["SuccessMessage"])');</text> }
+            @if (TempData["ErrorMessage"] != null) { <text>toastr.error('@Html.Raw(TempData["ErrorMessage"])');</text> }
+
+            // Helpers
+            function cleanInputForNumber(s) {
+                s = (s || '').toString();
+                s = s.replace(/,/g, '').replace(/[^0-9.]/g, '');
+                var parts = s.split('.');
+                if (parts.length > 2) s = parts[0] + '.' + parts.slice(1).join('');
+                return s;
+            }
+
+            function formatIntegerWithCommas(intStr) {
+                return intStr.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+            }
+
+            function formatLive(value) {
+                if (value === '' || value === null || value === undefined) return '';
+                var parts = value.split('.');
+                var intPart = parts[0] || '0';
+                var fracPart = parts[1] || '';
+                intPart = intPart.replace(/^0+(?=\d)/, '');
+                var formattedInt = formatIntegerWithCommas(intPart);
+                return fracPart.length ? (formattedInt + '.' + fracPart) : formattedInt;
+            }
+
+            function formatFixed(value, decimals) {
+                var n = parseFloat(value);
+                if (isNaN(n)) return '';
+                return n.toLocaleString('en-US', { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
+            }
+
+            // caret helpers
+            function digitIndexFromCaret(val, caretPos) {
+                return val.slice(0, caretPos).replace(/[^0-9]/g, '').length;
+            }
+            function setCaretFromDigitIndex(el, targetDigitIndex) {
+                var val = el.value;
+                var pos = 0, digits = 0;
+                while (pos < val.length && digits < targetDigitIndex) {
+                    if (/\d/.test(val.charAt(pos))) digits++;
+                    pos++;
+                }
+                try { el.setSelectionRange(pos, pos); } catch (e) {}
+            }
+
+            // Live formatter initializer
+            function initLiveFormatter(hiddenSelector, displaySelector, blurDecimals) {
+                var $hidden = $(hiddenSelector);
+                var $disp = $(displaySelector);
+                if (!$disp.length || !$hidden.length) return;
+
+                // initialize display from hidden value (server-provided)
+                var rawInit = cleanInputForNumber($hidden.val() || '');
+                $hidden.val(rawInit);
+                $disp.val(rawInit ? formatLive(rawInit) : '');
+
+                $disp.on('input', function () {
+                    var el = this;
+                    var before = el.value;
+                    var caret = el.selectionStart;
+                    var digitIndex = digitIndexFromCaret(before, caret);
+
+                    var cleaned = cleanInputForNumber(before);
+                    $hidden.val(cleaned === '' ? '' : cleaned);
+
+                    var formatted = formatLive(cleaned);
+                    el.value = formatted;
+                    setCaretFromDigitIndex(el, digitIndex);
+
+                    if (typeof calculateAuto === 'function') calculateAuto();
+                });
+
+                $disp.on('focus', function () {
+                    // show raw for easy editing
+                    var raw = $hidden.val() || '';
+                    this.value = raw;
+                    try { this.setSelectionRange(raw.length, raw.length); } catch (e) {}
+                });
+
+                $disp.on('blur', function () {
+                    var cleaned = cleanInputForNumber(this.value);
+                    $hidden.val(cleaned === '' ? '' : cleaned);
+                    this.value = cleaned === '' ? '' : formatFixed(cleaned, blurDecimals);
+                    if (typeof calculateAuto === 'function') calculateAuto();
+                });
+            }
+
+            // Initialize pairs
+            initLiveFormatter('#BudgetPlan_TotalBudget', '#BudgetPlanTotal_display', 2);
+            initLiveFormatter('#QuarterEmployee', '#QuarterEmployee_display', 2);
+            initLiveFormatter('#QuarterManager', '#QuarterManager_display', 2);
+            initLiveFormatter('#MonthEmployee', '#MonthEmployee_display', 2);
+            initLiveFormatter('#MonthManager', '#MonthManager_display', 2);
+
+            // calculateAuto reads hidden numeric values
+            window.calculateAuto = function () {
+                var monthEmployee = parseFloat($('#MonthEmployee').val()) || 0;
+                var monthManager = parseFloat($('#MonthManager').val()) || 0;
+                var totalMonth = monthEmployee + monthManager;
+
+                if (monthEmployee === 0 && monthManager === 0) {
+                    var quarterEmployee = parseFloat($('#QuarterEmployee').val()) || 0;
+                    var quarterManager = parseFloat($('#QuarterManager').val()) || 0;
+
+                    if (quarterEmployee > 0) {
+                        var me = (quarterEmployee / 3).toFixed(2);
+                        if ($('#MonthEmployee').length) $('#MonthEmployee').val(me);
+                        if ($('#MonthEmployee_display').length) $('#MonthEmployee_display').val(formatFixed(me, 2));
+                    }
+                    if (quarterManager > 0) {
+                        var mm = (quarterManager / 3).toFixed(2);
+                        if ($('#MonthManager').length) $('#MonthManager').val(mm);
+                        if ($('#MonthManager_display').length) $('#MonthManager_display').val(formatFixed(mm, 2));
+                    }
+
+                    monthEmployee = parseFloat($('#MonthEmployee').val()) || 0;
+                    monthManager = parseFloat($('#MonthManager').val()) || 0;
+                    totalMonth = monthEmployee + monthManager;
+                }
+
+                if ($('#TotalMonth_display').length) {
+                    $('#TotalMonth_display').val((totalMonth).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
+                }
+            };
+
+            // wire events to recalc
+            $(document).on('change blur input', '#QuarterEmployee, #QuarterManager, #MonthEmployee, #MonthManager, #QuarterEmployee_display, #QuarterManager_display, #MonthEmployee_display, #MonthManager_display', function () {
+                calculateAuto();
+            });
+
+            // initial calc
+            calculateAuto();
+
+            // validation
+            $('#editForm').submit(function (e) {
+                var quarter = $('#Quarter').val();
+                var monthNumber = $('#MonthNumber').val();
+
+                if (!quarter || !monthNumber) {
+                    e.preventDefault();
+                    toastr.error('Vui lòng nhập đầy đủ các trường bắt buộc (*)');
+                    return false;
+                }
+
+                var quarterEmployee = parseFloat($('#QuarterEmployee').val()) || 0;
+                var quarterManager = parseFloat($('#QuarterManager').val()) || 0;
+                var monthEmployee = parseFloat($('#MonthEmployee').val()) || 0;
+                var monthManager = parseFloat($('#MonthManager').val()) || 0;
+
+                if (quarterEmployee < 0 || quarterManager < 0 || monthEmployee < 0 || monthManager < 0) {
+                    e.preventDefault();
+                    toastr.error('Giá trị phân bổ không được âm');
+                    return false;
+                }
+
+                return true;
+            });
+        });
+    </script>
+}

@@ -1,0 +1,135 @@
+﻿@model PMS.Models.TblBudgetPlan
+
+@{
+    ViewData["Title"] = "Chỉnh sửa mã nguồn tổng";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/tbl-position-forms.css">
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <form asp-action="Edit_v1" method="post" id="editForm">
+                        <input type="hidden" asp-for="Id" />
+
+                        <!-- Row 1: Năm và Tổng ngân sách -->
+                        <div class="row">
+                            <div class="col-lg-6 col-md-6 col-sm-12">
+                                <div class="form-group mb-3">
+                                    <div class="boldText">Năm:<code>*</code></div>
+                                    <input asp-for="Year" class="form-control" type="number" min="2000" max="2100" placeholder="Nhập năm" required />
+                                    <span asp-validation-for="Year" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-lg-6 col-md-6 col-sm-12">
+                                <div class="form-group mb-3">
+                                    <div class="boldText">Tổng ngân sách (VND):<code>*</code></div>
+                                    <input id="TotalBudget_display" class="form-control" type="text" placeholder="Nhập tổng ngân sách" required />
+                                    <input type="hidden" asp-for="TotalBudget" id="TotalBudget" />
+                                    <span asp-validation-for="TotalBudget" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Row 2: Ngân sách nhân viên và Ngân sách quản lý -->
+                        <div class="row">
+                            <div class="col-lg-6 col-md-6 col-sm-12">
+                                <div class="form-group mb-3">
+                                    <div class="boldText">Ngân sách nhân viên (VND):<code>*</code></div>
+                                    <input id="EmployeeBudget_display" class="form-control" type="text" placeholder="Nhập ngân sách cho nhân viên" required />
+                                    <input type="hidden" asp-for="EmployeeBudget" id="EmployeeBudget" />
+                                    <span asp-validation-for="EmployeeBudget" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-lg-6 col-md-6 col-sm-12">
+                                <div class="form-group mb-3">
+                                    <div class="boldText">Ngân sách quản lý (VND):<code>*</code></div>
+                                    <input id="ManagerBudget_display" class="form-control" type="text" placeholder="Nhập ngân sách cho quản lý" required />
+                                    <input type="hidden" asp-for="ManagerBudget" id="ManagerBudget" />
+                                    <span asp-validation-for="ManagerBudget" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Buttons -->
+                        <div class="row">
+                            <div class="col-12">
+                                <button type="submit" class="btn btn-success waves-effect waves-light m-r-10">Cập nhật</button>
+                                <a asp-action="Index" class="btn btn-secondary">Quay lại</a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script>
+        $(document).ready(function () {
+            // Keep number-only inputs (Year) normalized
+            $('input[type="number"]').on('input', function() {
+                var value = $(this).val();
+                if (value && !isNaN(value)) {
+                    $(this).val(parseInt(value));
+                }
+            });
+
+            function formatNumberWithCommas(n) {
+                return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+            }
+            function unformatNumber(s) {
+                return s.replace(/,/g, "");
+            }
+
+            // Helper to initialize a display input from a hidden numeric input
+            function initDisplay(hiddenSelector, displaySelector) {
+                var initial = $(hiddenSelector).val();
+                if (initial) {
+                    $(displaySelector).val(formatNumberWithCommas(initial));
+                }
+
+                $(displaySelector).on('input', function () {
+                    // allow only digits while typing
+                    var raw = $(this).val().replace(/[^\d]/g, '');
+                    $(hiddenSelector).val(raw === '' ? '' : raw);
+                    // update visible input with formatted number
+                    $(this).val(raw ? formatNumberWithCommas(raw) : '');
+                });
+
+                
+                $(displaySelector).on('blur', function () {
+                    var raw = $(this).val().replace(/[^\d]/g, '');
+                    if (raw) $(this).val(formatNumberWithCommas(raw));
+                });
+            }
+
+            // Initialize Total, Employee and Manager displays (hidden inputs are model-bound)
+            initDisplay('#TotalBudget', '#TotalBudget_display');
+            initDisplay('#EmployeeBudget', '#EmployeeBudget_display');
+            initDisplay('#ManagerBudget', '#ManagerBudget_display');
+
+            // Validation for budgets on submit (use hidden numeric inputs)
+            $('#editForm').on('submit', function() {
+                var totalBudget = parseFloat($('#TotalBudget').val()) || 0;
+                var employeeBudget = parseFloat($('#EmployeeBudget').val()) || 0;
+                var managerBudget = parseFloat($('#ManagerBudget').val()) || 0;
+
+                if (employeeBudget + managerBudget > totalBudget) {
+                    alert('Tổng ngân sách nhân viên và quản lý không được vượt quá tổng ngân sách!');
+                    return false;
+                }
+                return true; 
+            });
+        }); df
+    </script>
+}

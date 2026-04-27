@@ -1,0 +1,240 @@
+﻿@model IEnumerable<PMS.Models.TblPhuTros>
+<style>
+    /* Tăng font-size và màu chữ */
+    .handsontable td {
+        color: #333333 !important;
+        font-size: 14px !important;
+        white-space: nowrap !important;
+    }
+    .handsontable span.colHeader {
+        color: #333333 !important;
+        font-weight: 700 !important;
+    }
+    /* Ẩn scrollbar dọc, giữ scrollbar ngang */
+    #phuTroDienThoaiTable .wtHolder {
+        overflow-x: auto !important;
+        overflow-y: visible !important;
+        height: auto !important;
+    }
+    #phuTroDienThoaiTable .ht_master .wtHolder {
+        overflow-x: auto !important;
+        overflow-y: visible !important;
+    }
+    #phuTroDienThoaiTable .ht_clone_top .wtHolder {
+        overflow: hidden !important;
+    }
+</style>
+<div id="phuTroDienThoaiTableWrapper" style="overflow:visible;">
+    <div id="phuTroDienThoaiTable"></div>
+
+    <script>
+        (function () {
+            const container = document.getElementById('phuTroDienThoaiTable');
+
+            // Lấy thông tin User mapping từ server
+            const userMapping = {};
+        @{
+            var users = ViewBag.Users as List<PMS.Models.TblUser> ?? new List<PMS.Models.TblUser>();
+        }
+        @foreach (var user in users)
+        {
+            @:userMapping['@user.UserCode'] = @user.Id;
+        }
+                // Convert dữ liệu từ Model sang JSON với UserId
+                const data = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(
+                Model.Select(x => new
+                {
+                    STT = x.STT,
+                    TenNhanVien = x.TenNhanVien,
+                    MaNhanVien = x.MaNhanVien,
+                    // TenPhongBan = x.TenPhongBan,
+                    SoTaiKhoan = x.SoTaiKhoan,
+                    ChucDanh = x.ChucDanh,
+                    DinhMuc = x.DinhMuc,
+                    ThucTeSuDung = x.ThucTeSuDung,
+                    PhaiThu = x.PhaiThu,
+                    UserId = users.FirstOrDefault(u => u.UserCode == x.MaNhanVien)?.Id ?? 0
+                })
+                ));
+
+            const nestedHeaders = [
+                ['STT', 'Tên nhân viên', 'Mã Nhân viên', 'Số Tài khoản', 'Chức danh', 'Định mức', 'Thực tế sử dụng', 'Phải thu']
+            ];
+
+            const columns = [
+                { data: 'STT', type: 'numeric', readOnly: true, width: 50, className: 'htCenter' },
+                { data: 'TenNhanVien', type: 'text', readOnly: true, width: 160 },
+                { data: 'MaNhanVien', type: 'text', readOnly: true, width: 100 },
+                
+                { data: 'SoTaiKhoan', type: 'text', readOnly: true, width: 120 },
+                { data: 'ChucDanh', type: 'text', readOnly: true, width: 140 },
+                { data: 'DinhMuc', type: 'numeric', readOnly: true, width: 100 },
+                { data: 'ThucTeSuDung', type: 'numeric', numericFormat: { pattern: '0,0' }, width: 140 },
+                { data: 'PhaiThu', type: 'numeric', numericFormat: { pattern: '0,0' }, readOnly: true, width: 120 }
+            ];
+
+            let isCalculating = false;
+
+            // Hàm tính toán Phải thu
+            function calculatePhaiThu(row) {
+                const dinhMuc = parseFloat(hot.getDataAtRowProp(row, 'DinhMuc')) || 0;
+                const thucTeSuDung = parseFloat(hot.getDataAtRowProp(row, 'ThucTeSuDung')) || 0;
+                return Math.max(thucTeSuDung - dinhMuc, 0);
+            }
+
+            // Hàm cập nhật các cột tính toán
+            function updateCalculatedColumns(row) {
+                if (isCalculating) return;
+                isCalculating = true;
+
+                const phaiThu = calculatePhaiThu(row);
+                hot.setDataAtRowProp(row, 'PhaiThu', phaiThu, 'calculation');
+
+                isCalculating = false;
+            }
+
+            const hot = new Handsontable(container, {
+                data: data,
+                columns: columns,
+                nestedHeaders: nestedHeaders,
+                rowHeaders: false,
+                colHeaders: false,
+                stretchH: 'all',
+                height: 'auto',  // Sử dụng scroll dọc của web
+                autoColumnSize: true,
+                manualColumnFreeze: true,
+                manualColumnMove: true,
+                fixedColumnsLeft: 2,
+                contextMenu: {
+                    items: {
+                        row_above: {},
+                        row_below: {},
+                        hsep1: '---------',
+                        freeze_column: { name: 'Cố định cột' },
+                        unfreeze_column: { name: 'Bỏ cố định cột' },
+                        hsep2: '---------',
+                        undo: {},
+                        redo: {},
+                        clear_custom: {
+                            name: 'Xóa nội dung các ô đã chọn',
+                            callback() { hot.emptySelectedCells(); }
+                        }
+                    }
+                },
+                filters: false,
+                dropdownMenu: false,
+                licenseKey: 'non-commercial-and-evaluation',
+
+                afterChange: function (changes, source) {
+                    if (!changes || source === 'loadData' || source === 'calculation') return;
+
+                    changes.forEach(([row, prop, oldVal, newVal]) => {
+                        if (prop === 'ThucTeSuDung' && oldVal !== newVal) {
+                            // Tính toán lại cột Phải thu ngay lập tức
+                            updateCalculatedColumns(row);
+
+                            // Lưu dữ liệu
+                            const rowData = hot.getSourceDataAtRow(row);
+                            const userId = rowData.UserId;
+                            if (userId > 0) {
+                                const month = parseInt($('#selectMonth').val());
+                                const year = parseInt($('#selectYear').val());
+
+                                $.ajax({
+                                    url: '/PhuTro/UpdatePhoneActualUse',
+                                    type: 'POST',
+                                    contentType: 'application/json',
+                                    data: JSON.stringify({
+                                        UserId: userId,
+                                        Month: month,
+                                        Year: year,
+                                        PhoneActualUse: parseFloat(newVal) || 0
+                                    }),
+                                    success: function (response) {
+                                        if (!response.success) {
+                                            console.log('Lỗi khi lưu: ' + response.message);
+                                        }
+                                    },
+                                    error: function (xhr, status, error) {
+                                        console.log('Lỗi khi lưu: ' + error);
+                                    }
+                                });
+                            }
+                        }
+                    });
+                }
+            });
+
+            // Xử lý sự kiện lưu
+            $('#btnSaveDienThoai').click(function () {
+                const month = parseInt($('#selectMonth').val());
+                const year = parseInt($('#selectYear').val());
+
+                if (!month || !year) {
+                    alert('Vui lòng chọn tháng và năm trước khi lưu!');
+                    return;
+                }
+
+                const sourceData = hot.getSourceData();
+                const saveData = [];
+
+                sourceData.forEach((row) => {
+                    if (row.UserId > 0) {
+                        saveData.push({
+                            UserId: row.UserId,
+                            PhoneActualUse: parseFloat(row.ThucTeSuDung) || 0
+                        });
+                    }
+                });
+
+                $(this).prop('disabled', true).html('<i class="fas fa-spinner fa-spin me-1"></i>Đang lưu...');
+
+                $.ajax({
+                    url: '/PhuTro/SavePhuTroDienThoai',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({
+                        Month: month,
+                        Year: year,
+                        Data: saveData
+                    }),
+                    success: function (response) {
+                        if (response.success) {
+                            alert('Lưu thành công: ' + response.message);
+                        } else {
+                            alert('Lỗi: ' + response.message);
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        alert('Lỗi khi lưu dữ liệu: ' + error);
+                    },
+                    complete: function () {
+                        $('#btnSaveDienThoai').prop('disabled', false).html('<i class="fas fa-save me-1"></i>Lưu dữ liệu');
+                    }
+                });
+            });
+
+            function calculateHotHeight() {
+                const windowHeight = window.innerHeight;
+                const offset = 360;
+                return Math.max(windowHeight - offset, 400);
+            }
+
+
+
+            // ===== HIỂN THỊ CÔNG THỨC TRONG SEARCH-BOX =====
+            HandsontableFormula.init(hot, 'formulaInput', {
+                getFormula: function(row, col, value, hotInstance) {
+                    const colHeader = hotInstance.getColHeader(col);
+                    if (col === 7) {
+                        return `= MAX(Thực tế sử dụng - Định mức, 0)`;
+                    }
+                    return `${value}`;
+                },
+                shouldShow: function(row, col, value) {
+                    return value != null && value !== '';
+                }
+            });
+        })();
+    </script>
+</div>

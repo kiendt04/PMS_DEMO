@@ -1,0 +1,12 @@
+@model IEnumerable<PMS.Models.TblTimeWork>
+@{
+    int i = 1;
+}
+@foreach (var item in Model)
+{
+    <tr>
+        <td class="text-center">@(i++)</td>
+        <td class="text-center">Tháng @item.Month</td>
+        <td class="text-center">@item.WorkDay</td>
+    </tr>
+}

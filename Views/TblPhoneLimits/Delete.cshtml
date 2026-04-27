@@ -1,0 +1,113 @@
+﻿@model PMS.Models.TblPhoneLimit
+
+@{
+    ViewData["Title"] = "DANH MỤC ĐỊNH MỨC ĐIỆN THOẠI";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row">
+    <div class="col-12">
+        <div class="card shadow border-0 rounded-3">
+            <div class="card-body">
+                <div class="row row-head mb-2">
+                    <div class="col-6">
+                        <h4 class="card-title mb-0">Xóa định mức điện thoại</h4>
+                    </div>
+                </div>
+                <hr />
+
+                <div class="alert alert-danger">
+                    <h5><i class="fa fa-exclamation-triangle"></i> Cảnh báo!</h5>
+                    <p class="mb-0">Bạn có chắc chắn muốn xóa định mức điện thoại <strong>@Model.ValueLimit</strong> không?</p>
+                    <p class="mb-0 text-muted">Hành động này không thể hoàn tác.</p>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="card border">
+                            <div class="card-header bg-light">
+                                <h5 class="card-title mb-0">Thông tin định mức điện thoại</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <dl class="row">
+                                            <dt class="col-sm-4">Vị trí:</dt>
+                                            <dd class="col-sm-8">
+                                                @Html.DisplayFor(m => m.Posion.Name)
+                                            </dd>
+
+                                            <dt class="col-sm-4">Giá trị định mức:</dt>
+                                            <dd class="col-sm-8">@Html.DisplayFor(m => m.ValueLimit)</dd>
+
+                                            <dt class="col-sm-4">Ngày ban hành:</dt>
+                                            <dd class="col-sm-8">@Html.DisplayFor(m => m.StartDate)</dd>
+                                            <dd class="col-sm-8">@Html.DisplayFor(m => m.EndDate)</dd>
+                                            <dt class="col-sm-4">Trạng thái:</dt>
+                                            <dd class="col-sm-8">
+                                                @if (Model.Status == 1)
+                                                {
+                                                    <span class="badge bg-success">Hoạt động</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge bg-danger">Ngưng hoạt động</span>
+                                                }
+                                            </dd>
+                                            <dt class="col-sm-4">Ghi chú:</dt>
+                                            <dd class="col-sm-8">@Html.DisplayFor(m => m.Note)</dd>
+                                        </dl>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <dl class="row">
+                                            <dt class="col-sm-4">Ngày tạo:</dt>
+                                            <dd class="col-sm-8">@Html.DisplayFor(m => m.CreatedDate)</dd>
+
+                                            <dt class="col-sm-4">Người tạo:</dt>
+                                            <dd class="col-sm-8">@Html.DisplayFor(m => m.CreatedUser)</dd>
+
+                                            <dt class="col-sm-4">Ngày sửa:</dt>
+                                            <dd class="col-sm-8">@Html.DisplayFor(m => m.ModifiedDate)</dd>
+
+                                            <dt class="col-sm-4">Người sửa:</dt>
+                                            <dd class="col-sm-8">@Html.DisplayFor(m => m.ModifiedUser)</dd>
+                                        </dl>
+                                    </div>
+                                </div>
+
+
+
+                                </div>
+                            </div>
+                        </div>
+
+                        
+                    </div>
+                <div class=" mt-4">
+                    <form asp-action="Delete" method="post" style="display:inline;" id="deleteForm">
+                        <input type="hidden" asp-for="Id" />
+                        <button type="submit" class="btn btn-danger btn">
+                            <i class="fa fa-trash"></i> Xác nhận xóa
+                        </button>
+                    </form>
+                    <a asp-action="Index" class="btn btn-secondary btn ms-2">
+                        <i class="fa fa-times"></i> Hủy bỏ
+                    </a>
+                </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.getElementById("deleteForm").addEventListener("submit", function (e) {
+            if (!confirm("Bạn có chắc chắn muốn xóa định mức điện thoại '@Html.Raw(Model.ValueLimit)'?")) {
+                e.preventDefault();
+            }
+        });
+    </script>
+}

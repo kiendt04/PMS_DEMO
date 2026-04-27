@@ -1,0 +1,163 @@
+﻿@model PMS.Models.GeneralRoomEditVM
+
+@{
+    ViewData["Title"] = "SỬA NHÓM PHÒNG BAN";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                @* <h4 class="card-title">Sửa nhóm phòng ban</h4> *@
+                <hr />
+
+                <form asp-action="Edit">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    <input type="hidden" asp-for="GeneralId" />
+
+                    <div class="form-group">
+                        <label asp-for="GeneralName" class="control-label">Tên nhóm phòng ban</label>
+                        <input asp-for="GeneralName" class="form-control" />
+                        <span asp-validation-for="GeneralName" class="text-danger"></span>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="form-group">
+                                <div class="boldText">Danh sách phòng ban thuộc ban: <code>*</code></div>
+
+                                <div class="alert alert-info">
+                                    <i class="fa fa-info-circle"></i>
+                                    Chỉ có thể chọn các phòng ban chưa thuộc nhóm nào
+                                </div>
+
+                                <div class="table-responsive mt-2">
+                                    <table class="table table-bordered table-striped">
+                                        <thead>
+                                            <tr>
+                                                <th class="text-center" style="width: 50px;">
+                                                    <input type="checkbox" id="selectAll" />
+                                                </th>
+                                                <th>Tên phòng ban</th>
+                                                <th>Trạng thái</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @if (Model.AvailableDepartments != null)
+                                            {
+                                                for (int i = 0; i < Model.AvailableDepartments.Count; i++)
+                                                {
+                                                    var department = Model.AvailableDepartments[i];
+                                                    var isDisabled = department.BelongsToOtherGroup;
+                                                    var isCurrentlySelected = department.IsSelected;
+
+                                                    <tr>
+                                                        <td class="text-center">
+                                                            @if (isDisabled)
+                                                            {
+                                                                <!-- QUAN TRỌNG: Giữ lại hidden input với giá trị nếu đã được chọn -->
+                                                                @if (isCurrentlySelected)
+                                                                {
+                                                                    <input type="hidden" name="SelectedDepartmentIds" value="@department.DepartmentId" />
+                                                                }
+                                                                <input type="checkbox" disabled @(isCurrentlySelected ? "checked" : "") />
+                                                            }
+                                                            else
+                                                            {
+                                                                <input type="checkbox"
+                                                                       name="SelectedDepartmentIds"
+                                                                       value="@department.DepartmentId"
+                                                                       @(isCurrentlySelected ? "checked" : "")
+                                                                       class="department-checkbox" />
+                                                            }
+                                                            <input type="hidden"
+                                                                   asp-for="@Model.AvailableDepartments[i].DepartmentId" />
+                                                            <input type="hidden"
+                                                                   asp-for="@Model.AvailableDepartments[i].DepartmentName" />
+                                                        </td>
+                                                        <td>@department.DepartmentName</td>
+                                                        <td>
+                                                            @if (isCurrentlySelected)
+                                                            {
+                                                                <span class="badge badge-success">Đã chọn</span>
+                                                            }
+                                                            else if (isDisabled)
+                                                            {
+                                                                <span class="badge badge-danger">Đã thuộc nhóm khác</span>
+                                                            }
+                                                            else
+                                                            {
+                                                                <span class="badge badge-secondary">Chưa chọn</span>
+                                                            }
+                                                        </td>
+                                                    </tr>
+                                                }
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-success me-3"><i class="fa fa-save"></i>Lưu</button>
+                        <a asp-action="Index" class="btn btn-secondary">Quay lại</a>
+                        <button type="submit" class="btn btn-primary">Lưu</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            // Select all checkbox - chỉ chọn những cái không disabled
+            $('#selectAll').change(function () {
+                $('.department-checkbox:not(:disabled)').prop('checked', this.checked);
+                updateStatus();
+            });
+
+            // Individual checkbox change
+            $('.department-checkbox').change(function () {
+                updateSelectAll();
+                updateStatus();
+            });
+
+            function updateSelectAll() {
+                var checkableBoxes = $('.department-checkbox:not(:disabled)');
+                var allChecked = checkableBoxes.length > 0 &&
+                               checkableBoxes.filter(':checked').length === checkableBoxes.length;
+                $('#selectAll').prop('checked', allChecked);
+            }
+
+            function updateStatus() {
+                // Cập nhật trạng thái cho tất cả các hàng
+                $('tbody tr').each(function () {
+                    var row = $(this);
+                    var checkbox = row.find('input[type="checkbox"]');
+                    var statusBadge = row.find('.badge');
+
+                    if (checkbox.is(':checked')) {
+                        statusBadge.removeClass('badge-secondary badge-danger').addClass('badge-success').text('Đã chọn');
+                    } else if (checkbox.is(':disabled')) {
+                        statusBadge.removeClass('badge-success badge-secondary').addClass('badge-danger').text('Đã thuộc nhóm khác');
+                    } else {
+                        statusBadge.removeClass('badge-success badge-danger').addClass('badge-secondary').text('Chưa chọn');
+                    }
+                });
+            }
+
+            // Initialize status on page load
+            updateStatus();
+
+            // Disable select all nếu không có checkbox nào có thể chọn
+            if ($('.department-checkbox:not(:disabled)').length === 0) {
+                $('#selectAll').prop('disabled', true);
+            }
+        });
+    </script>
+}

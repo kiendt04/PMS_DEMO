@@ -722,13 +722,12 @@
           <div id="tuHotContainer" style="width:100%;"></div>
         </div>
 
-
+        <!-- ═══ ĐIỀU CHUYỂN ═══ -->
         <div class="page-section fade-in" id="page-dieu-chuyen">
           <div class="cat-header">
             <div class="cat-header-left">
               <div class="cat-icon-wrap" style="background:#FEF3E2;color:#B45309"><svg viewBox="0 0 20 20" fill="none">
-                  <path d="M4 10h12M10 4l6 6-6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"
-                    stroke-linejoin="round" />
+                  <path d="M4 10h12M10 4l6 6-6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
                 </svg></div>
               <div>
                 <div class="cat-title">Quản lý điều chuyển</div>
@@ -736,101 +735,131 @@
               </div>
             </div><button class="btn-cat-add">+ Thêm mới</button>
           </div>
-          <div class="placeholder">
-            <p>Dữ liệu điều chuyển sẽ hiển thị tại đây</p>
-          </div>
+          <div class="placeholder"><p>Dữ liệu điều chuyển sẽ hiển thị tại đây</p></div>
         </div>
 
+        <!-- ═══ NGHỈ PHÉP ═══ -->
         <div class="page-section fade-in" id="page-nghi-phep">
-          <div class="cat-header">
-            <div class="cat-header-left">
-              <div class="cat-icon-wrap" style="background:#FEF3E2;color:#B45309"><svg viewBox="0 0 20 20" fill="none">
-                  <rect x="2" y="4" width="16" height="14" rx="2" stroke="currentColor" stroke-width="1.6" />
-                  <path d="M6 2v4M14 2v4M2 10h16" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
-                </svg></div>
-              <div>
-                <div class="cat-title">Quản lý nghỉ phép</div>
-                <div class="cat-sub">Theo dõi và duyệt đơn nghỉ phép</div>
-              </div>
-            </div><button class="btn-cat-add">+ Thêm đơn</button>
+          <div class="cc-filterbar">
+            <div class="cc-filter-group"><label>Chọn năm</label>
+              <select id="npNam" class="cc-select"></select>
+            </div>
+            <div class="cc-filter-group" style="margin-left:auto;display:flex;flex-direction:row;align-items:center;gap:6px">
+              <button class="btn-cat-add" id="npExcel"
+                style="background:linear-gradient(135deg,#22c97b,#15a25e);box-shadow:0 2px 8px rgba(21,162,94,.3)">
+                <svg width="13" height="13" viewBox="0 0 14 14" fill="none">
+                  <path d="M2 10v2h10v-2M7 2v7M4 6l3 3 3-3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>Xuất Excel
+              </button>
+            </div>
           </div>
-          <div class="placeholder">
-            <p>Dữ liệu nghỉ phép sẽ hiển thị tại đây</p>
-          </div>
+          <div id="npHotContainer" style="width:100%;"></div>
         </div>
 
+        <!-- ═══ QUẢN LÝ ĂN CA ═══ -->
         <div class="page-section fade-in" id="page-quan-ly-an-ca">
-          <div class="cat-header">
-            <div class="cat-header-left">
-              <div class="cat-icon-wrap" style="background:#FEF3E2;color:#B45309"><svg viewBox="0 0 20 20" fill="none">
-                  <path d="M4 9c0-3.3 2.7-6 6-6s6 2.7 6 6M4 9v4a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V9" stroke="currentColor"
-                    stroke-width="1.6" />
-                </svg></div>
-              <div>
-                <div class="cat-title">Quản lý ăn ca</div>
-                <div class="cat-sub">Theo dõi ca ăn của nhân viên</div>
-              </div>
-            </div><button class="btn-cat-add">+ Thêm mới</button>
+          <div class="cc-filterbar">
+            <div class="cc-filter-group"><label>Chọn tháng</label>
+              <select id="acThang" class="cc-select">
+                <option value="1">Tháng 1</option><option value="2">Tháng 2</option>
+                <option value="3">Tháng 3</option><option value="4" selected>Tháng 4</option>
+                <option value="5">Tháng 5</option><option value="6">Tháng 6</option>
+                <option value="7">Tháng 7</option><option value="8">Tháng 8</option>
+                <option value="9">Tháng 9</option><option value="10">Tháng 10</option>
+                <option value="11">Tháng 11</option><option value="12">Tháng 12</option>
+              </select>
+            </div>
+            <div class="cc-filter-group"><label>Chọn năm</label>
+              <select id="acNam" class="cc-select"></select>
+            </div>
+            <div class="cc-filter-group" style="margin-left:auto;display:flex;flex-direction:row;align-items:center;gap:6px">
+              <button class="btn-cat-add" id="acExcel"
+                style="background:linear-gradient(135deg,#22c97b,#15a25e);box-shadow:0 2px 8px rgba(21,162,94,.3)">
+                <svg width="13" height="13" viewBox="0 0 14 14" fill="none">
+                  <path d="M2 10v2h10v-2M7 2v7M4 6l3 3 3-3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>Xuất Excel
+              </button>
+            </div>
           </div>
-          <div class="placeholder">
-            <p>Dữ liệu ăn ca sẽ hiển thị tại đây</p>
-          </div>
+          <div id="acHotContainer" style="width:100%;"></div>
         </div>
 
+        <!-- ═══ BẢNG HỆ SỐ LƯƠNG ═══ -->
         <div class="page-section fade-in" id="page-he-so-luong">
-          <div class="cat-header">
-            <div class="cat-header-left">
-              <div class="cat-icon-wrap" style="background:#FEF3E2;color:#B45309"><svg viewBox="0 0 20 20" fill="none">
-                  <path d="M2 14l4-6 4 4 4-8 4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"
-                    stroke-linejoin="round" />
-                </svg></div>
-              <div>
-                <div class="cat-title">Bảng hệ số lương</div>
-                <div class="cat-sub">Quản lý hệ số lương theo chức vụ</div>
-              </div>
-            </div><button class="btn-cat-add">+ Thêm mới</button>
+          <div class="cc-filterbar">
+            <div class="cc-filter-group"><label>Đối tượng</label>
+              <select id="hslDoiTuong" class="cc-select">
+                <option value="0">Tất cả</option>
+                <option value="1">HĐ lao động</option>
+                <option value="2">Hợp đồng khoán</option>
+              </select>
+            </div>
+            <div class="cc-filter-group" style="margin-left:auto;display:flex;flex-direction:row;align-items:center;gap:6px">
+              <button class="btn-cat-add" id="hslExcel"
+                style="background:linear-gradient(135deg,#22c97b,#15a25e);box-shadow:0 2px 8px rgba(21,162,94,.3)">
+                <svg width="13" height="13" viewBox="0 0 14 14" fill="none">
+                  <path d="M2 10v2h10v-2M7 2v7M4 6l3 3 3-3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>Xuất Excel
+              </button>
+            </div>
           </div>
-          <div class="placeholder">
-            <p>Bảng hệ số lương sẽ hiển thị tại đây</p>
-          </div>
+          <div id="hslHotContainer" style="width:100%;"></div>
         </div>
 
+        <!-- ═══ QUYẾT TOÁN LƯƠNG ═══ -->
         <div class="page-section fade-in" id="page-quyet-toan">
-          <div class="cat-header">
-            <div class="cat-header-left">
-              <div class="cat-icon-wrap" style="background:#FEF3E2;color:#B45309"><svg viewBox="0 0 20 20" fill="none">
-                  <rect x="3" y="3" width="14" height="14" rx="2" stroke="currentColor" stroke-width="1.6" />
-                  <path d="M7 10l2 2 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"
-                    stroke-linejoin="round" />
-                </svg></div>
-              <div>
-                <div class="cat-title">Quyết toán lương</div>
-                <div class="cat-sub">Quyết toán lương theo tháng</div>
-              </div>
-            </div><button class="btn-cat-add">+ Quyết toán</button>
+          <div class="cc-filterbar">
+            <div class="cc-filter-group"><label>Chọn tháng</label>
+              <select id="qtThang" class="cc-select">
+                <option value="1">Tháng 1</option><option value="2">Tháng 2</option>
+                <option value="3">Tháng 3</option><option value="4" selected>Tháng 4</option>
+                <option value="5">Tháng 5</option><option value="6">Tháng 6</option>
+                <option value="7">Tháng 7</option><option value="8">Tháng 8</option>
+                <option value="9">Tháng 9</option><option value="10">Tháng 10</option>
+                <option value="11">Tháng 11</option><option value="12">Tháng 12</option>
+              </select>
+            </div>
+            <div class="cc-filter-group"><label>Chọn năm</label>
+              <select id="qtNam" class="cc-select"></select>
+            </div>
+            <div class="cc-filter-group" style="margin-left:auto;display:flex;flex-direction:row;align-items:center;gap:6px">
+              <button class="btn-cat-add" id="qtExcel"
+                style="background:linear-gradient(135deg,#22c97b,#15a25e);box-shadow:0 2px 8px rgba(21,162,94,.3)">
+                <svg width="13" height="13" viewBox="0 0 14 14" fill="none">
+                  <path d="M2 10v2h10v-2M7 2v7M4 6l3 3 3-3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>Xuất Excel
+              </button>
+            </div>
           </div>
-          <div class="placeholder">
-            <p>Dữ liệu quyết toán lương sẽ hiển thị tại đây</p>
-          </div>
+          <div id="qtHotContainer" style="width:100%;"></div>
         </div>
 
+        <!-- ═══ CHI TRẢ LƯƠNG ═══ -->
         <div class="page-section fade-in" id="page-chi-luong">
-          <div class="cat-header">
-            <div class="cat-header-left">
-              <div class="cat-icon-wrap" style="background:#FEF3E2;color:#B45309"><svg viewBox="0 0 20 20" fill="none">
-                  <rect x="2" y="5" width="16" height="12" rx="2" stroke="currentColor" stroke-width="1.6" />
-                  <path d="M6 5V4a4 4 0 0 1 8 0v1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
-                  <path d="M8 11h4M10 9v4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
-                </svg></div>
-              <div>
-                <div class="cat-title">Quản lý chi trả lương theo tháng</div>
-                <div class="cat-sub">Theo dõi chi trả lương hàng tháng</div>
-              </div>
-            </div><button class="btn-cat-add">+ Thêm mới</button>
+          <div class="cc-filterbar">
+            <div class="cc-filter-group"><label>Chọn tháng</label>
+              <select id="clThang" class="cc-select">
+                <option value="1">Tháng 1</option><option value="2">Tháng 2</option>
+                <option value="3">Tháng 3</option><option value="4" selected>Tháng 4</option>
+                <option value="5">Tháng 5</option><option value="6">Tháng 6</option>
+                <option value="7">Tháng 7</option><option value="8">Tháng 8</option>
+                <option value="9">Tháng 9</option><option value="10">Tháng 10</option>
+                <option value="11">Tháng 11</option><option value="12">Tháng 12</option>
+              </select>
+            </div>
+            <div class="cc-filter-group"><label>Chọn năm</label>
+              <select id="clNam" class="cc-select"></select>
+            </div>
+            <div class="cc-filter-group" style="margin-left:auto;display:flex;flex-direction:row;align-items:center;gap:6px">
+              <button class="btn-cat-add" id="clExcel"
+                style="background:linear-gradient(135deg,#22c97b,#15a25e);box-shadow:0 2px 8px rgba(21,162,94,.3)">
+                <svg width="13" height="13" viewBox="0 0 14 14" fill="none">
+                  <path d="M2 10v2h10v-2M7 2v7M4 6l3 3 3-3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>Xuất Excel
+              </button>
+            </div>
           </div>
-          <div class="placeholder">
-            <p>Dữ liệu chi trả lương sẽ hiển thị tại đây</p>
-          </div>
+          <div id="clHotContainer" style="width:100%;"></div>
         </div>
 
         <!-- ═══ QUAN LY PHONG BAN pages ═══ -->
@@ -1373,6 +1402,11 @@
   <script src="asset/chuc-vu.js"></script>
   <script src="asset/an-toan-dien.js"></script>
   <script src="asset/tam-ung-luong.js"></script>
+  <script src="asset/he-so-luong.js"></script>
+  <script src="asset/nghi-phep.js"></script>
+  <script src="asset/quan-ly-an-ca.js"></script>
+  <script src="asset/quyet-toan.js"></script>
+  <script src="asset/chi-luong.js"></script>
 </body>
 
 </html>

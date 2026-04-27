@@ -1,0 +1,101 @@
+﻿@model PMS.Models.TblDepartment
+
+@{
+    ViewData["Title"] = "DANH MỤC PHÒNG BAN";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row">
+    <div class="col-12">
+        <div class="card shadow border-0 rounded-3">
+            <div class="card-body">
+                <div class="row row-head">
+                    <div class="col-lg-9">
+                        <h4 class="card-title" style="margin-bottom:0px;">Xóa phòng ban</h4>
+                    </div>
+                       <!--
+                            <div class="col-lg-3 d-flex justify-content-end">
+                        <a href="@Url.Action("Index")" class="btn btn-sm btn-secondary">Quay lại</a>
+                    </div>
+                       -->
+                   
+                </div>
+                <hr />
+
+                <div class="alert alert-danger">
+                    <h5><i class="fa fa-exclamation-triangle"></i> Cảnh báo!</h5>
+                    <p class="mb-0">Bạn có chắc chắn muốn xóa phòng ban <strong>"@Model.Name"</strong> không?</p>
+                    <p class="mb-0 text-muted">Hành động này không thể hoàn tác.</p>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="card border">
+                            <div class="card-header bg-light">
+                                <h5 class="card-title mb-0">Thông tin phòng ban</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <dl class="row">
+                                            <dt class="col-sm-4">Tên phòng ban:</dt>
+                                            <dd class="col-sm-8">@Html.DisplayFor(m => m.Name)</dd>
+
+                                            <dt class="col-sm-4">Tên viết tắt:</dt>
+                                            <dd class="col-sm-8">@Html.DisplayFor(m => m.ShortName)</dd>
+
+                                            <dt class="col-sm-4">Độ ưu tiên:</dt>
+                                            <dd class="col-sm-8">@Html.DisplayFor(m => m.OrderNumber)</dd>
+
+                                            <dt class="col-sm-4">Trạng thái:</dt>
+                                            <dd class="col-sm-8">
+                                                @if (Model.Status == 1)
+                                                {
+                                                    <span class="badge bg-success">Hoạt động</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge bg-danger">Ngưng hoạt động</span>
+                                                }
+                                            </dd>
+                                        </dl>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <dl class="row">
+                                            <dt class="col-sm-4">Mô tả:</dt>
+                                            <dd class="col-sm-8">@Html.DisplayFor(m => m.Description)</dd>
+
+                                            <dt class="col-sm-4">Ghi chú:</dt>
+                                            <dd class="col-sm-8">@Html.DisplayFor(m => m.Note)</dd>
+                                        </dl>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                </div>
+                <div class=" mt-4">
+                    <form asp-action="Delete" style="display: inline;" id="deleteForm">
+                        <input type="hidden" asp-for="Id" />
+                        <button type="submit" class="btn btn-danger btn">
+                            <i class="fa fa-trash"></i> Xác nhận xóa
+                        </button>
+                    </form>
+                    <a asp-action="Index" class="btn btn-secondary btn ms-2">
+                        <i class="fa fa-times"></i> Hủy bỏ
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.getElementById("deleteForm").addEventListener("submit", function (e) {
+        if (!confirm("Bạn có chắc chắn muốn xóa phòng ban '@Html.Raw(@Model.Name)'?")) {
+            e.preventDefault();
+        }
+    });
+</script>
+

@@ -120,7 +120,7 @@
     const cols = [
       {data:0, readOnly:true, width:35,  type:'text', className:'htCenter htMiddle cc-fixed'},
       {data:1, readOnly:true, width:140, type:'text', className:'htLeft   htMiddle cc-fixed'},
-      {data:2, readOnly:true, width:100, type:'text', className:'htLeft   htMiddle cc-fixed'},
+      {data:2, readOnly:true, width:100, type:'text', className:'htCenter htMiddle cc-fixed'},
     ];
     let ci = FIXED;
     months.forEach(() => {
@@ -197,7 +197,9 @@
         const props = {};
         let classes = [];
         if (row % 2 === 0) classes.push('cc-even-row');
-        if (col === 0) classes.push('htCenter', 'htMiddle');
+        if (col === 1) classes.push('htLeft');
+        else classes.push('htCenter');
+        classes.push('htMiddle');
         if (classes.length) props.className = classes.join(' ');
         return props;
       },

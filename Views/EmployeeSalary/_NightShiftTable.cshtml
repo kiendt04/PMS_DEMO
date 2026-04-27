@@ -1,0 +1,48 @@
+@model PMS.ViewModels.EmployeeSalaryViewModel
+
+<div class="table-responsive mt-2">
+    <table id="myTable" class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                <th class="text-center" style="width: 50px;">#</th>
+                <th class="text-center">Tháng/Năm</th>
+                <th class="text-center">Ca đêm</th>
+                <th class="text-center">Tổng CD + TG</th>
+                <th class="text-center">Tổng lĩnh</th>
+                <th class="text-center">Ghi chú</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model != null && Model.MonthlyDetails != null && Model.MonthlyDetails.Any())
+            {
+                int i = 1;
+                foreach (var detail in Model.MonthlyDetails.Where(d => d.NightShiftValue.HasValue && d.NightShiftValue.Value > 0))
+                {
+                    <tr>
+                        <td class="text-center">@(i++)</td>
+                        <td><strong>@detail.Month/@detail.Year</strong></td>
+                        <td class="text-right">@(detail.NightShiftValue?.ToString("N0") ?? "0")</td>
+                        <td class="text-right">@(detail.NightShiftOvertime?.ToString("N0") ?? "0")</td>
+                        <td class="text-right"><strong>@(detail.TotalReceived?.ToString("N0") ?? "0")</strong></td>
+                        <td title="@detail.Notes">
+                            @(detail.Notes?.Length > 50 ? detail.Notes.Substring(0, 50) + "..." : detail.Notes ?? "")
+                        </td>
+                    </tr>
+                }
+                @if (!Model.MonthlyDetails.Any(d => d.NightShiftValue.HasValue && d.NightShiftValue.Value > 0))
+                {
+                    <tr>
+                        <td colspan="6" class="text-center">Không có dữ liệu ca đêm</td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="6" class="text-center">Không có dữ liệu</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+

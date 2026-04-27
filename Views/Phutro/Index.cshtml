@@ -1,0 +1,219 @@
+﻿@{
+    ViewData["Title"] = "QUẢN LÝ PHỤ TRỢ";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                @* <h4 class="card-title mb-4">
+                    DANH SÁCH QUẢN LÝ PHỤ TRỢ THÁNG @DateTime.Now.Month/@DateTime.Now.Year
+                </h4> *@
+
+                <!-- Bộ lọc -->
+                <div class="row mt-4 mb-4" style="margin-top : 0px !important; margin-bottom: 0px !important;">
+                    <div class="col-12">
+                        <div class="d-flex align-items-center flex-wrap" style="gap: 2rem;">
+                            <!-- Chọn thời gian -->
+                            <div class="d-flex align-items-center">
+                                <label class="me-3 mb-0 fw-semibold text-nowrap" style="padding-right : 10px">Chọn tháng:</label>
+                                <div class="d-flex" style="gap: 0.75rem;">
+                                    <select class="form-control form-control-sm" id="selectMonth" style="width:65px;">
+                                        @for (int i = 1; i <= 12; i++)
+                                        {
+                                            if (i == DateTime.Now.Month)
+                                            {
+                                                <option value="@i" selected style="text-align:left">@i</option>
+                                            }
+                                            else
+                                            {
+                                                <option value="@i" style="text-align:left">@i</option>
+                                            }
+                                        }
+                                    </select>
+                                </div>
+
+                                <label class="me-3 mb-0 fw-semibold text-nowrap" style="padding-right : 10px; padding-left: 20px">Chọn năm:</label>
+                                <div class="d-flex" style="gap: 0.75rem;">
+                                    <select class="form-control form-control-sm" id="selectYear" style="width:100px;">
+                                        @for (int i = DateTime.Now.Year - 5; i <= DateTime.Now.Year + 1; i++)
+                                        {
+                                            if (i == DateTime.Now.Year)
+                                            {
+                                                <option value="@i" selected style="text-align:center">@i</option>
+                                            }
+                                            else
+                                            {
+                                                <option value="@i" style="text-align:center">@i</option>
+                                            }
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- Loại phụ trợ -->
+                            <div class="d-flex align-items-center">
+                                <label class="me-3 mb-0 fw-semibold text-nowrap" style="padding: 20px">Loại phụ trợ:</label>
+                                <div class="d-flex" style="gap: 1.5rem;">
+                                    <div class="form-check mb-0">
+                                        <input class="form-check-input me-2" type="radio" name="loaiPhuTro" id="dienThoai" value="DienThoai" checked>
+                                        <label class="form-check-label" for="dienThoai">Điện thoại</label>
+                                    </div>
+                                    <div class="form-check mb-0">
+                                        <input class="form-check-input me-2" type="radio" name="loaiPhuTro" id="cdPhi" value="CDPhi">
+                                        <label class="form-check-label" for="cdPhi">CĐ Phí</label>
+                                    </div>
+                                    <div class="form-check mb-0">
+                                        <input class="form-check-input me-2" type="radio" name="loaiPhuTro" id="tncn" value="TNCN">
+                                        <label class="form-check-label" for="tncn">TNCN</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Nút bấm -->
+                            <div class="ms-auto">
+                                <div class="d-flex" style="gap: 0.75rem;">
+                                     <!-- <button id="btnCreateNewAdvanceSalaryTbl" class="btn btn-info btn-sm px-4">Tạo bảng lương mới</button> -->
+                                     <button id="btnExportExcel" class="btn btn-primary btn-sm px-4" title="Xuất dữ liệu ra Excel">
+                                         <i class="fa fa-download"></i> Export Excel
+                                     </button>
+                                     <button id="btnImportExcel" class="btn btn-success btn-sm px-4" title="Import dữ liệu từ Excel">
+                                         <i class="fa fa-upload"></i> Import Excel
+                                     </button>
+                                     <input type="file" id="fileInput" style="display: none;" accept=".xlsx, .xls, .csv">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Kết quả load AJAX -->
+                <div class="table-responsive" id="bangKetQua">
+                    <div class="text-center py-4 text-muted">
+                        Nhấn "Tìm kiếm" để tải dữ liệu
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/handsontable@14.3.0/dist/handsontable.full.min.css" />
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/handsontable@14.3.0/dist/handsontable.full.min.js"></script>
+    <script src="~/js/handsontable-formula.js?v=2.1"></script>
+    <script>
+        $(document).ready(function () {
+            // Khởi tạo với tháng/năm hiện tại
+            loadBangPhuTro();
+            loadBangPhuTro();
+            // Events
+            // $('#btnCreateNewAdvanceSalaryTbl').click(function () {
+                
+            // });
+
+            $('input[name="loaiPhuTro"]').change(function () {
+                loadBangPhuTro();
+            });
+
+            $('#selectMonth, #selectYear').change(function () {
+                loadBangPhuTro();
+            });
+
+            // Trigger file input
+            $('#btnImportExcel').click(function () {
+                $('#fileInput').click();
+            });
+
+            // Handle file selection
+            $('#fileInput').change(function () {
+                var file = this.files[0];
+                if (file) {
+                    var formData = new FormData();
+                    formData.append('file', file);
+                    formData.append('month', $('#selectMonth').val());
+                    formData.append('year', $('#selectYear').val());
+                    formData.append('type', $('input[name="loaiPhuTro"]:checked').val());
+
+                    // Show loading
+                    var oldHtml = $('#btnImportExcel').html();
+                    $('#btnImportExcel').html('<i class="fa fa-spinner fa-spin"></i> Processing...').prop('disabled', true);
+
+                    $.ajax({
+                        url: '/PhuTro/ImportPhuTro',
+                        type: 'POST',
+                        data: formData,
+                        processData: false, // Important
+                        contentType: false, // Important
+                        success: function (response) {
+                            if (response.success) {
+                                alert(response.message);
+                                loadBangPhuTro(); // Reload data
+                            } else {
+                                alert('Error: ' + response.message);
+                            }
+                        },
+                        error: function (xhr, status, error) {
+                             alert('System Error: ' + (xhr.responseText || error));
+                        },
+                        complete: function () {
+                            $('#btnImportExcel').html(oldHtml).prop('disabled', false);
+                            $('#fileInput').val(''); // Reset input
+                        }
+                    });
+                }
+            });
+
+            // Handle Export Logic
+            $('#btnExportExcel').click(function () {
+                var loai = $('input[name="loaiPhuTro"]:checked').val();
+                var thang = $('#selectMonth').val();
+                var nam = $('#selectYear').val();
+
+                // Build URL
+                var url = '/PhuTro/ExportPhuTro?loai=' + loai + '&thang=' + thang + '&nam=' + nam;
+                
+                // Open in new tab or trigger download
+                window.location.href = url;
+            });
+
+            function TaoBangThangMoi()
+            {
+                const thang = parseInt($('#selectMonth').val());
+                const nam = parseInt($('#selectYear').val());
+
+            }
+
+            function loadBangPhuTro() {
+                const loai = $('input[name="loaiPhuTro"]:checked').val();
+                const thang = parseInt($('#selectMonth').val());
+                const nam = parseInt($('#selectYear').val());
+
+                $('#bangKetQua').html('<div class="text-center py-4">Đang tải dữ liệu...</div>');
+
+                $.ajax({
+                    url: '/PhuTro/RenderPhuTro',
+                    type: 'GET',
+                    data: { loai: loai, thang: thang, nam: nam },
+                    success: function (data) {
+                        $('#bangKetQua').html(data);
+                    },
+                    error: function (xhr, status, error) {
+                        let errorMsg = 'Lỗi khi tải dữ liệu. ';
+                        if (xhr.responseText) {
+                            errorMsg += 'Chi tiết: ' + xhr.responseText;
+                        } else {
+                            errorMsg += 'Status: ' + status + ', Error: ' + error;
+                        }
+                        $('#bangKetQua').html('<div class="alert alert-danger">' + errorMsg + '</div>');
+                    }
+                });
+            }
+        });
+    </script>
+}
+
+<style>
+</style>

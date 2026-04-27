@@ -1,0 +1,741 @@
+﻿@model PMS.Models.LeaveManagementResponse
+
+@{
+    ViewBag.Title = "Quản lý nghỉ phép";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var selectedYear = ViewBag.SelectedYear ?? DateTime.Now.Year;
+    var currentYear = DateTime.Now.Year;
+    var startYear = currentYear - 5;
+    var endYear = currentYear + 2;
+
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+
+                    <!-- Filter Section -->
+                    <div class="row mt-3 mb-4">
+                        <div class="col-12">
+                            <div class="d-flex align-items-center flex-wrap" style="gap: 15px;">
+                                <!-- Chọn năm -->
+                                <div class="d-flex align-items-center">
+                                    <label for="selectYear" class="mb-0 me-2">Năm:</label>
+                                    <select id="selectYear" class="form-control" style="width: 90px;">
+                                        @for (int year = startYear; year <= endYear; year++)
+                                        {
+                                            if (year == selectedYear)
+                                            {
+                                                <option value="@year" selected>@year</option>
+                                            }
+                                            else
+                                            {
+                                                <option value="@year">@year</option>
+                                            }
+                                        }
+                                    </select>
+                                </div>
+
+                                <!-- Nút bấm -->
+                                <div class="ms-auto">
+                                    <div class="d-flex" style="gap: 10px;">
+                                        <button id="btnSearch" class="btn btn-info btn-sm px-4" style="display: none">
+                                            <i class="fa fa-search"></i> Tìm kiếm
+                                        </button>
+                                        <button id="btnExportExcel" class="btn btn-primary btn-sm px-4">
+                                            <i class="fa fa-file-excel"></i> Xuất Excel
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Title -->
+                   @*  <h4 class=" text-primary font-weight-bold mb-4">
+                        @Model.Title
+                    </h4> *@
+
+                    <!-- Handsontable Container -->
+                    <div id="leaveManagementTable" style="overflow: visible;">
+                        <div id="leaveHotContainer"></div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Include Handsontable CSS & JS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/handsontable@14.3.0/dist/handsontable.full.min.css" />
+<style>
+    /* Tăng kích thước chữ */
+    .handsontable td {
+        color: #000000 !important;
+        font-size: 14px !important;
+    }
+    .handsontable span.colHeader {
+        color: black !important;
+        font-weight: 700 !important;
+    }
+    /* Ẩn scrollbar dọc của Handsontable, giữ scrollbar ngang ở dưới */
+    #leaveHotContainer .wtHolder {
+        overflow-x: auto !important;
+        overflow-y: visible !important;
+        height: auto !important;
+    }
+    #leaveHotContainer .ht_master .wtHolder {
+        overflow-x: auto !important;
+        overflow-y: visible !important;
+    }
+    /* Ẩn scrollbar của header clone - chỉ giữ 1 scroll ở dưới */
+    #leaveHotContainer .ht_clone_top .wtHolder {
+        overflow: hidden !important;
+    }
+</style>
+<script src="https://cdn.jsdelivr.net/npm/handsontable@14.3.0/dist/handsontable.full.min.js"></script>
+<script src="~/js/handsontable-formula.js?v=2.1"></script>
+<script>
+    (function () {
+        const container = document.getElementById('leaveHotContainer');
+
+        // Lấy dữ liệu từ model
+        const leaveData = @Html.Raw(Json.Serialize(Model));
+        if (!leaveData || !leaveData.departmentGroups) {
+            console.log('Không có dữ liệu để hiển thị');
+            return;
+        }
+
+        const monthLabels = Array.from({ length: 12 }, (_, i) => `T${i + 1}`);
+
+        const nestedHeaders = [
+            [
+                { label: 'TT', rowspan: 2 },
+                { label: 'HỌ VÀ TÊN', rowspan: 2 },
+                { label: 'Mã nhân viên', rowspan: 2 },
+                { label: 'Ngày tuyển dụng', colspan: 3 },
+                { label: `Số năm lao động <br/> tính đến <br/> 31/12/${leaveData.year}`, colspan: 2 },
+                { label: 'Số <br/> ngày phép <br/> theo chế độ', rowspan: 2 },
+                { label: 'Số ngày <br/> đã nghỉ <br/> cả năm', rowspan: 2 },
+                { label: 'Số ngày <br/> phép <br/> còn lại', rowspan: 2 },
+                { label: 'Số liệu chi tiết <br/> từng tháng', colspan: 12 },
+                { label: `Chuyển phép sang <br/> tháng 01/${leaveData.year + 1}`, rowspan: 2 }
+            ],
+            [
+                '', '', '',
+                'Ngày', 'Tháng', 'Năm',
+                'Năm', 'Tháng',
+                '', '', '',
+                ...monthLabels,
+                ''
+            ]
+        ];
+
+        const columns = [
+            { data: 0, type: 'numeric', width: 40, readOnly: true }, // TT
+            { data: 1, type: 'text', readOnly: true }, // Họ và tên
+            { data: 2, type: 'text', readOnly: true }, // Mã nhân viên
+            { data: 3, type: 'numeric', width: 35, readOnly: true }, // Ngày
+            { data: 4, type: 'numeric', width: 35, readOnly: true }, // Tháng
+            { data: 5, type: 'numeric', width: 55, readOnly: true }, // Năm
+            { data: 6, type: 'numeric', width: 55, readOnly: true }, // Số năm
+            { data: 7, type: 'numeric', width: 40, readOnly: true }, // Số tháng
+            { data: 8, type: 'numeric', width: 65, readOnly: true }, // Số ngày phép theo chế độ
+            { data: 9, type: 'numeric', width: 65, readOnly: true }, // Số ngày đã nghỉ cả năm
+            { data: 10, type: 'numeric', width: 65, readOnly: true }, // Số ngày phép còn lại
+        ];
+
+
+        for (let i = 0; i < 12; i++) {
+            columns.push({
+                data: 11 + i,
+                type: 'text',
+                numericFormat: { pattern: '0' },
+                width: 30, // nhỏ gọn hơn
+                readOnly: false                
+            });
+        }
+
+        // Cột chuyển phép sang năm sau
+        columns.push({
+            data: 23,
+            type: 'numeric',
+            width: 70,
+            readOnly: true
+        });
+
+        // Tạo map để lưu userId theo row index
+        const rowUserIdMap = new Map();
+
+        function makeGroupRow(departmentName) {
+            const row = new Array(24).fill('');
+            row[1] = departmentName;
+            return row;
+        }
+
+        function makeEmployeeRow(index, employee) {
+            const row = new Array(24).fill('');
+
+            row[0] = index;
+            row[1] = employee.fullName;
+            row[2] = employee.userCode;
+
+            // Xử lý ngày tuyển dụng
+            if (employee.employmentDate) {
+                const hireDate = new Date(employee.employmentDate);
+                if (!isNaN(hireDate.getTime())) {
+                    row[3] = hireDate.getDate();
+                    row[4] = hireDate.getMonth() + 1;
+                    row[5] = hireDate.getFullYear();
+                }
+            }
+
+            row[6] = employee.workingYearsYear || 0;
+            row[7] = employee.workingYearsMonth || 0;
+            row[8] = employee.totalLeaveDaysByPolicy || 0; // Đã bao gồm chuyển phép từ năm trước
+            row[9] = employee.usedLeaveDays || 0;
+            row[10] = employee.remainingLeaveDays || 0; // Số ngày còn lại cuối năm
+
+            // Dữ liệu nghỉ phép từng tháng
+            for (let month = 1; month <= 12; month++) {
+                const monthlyData = employee.monthlyLeaveData;
+                if (monthlyData && typeof monthlyData === 'object') {
+                    row[10 + month] = monthlyData[month] || 0;
+                } else {
+                    row[10 + month] = 0;
+                }
+            }
+
+            // QUAN TRỌNG: Cột chuyển phép = số ngày còn lại cuối năm
+            row[23] = employee.remainingLeaveDays || 0; // Chuyển phép sang năm sau
+
+            return row;
+        }
+
+        const data = [];
+        let globalIndex = 1;
+        let currentRowIndex = 0;
+
+        leaveData.departmentGroups.forEach(dept => {
+            data.push(makeGroupRow(dept.departmentName));
+            currentRowIndex++;
+
+            dept.employees.forEach(emp => {
+                const employeeRow = makeEmployeeRow(globalIndex++, emp);
+                data.push(employeeRow);
+                // Lưu mapping userId với row index
+                rowUserIdMap.set(currentRowIndex, emp.userId);
+                currentRowIndex++;
+            });
+        });
+
+        console.log('Row-User mapping:', Array.from(rowUserIdMap.entries()));
+        console.log('Sample employee data:', leaveData.departmentGroups[0]?.employees[0]);
+
+        // Hàm để tính lại tổng số ngày nghỉ
+        function recalculateUsedDays(row) {
+            let total = 0;
+            for (let month = 11; month <= 22; month++) { // Cột 11-22 là các tháng
+                const value = hot.getDataAtCell(row, month);
+                if (value && !isNaN(value)) {
+                    total += parseInt(value);
+                }
+            }
+            return total;
+        }
+
+        function updateRemainingDays(row) {
+            const totalByPolicy = hot.getDataAtCell(row, 8) || 0; // Số ngày phép theo chế độ
+
+            // Tính số đã nghỉ thật sự từ các cột tháng
+            let usedDays = 0;
+            for (let col = 11; col <= 22; col++) {
+                let v = hot.getDataAtCell(row, col);
+                if (v && !isNaN(v)) usedDays += parseInt(v);
+            }
+
+            const remaining = Math.max(totalByPolicy - usedDays, 0); // Đảm bảo không âm
+
+            hot.setDataAtCell(row, 9, usedDays, 'auto'); // Số ngày đã nghỉ cả năm
+            hot.setDataAtCell(row, 10, remaining, 'auto'); // Số ngày còn lại
+            hot.setDataAtCell(row, 23, remaining, 'auto'); // QUAN TRỌNG: Cập nhật cột chuyển phép = số ngày còn lại
+        }
+
+        // Hàm gọi API để lưu dữ liệu
+        async function saveLeaveData(userId, month, year, leaveDays) {
+            try {
+                console.log('Saving data:', { userId, month, year, leaveDays });
+
+                const response = await fetch('@Url.Action("UpdateLeave", "LeaveManagement")', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]')?.value || ''
+                    },
+                    body: JSON.stringify({
+                        UserId: userId,
+                        Month: month,
+                        Year: year,
+                        LeaveDays: leaveDays
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const result = await response.json();
+                console.log('API response:', result);
+
+                if (result.success) {
+                    showToast('Lưu dữ liệu thành công!', 'success');
+                } else {
+                    showToast('Lỗi: ' + result.message, 'error');
+                }
+
+                return result;
+            } catch (error) {
+                console.error('API call error:', error);
+                showToast('Lỗi kết nối! Vui lòng thử lại.', 'error');
+                return { success: false, message: 'Lỗi kết nối: ' + error.message };
+            }
+        }
+
+        function showToast(message, type = 'info') {
+            // Tính toán vị trí để không bị header che
+            const header = document.querySelector('header, .header, .navbar, .fixed-top');
+            const headerHeight = header ? header.offsetHeight : 0;
+            const toastTop = headerHeight + 20; // Cách header 20px
+
+            // Tạo toast element
+            const toast = document.createElement('div');
+            toast.className = `alert alert-${type === 'success' ? 'success' : 'danger'} alert-dismissible fade show`;
+            toast.style.position = 'fixed';
+            toast.style.top = toastTop + 'px'; // Sử dụng top tính toán
+            toast.style.right = '20px';
+            toast.style.zIndex = '9999';
+            toast.style.minWidth = '300px';
+            toast.style.maxWidth = '400px';
+            toast.style.wordWrap = 'break-word';
+
+            toast.innerHTML = `
+                ${message}
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            `;
+
+            document.body.appendChild(toast);
+
+            // Tự động ẩn sau 5 giây
+            setTimeout(() => {
+                if (toast.parentElement) {
+                    toast.remove();
+                }
+            }, 5000);
+
+            // Thêm event listener cho nút close
+            const closeButton = toast.querySelector('.close');
+            if (closeButton) {
+                closeButton.addEventListener('click', function() {
+                    toast.remove();
+                });
+            }
+        }
+
+        const hot = new Handsontable(container, {
+            data: data,
+            columns: columns,
+            colHeaders: false,
+            rowHeaders: false,
+            nestedHeaders: nestedHeaders,
+            width: '100%',
+            height: 'auto',  // Sử dụng scroll dọc của web
+            stretchH: 'all',
+            autoColumnSize: true,
+            manualColumnFreeze: true,
+            manualColumnMove: true,
+            fixedColumnsLeft: 0,
+            filters: false,
+            dropdownMenu: false,
+            contextMenu: true,
+            licenseKey: 'non-commercial-and-evaluation',
+
+            // Event handlers
+            afterChange: function (changes, source) {
+                if (source === 'edit' && changes) {
+                    console.log('Data changed:', changes);
+
+                    changes.forEach(([row, col, oldVal, newVal]) => {
+                        // Chỉ xử lý khi thay đổi các cột tháng (11-22)
+                        if (col >= 11 && col <= 22) {
+                            const userId = rowUserIdMap.get(row);
+                            console.log(`Row ${row}, Col ${col}, UserId: ${userId}`);
+
+                            if (userId) {
+                                const month = col - 10; // Convert column index to month (1-12)
+                                const year = leaveData.year || new Date().getFullYear();
+                                const leaveDays = parseInt(newVal) || 0;
+
+                                console.log(`Attempting to save: UserId=${userId}, Month=${month}, Year=${year}, LeaveDays=${leaveDays}`);
+
+                                // Validate giá trị
+                                if (leaveDays < 0 || leaveDays > 31) {
+                                    showToast('Số ngày nghỉ phải từ 0 đến 31!', 'error');
+                                    hot.setDataAtCell(row, col, oldVal || 0, 'auto');
+                                    return;
+                                }
+
+                                // Lưu dữ liệu và cập nhật tổng
+                                saveLeaveData(userId, month, year, leaveDays).then(result => {
+                                    if (result.success) {
+                                        // QUAN TRỌNG: Cập nhật lại tất cả các cột tự động
+                                        updateRemainingDays(row);
+                                    } else {
+                                        // Revert về giá trị cũ nếu lưu thất bại
+                                        hot.setDataAtCell(row, col, oldVal || 0, 'auto');
+                                    }
+                                });
+                            } else {
+                                console.warn('Không tìm thấy userId cho row:', row);
+                            }
+                        }
+                    });
+                }
+            },
+            cells: function (row, col) {
+                const cellProperties = {};
+                const dataAtRow = this.instance.getDataAtRow(row);
+
+                // Nếu là dòng nhóm (phòng ban)
+                if (dataAtRow && dataAtRow[1] && dataAtRow[0] === '' && (!dataAtRow[2] || dataAtRow[2] === '')) {
+                    cellProperties.readOnly = true;
+                    cellProperties.renderer = function (instance, td, row, col, prop, value, cellProperties) {
+                        td.style.fontStyle = 'italic';
+                        td.style.color = 'blue';
+                        td.style.fontWeight = 'bold';
+                        td.style.background = '#f0f8ff';
+                        td.innerHTML = value || '';
+                    };
+                } else {
+                    // Căn giữa tất cả cột trừ cột "Họ và tên" (col = 1)
+                    if (col !== 1) {
+                        cellProperties.className = 'htCenter';
+                    }
+                }
+
+                return cellProperties;
+            }
+
+        });
+
+        // ===== HIỂN THỊ CÔNG THỨC TRONG SEARCH-BOX =====
+        HandsontableFormula.init(hot, 'formulaInput', {
+            getFormula: function(row, col, value, hotInstance) {
+                const rowData = hotInstance.getSourceDataAtRow(row);
+                
+                // // Kiểm tra nếu là dòng phòng ban (không có mã nhân viên)
+                // if (!rowData || !rowData[2]) {
+                //     return '';
+                // }
+                
+                // // Các cột tháng (11-22)
+                // if (col >= 11 && col <= 22) {
+                //     const month = col - 10; // Convert column index to month (1-12)
+                //     return `= Số ngày nghỉ phép tháng ${month}`;
+                // }
+                
+                // // Cột số ngày đã nghỉ cả năm (col 9)
+                // if (col === 9) {
+                //     return `= TỔNG(T1 + T2 + T3 + T4 + T5 + T6 + T7 + T8 + T9 + T10 + T11 + T12)`;
+                // }
+                
+                // // Cột số ngày còn lại (col 10)
+                // if (col === 10) {
+                //     return `= Số ngày phép theo chế độ - Số ngày đã nghỉ cả năm`;
+                // }
+                
+                // // Cột chuyển phép sang năm sau (col 23)
+                // if (col === 23) {
+                //     return `= Số ngày phép còn lại (chuyển sang năm ${leaveData.year + 1})`;
+                // }
+                
+                return `= ${value}`;
+            },
+            
+            shouldShow: function(row, col, value) {
+                        return value != null && value !== '';
+                    }
+        });
+
+        // Chọn năm tự load và nút Tìm kiếm vẫn hoạt động
+        const btnSearch = document.getElementById('btnSearch');
+        const selectYear = document.getElementById('selectYear');
+
+        async function loadByYear() {
+        const year = document.getElementById('selectYear').value;
+        if (year) {
+            try {
+                // Hiển thị loading
+                showLoading(true);
+
+                console.log('Loading data for year:', year);
+
+                // Gọi AJAX để lấy dữ liệu JSON
+                const response = await fetch(`/LeaveManagement/GetLeaveData?year=${year}`, {
+                    method: 'GET',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json'
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const result = await response.json();
+                console.log('API response:', result);
+
+                if (result.success && result.data) {
+                    // Render lại bảng với dữ liệu mới
+                    renderHandsontable(result.data);
+
+                    // Cập nhật URL không reload trang
+                    const newUrl = `${window.location.pathname}?year=${year}`;
+                    window.history.pushState({ path: newUrl }, '', newUrl);
+
+                    showToast('Tải dữ liệu thành công!', 'success');
+                } else {
+                    throw new Error(result.message || 'Lỗi khi tải dữ liệu');
+                }
+
+            } catch (error) {
+                console.error('Error loading data:', error);
+                showToast('Lỗi khi tải dữ liệu: ' + error.message, 'error');
+            } finally {
+                showLoading(false);
+            }
+        }
+    }
+
+        function renderHandsontable(leaveData) {
+        const container = document.getElementById('leaveHotContainer');
+        if (!container) {
+            console.error('Không tìm thấy container');
+            return;
+        }
+
+        // Xóa table cũ nếu có
+        container.innerHTML = '';
+
+        if (!leaveData || !leaveData.departmentGroups) {
+            console.log('Không có dữ liệu để hiển thị');
+            container.innerHTML = '<div class="alert alert-info">Không có dữ liệu</div>';
+            return;
+        }
+
+        // Cấu hình columns và data (giữ nguyên code của bạn)
+        const monthLabels = Array.from({ length: 12 }, (_, i) => `T${i + 1}`);
+
+        const nestedHeaders = [
+            [
+                { label: 'TT', rowspan: 2 },
+                { label: 'HỌ VÀ TÊN', rowspan: 2 },
+                { label: 'Mã nhân viên', rowspan: 2 },
+                { label: 'Ngày tuyển dụng', colspan: 3 },
+                { label: `Số năm lao động <br/> tính đến 31/12/${leaveData.year}`, colspan: 2 },
+                { label: 'Số ngày phép <br/> theo chế độ', rowspan: 2 },
+                { label: 'Số ngày <br/> đã nghỉ cả năm', rowspan: 2 },
+                { label: 'Số ngày <br/> phép còn lại', rowspan: 2 },
+                { label: 'Số liệu chi tiết <br/> từng tháng', colspan: 12 },
+                { label: `Chuyển phép sang <br/> tháng 01/${leaveData.year + 1}`, rowspan: 2 }
+            ],
+            [
+                '', '', '',
+                'Ngày', 'Tháng', 'Năm',
+                'Năm', 'Tháng',
+                '', '', '',
+                ...monthLabels,
+                ''
+            ]
+        ];
+
+        const columns = [
+            { data: 0, type: 'numeric', width: 30, readOnly: true },
+            { data: 1, type: 'text', width: 160, readOnly: true },
+            { data: 2, type: 'text', width: 70, readOnly: true },
+            { data: 3, type: 'numeric', width: 35, readOnly: true },
+            { data: 4, type: 'numeric', width: 35, readOnly: true },
+            { data: 5, type: 'numeric', width: 55, readOnly: true },
+            { data: 6, type: 'numeric', width: 55, readOnly: true },
+            { data: 7, type: 'numeric', width: 40, readOnly: true },
+            { data: 8, type: 'numeric', width: 65, readOnly: true },
+            { data: 9, type: 'numeric', width: 65, readOnly: true },
+            { data: 10, type: 'numeric', width: 65, readOnly: true },
+        ];
+
+        for (let i = 0; i < 12; i++) {
+            columns.push({
+                data: 11 + i,
+                type: 'numeric',
+                numericFormat: { pattern: '0' },
+                width: 45,
+                readOnly: false
+            });
+        }
+
+        columns.push({
+            data: 23,
+            type: 'numeric',
+            width: 70,
+            readOnly: true
+        });
+
+        // Tạo data
+        const rowUserIdMap = new Map();
+        const data = [];
+        let globalIndex = 1;
+        let currentRowIndex = 0;
+
+        function makeGroupRow(departmentName) {
+            const row = new Array(24).fill('');
+            row[1] = departmentName;
+            return row;
+        }
+
+        function makeEmployeeRow(index, employee) {
+            const row = new Array(24).fill('');
+            row[0] = index;
+            row[1] = employee.fullName;
+            row[2] = employee.userCode;
+
+            if (employee.employmentDate) {
+                const hireDate = new Date(employee.employmentDate);
+                if (!isNaN(hireDate.getTime())) {
+                    row[3] = hireDate.getDate();
+                    row[4] = hireDate.getMonth() + 1;
+                    row[5] = hireDate.getFullYear();
+                }
+            }
+
+            row[6] = employee.workingYearsYear || 0;
+            row[7] = employee.workingYearsMonth || 0;
+            row[8] = employee.totalLeaveDaysByPolicy || 0;
+            row[9] = employee.usedLeaveDays || 0;
+            row[10] = employee.remainingLeaveDays || 0;
+
+            for (let month = 1; month <= 12; month++) {
+                const monthlyData = employee.monthlyLeaveData;
+                if (monthlyData && typeof monthlyData === 'object') {
+                    row[10 + month] = monthlyData[month] || 0;
+                } else {
+                    row[10 + month] = 0;
+                }
+            }
+
+            row[23] = employee.remainingLeaveDays || 0;
+            return row;
+        }
+
+        leaveData.departmentGroups.forEach(dept => {
+            data.push(makeGroupRow(dept.departmentName));
+            currentRowIndex++;
+
+            dept.employees.forEach(emp => {
+                const employeeRow = makeEmployeeRow(globalIndex++, emp);
+                data.push(employeeRow);
+                rowUserIdMap.set(currentRowIndex, emp.userId);
+                currentRowIndex++;
+            });
+        });
+
+        // Khởi tạo Handsontable
+        const hot = new Handsontable(container, {
+            data: data,
+            columns: columns,
+            colHeaders: false,
+            rowHeaders: true,
+            nestedHeaders: nestedHeaders,
+            width: '100%',
+            height: 600,
+            stretchH: 'all',
+            autoColumnSize: true,
+            manualColumnFreeze: true,
+            manualColumnMove: true,
+            fixedColumnsLeft: 3,
+            filters: false,
+            dropdownMenu: false,
+            contextMenu: true,
+            licenseKey: 'non-commercial-and-evaluation',
+
+            // Các events khác giữ nguyên
+            afterChange: function (changes, source) {
+                // Giữ nguyên logic afterChange của bạn
+            },
+
+            cells: function (row, col) {
+                // Giữ nguyên logic cells của bạn
+            }
+        });
+
+        window.currentHot = hot; // Lưu reference để sử dụng sau này
+        window.rowUserIdMap = rowUserIdMap; // Lưu mapping
+    }
+
+        function showLoading(show) {
+        if (show) {
+            // Tạo hoặc hiển thị loading
+            let loading = document.getElementById('loadingIndicator');
+            if (!loading) {
+                loading = document.createElement('div');
+                loading.id = 'loadingIndicator';
+                loading.innerHTML = `
+                    <div class="text-center p-3">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <p class="mt-2">Đang tải dữ liệu...</p>
+                    </div>
+                `;
+                loading.style.position = 'fixed';
+                loading.style.top = '50%';
+                loading.style.left = '50%';
+                loading.style.transform = 'translate(-50%, -50%)';
+                loading.style.zIndex = '9999';
+                loading.style.background = 'rgba(255,255,255,0.9)';
+                loading.style.padding = '20px';
+                loading.style.borderRadius = '8px';
+                loading.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+                document.body.appendChild(loading);
+            }
+        } else {
+            // Ẩn loading
+            const loading = document.getElementById('loadingIndicator');
+            if (loading) {
+                loading.remove();
+            }
+        }
+    }
+      
+
+
+        selectYear?.addEventListener('change', loadByYear);
+        btnSearch?.addEventListener('click', loadByYear);
+
+        // Nút Xuất Excel
+        document.getElementById('btnExportExcel')?.addEventListener('click', function () {
+            const year = selectYear.value || new Date().getFullYear();
+            window.location.href = '@Url.Action("ExportExcel", "LeaveManagement")?year=' + year;
+        });
+
+
+    })();
+</script>
+
+<style>
+</style>

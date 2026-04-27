@@ -1,0 +1,351 @@
+﻿@model IEnumerable<PMS.Models.TblTransfer>
+
+@{
+    ViewData["Title"] = "Danh sách điều chuyển";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                @* <div class="row">
+                    <div class="col-lg-5">
+                        <h4 class="card-title" style="margin-bottom:0px;">Quản lý danh sách điều chuyển</h4>
+                    </div>
+                    <div class="col-lg-7" style="text-align: right;">
+                        <a class="btn btn-sm btn-primary" href="@Url.Action("Create", "TransferUser")">Điều chuyển</a>
+                    </div>
+                </div> *@
+
+                <div class="table-responsive">
+                    <table id="myTable" class="table table-bordered table-striped">
+                        <thead>
+                            <tr>
+                                <th style="width: 50px;" class="text-center">STT</th>
+                                <th class="text-center">Tên nhân viên</th>
+                                <th class="text-center">Phòng ban</th>
+                                <th class="text-center">Chức danh</th>
+                                <th class="text-center">Mã nhân viên</th>
+                                <th class="text-center">Ngày hiệu lực</th>
+                                <th class="text-center">Hiệu lực</th>
+                                <th class="text-center">Ghi chú</th>
+                                <th class="text-nowrap">Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (Model != null)
+                            {
+                                int i = 1;
+                                foreach (var item in Model)
+                                {
+                                    <tr>
+                                        <td class="text-center">
+                                            @(i++)
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.EmployeeName)
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.Department)
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.Position)
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.EmployeeCode)
+                                        </td>
+                                        <td class="text-center">
+                                            @item.TransferDate.ToString("dd/MM/yyyy")
+                                        </td>
+                                        <td class="text-center">
+                                            @if (item.Status == 1)
+                                            {
+                                                <span class="text-success">Còn hiệu lực</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="text-danger">Hết hiệu lực</span>
+                                            }
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.Notes)
+                                        </td>
+                                        <td class="text-center">
+                                            <a class="btn btn-link p-0 mr-2" data-toggle="tooltip" data-original-title="Sửa" href="@Url.Action("Edit", "TransferUser", new { id = item.Id })">
+                                                <i class="fa fa-pencil text-warning"></i>
+                                            </a>
+                                            <a class="btn btn-link p-0 delete-transfer" href="#" data-id="@item.Id" data-name="@item.EmployeeName" data-toggle="tooltip" data-original-title="Xóa">
+                                                <i class="fa fa-close text-danger"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="~/assets/node_modules/datatables/jquery.dataTables.min.js"></script>
+<script>
+    // Prepare data from ViewBag for JavaScript
+    var selectedMonth = @(ViewBag.Month ?? 0);
+    var selectedYear = @(ViewBag.Year ?? 0);
+    var selectedDepartment = '@(ViewBag.DepartmentId ?? "")';
+    var departments = [
+        @if (ViewBag.Departments != null)
+        {
+            var depts = ViewBag.Departments as IEnumerable<dynamic>;
+            if (depts != null)
+            {
+                var deptList = new List<string>();
+                foreach (var dept in depts)
+                {
+                    deptList.Add($"{{ id: '{dept.Id}', name: '{dept.Name}' }}");
+                }
+                @Html.Raw(string.Join(", ", deptList))
+            }
+        }
+    ];
+
+    $(document).ready(function () {
+        $('#myTable').DataTable({
+
+            "language": {
+                "url": "//cdn.datatables.net/plug-ins/1.10.24/i18n/Vietnamese.json"
+            },
+            "pageLength": 10,
+            "order": [[0, 'asc']],
+            "dom":
+                '<"d-flex justify-content-between align-items-center mb-3"<"d-flex align-items-center"l><"d-flex align-items-center"f>>' +
+                '<"row"<"col-sm-12"tr>>' +
+                '<"row"<"col-sm-5"i><"col-sm-7"p>>',
+            "initComplete": function () {
+                // 1. Lấy container bên trái (chứa "Hiển thị")
+                var leftContainer = $('.dataTables_wrapper .d-flex.align-items-center').first();
+                
+                // 2. Tạo Month Select với Label
+                var monthLabel = $('<label>', {
+                    css: { 
+                        'margin-bottom': '0',
+                        'display': 'flex',
+                        'align-items': 'center',
+                        'gap': '8px'
+                    }
+                }).text('Tháng:');
+                
+                var monthSelect = $('<select>', {
+                    name: 'month',
+                    id: 'month',
+                    class: 'form-control',
+                    css: { width: '70px' }
+                });
+                monthSelect.append($('<option>', { value: '0', text: 'Tất cả' }));
+                for (var i = 1; i <= 12; i++) {
+                    monthSelect.append($('<option>', {
+                        value: i,
+                        text: i,
+                        selected: selectedMonth == i
+                    }));
+                }
+                monthLabel.append(monthSelect);
+                
+                // 3. Tạo Year Select với Label
+                var yearLabel = $('<label>', {
+                    css: { 
+                        'margin-bottom': '0',
+                        'display': 'flex',
+                        'align-items': 'center',
+                        'gap': '8px'
+                    }
+                }).text('Năm:');
+                
+                var currentYear = new Date().getFullYear();
+                var yearSelect = $('<select>', {
+                    name: 'year',
+                    id: 'year',
+                    class: 'form-control',
+                    css: { width: '90px' }
+                });
+                yearSelect.append($('<option>', { value: '0', text: 'Tất cả' }));
+                for (var i = currentYear - 5; i <= currentYear + 1; i++) {
+                    yearSelect.append($('<option>', {
+                        value: i,
+                        text: i,
+                        selected: selectedYear == i
+                    }));
+                }
+                yearLabel.append(yearSelect);
+                
+                // 4. Tạo Department Select với Label
+                var departmentLabel = $('<label>', {
+                    css: { 
+                        'margin-bottom': '0',
+                        'display': 'flex',
+                        'align-items': 'center',
+                        'gap': '8px'
+                    }
+                }).text('Phòng ban:');
+                
+                var departmentSelect = $('<select>', {
+                    name: 'department',
+                    id: 'department',
+                    class: 'form-control',
+                    css: { width: 'auto', minWidth: '200px' }
+                });
+                departmentSelect.append($('<option>', { value: '', text: 'Tất cả phòng ban' }));
+                departments.forEach(function(dept) {
+                    departmentSelect.append($('<option>', {
+                        value: dept.id,
+                        text: dept.name,
+                        selected: selectedDepartment == dept.id
+                    }));
+                });
+                departmentLabel.append(departmentSelect);
+                
+                // 5. Thêm các filter vào sau "Hiển thị ... bản ghi"
+                leftContainer.append(monthLabel);
+                leftContainer.append(yearLabel);
+                leftContainer.append(departmentLabel);
+                
+                // 6. Di chuyển search box vào leftContainer (để nó nằm sau department)
+                var searchBox = $('.dataTables_filter');
+                leftContainer.append(searchBox);
+                
+                // 7. Thêm nút "Điều chuyển" vào cuối
+                var addButton = '<a class="btn btn-sm btn-primary" href="@Url.Action("Create", "TransferUser")">Điều chuyển</a>';
+                leftContainer.append(addButton);
+
+                // 8. Điều chỉnh khoảng cách
+                leftContainer.css('gap', '15px');
+
+                // 9. Điều chỉnh label
+                $('.dataTables_length label, .dataTables_filter label').css({
+                    'margin-bottom': '0',
+                    'display': 'flex',
+                    'align-items': 'center',
+                    'gap': '8px'
+                });
+            }
+        });
+
+        // Tự động load lại khi chọn tháng/năm/phòng ban (sử dụng event delegation)
+        $(document).on('change', '#month, #year, #department', function() {
+            var month = $('#month').val();
+            var year = $('#year').val();
+            var department = $('#department').val();
+            
+            // Tạo URL với tham số
+            var url = '@Url.Action("Index", "TransferUser")';
+            var params = [];
+            
+            if (month) params.push('month=' + month);
+            if (year) params.push('year=' + year);
+            if (department) params.push('department=' + department);
+            
+            if (params.length > 0) {
+                url += '?' + params.join('&');
+            }
+            
+            // Chuyển hướng đến URL mới
+            window.location.href = url;
+        });
+
+         // Hàm hiển thị thông báo cập nhật
+            function showUpdateNotification(type, message) {
+                try {
+                    let alertClass, icon;
+                    if (type === 'success') {   
+                        alertClass = 'alert-success';
+                        icon = 'fa-check-circle';
+                    } else if (type === 'info') {
+                        alertClass = 'alert-info';
+                        icon = 'fa-info-circle';
+                    } else {
+                        alertClass = 'alert-danger';
+                        icon = 'fa-exclamation-triangle';
+                    }
+
+                    const notification = $(`
+                        <div class="alert ${alertClass} alert-dismissible fade show update-notification" role="alert" style="position: fixed; top: 20px; right: 20px; z-index: 99999; min-width: 300px; max-width: 400px;">
+                            <i class="fa ${icon}"></i> ${message}
+                            <button type="button" class="close" data-dismiss="alert">
+                                <span>&times;</span>
+                            </button>
+                        </div>
+                    `);
+
+                    $('body').append(notification);
+
+                    setTimeout(() => {
+                        try {
+                            notification.alert('close');
+                        } catch (e) {
+                            notification.remove();
+                        }
+                    }, 3000);
+                } catch (error) {
+                    console.error('Error showing notification:', error);
+                    alert(message);
+                }
+            }
+
+        // Xử lý xóa bản ghi điều chuyển
+        $(document).on('click', '.delete-transfer', function(e) {
+            e.preventDefault();
+            const transferId = $(this).data('id');
+            const employeeName = $(this).data('name');
+            
+            if (confirm(`Bạn có chắc chắn muốn xóa bản ghi điều chuyển của ${employeeName} không?`)) {
+                $.ajax({
+                    url: '@Url.Action("Delete", "TransferUser")/' + transferId,
+                    type: 'GET',
+                    success: function(response) {
+                        showUpdateNotification('success', 'Xóa bản ghi thành công!');
+                        // Reload trang sau 1 giây
+                        setTimeout(function() {
+                            location.reload();
+                        }, 1000);
+                    },
+                    error: function(xhr, status, error) {
+                        var errorMessage = 'Xóa bản ghi thất bại: ' + error;
+                        if (xhr.responseText) {
+                            try {
+                                var response = JSON.parse(xhr.responseText);
+                                errorMessage = response.Message || response.message || errorMessage;
+                            } catch (e) {
+                                // Nếu không parse được, dùng message mặc định
+                            }
+                        }
+                        showUpdateNotification('error', errorMessage);
+                    }
+                });
+            }
+        });
+
+
+    });
+</script>
+<style>
+    .dataTables_wrapper .d-flex.justify-content-between {
+        flex-wrap: nowrap !important;
+        justify-content: flex-start !important;
+        gap: 15px;
+    }
+    
+    .dataTables_wrapper .d-flex.align-items-center {
+        flex-wrap: nowrap !important;
+        gap: 15px;
+    }
+    
+    .dataTables_length select,
+    .dataTables_filter input {
+        margin-left: 8px;
+        margin-right: 0;
+    }
+
+</style>
