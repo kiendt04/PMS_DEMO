@@ -95,7 +95,7 @@ function tlvRender() {
   if (pill) pill.textContent = totalItems + ' bản ghi';
 
   if (pagedData.length === 0) {
-    tbody.innerHTML = `<tr class="cat-empty"><td colspan="6">
+    tbody.innerHTML = `<tr class="cat-empty"><td colspan="5">
       <svg width="40" height="40" viewBox="0 0 40 40" fill="none" style="display:block;margin:0 auto 10px;opacity:.25"><circle cx="20" cy="20" r="16" stroke="currentColor" stroke-width="2"/><path d="M14 20h12M20 14v12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
       Không tìm thấy kết quả phù hợp.
     </td></tr>`;
@@ -116,21 +116,17 @@ function tlvRender() {
           ${r.soNgayLamViec} ngày
         </span>
       </td>
-      <td style="text-align:center;">
-        ${r.soNgayLe > 0
-          ? `<span style="display:inline-block;padding:2px 10px;border-radius:99px;font-size:12.5px;font-weight:600;background:#FEF2F2;color:#DC2626;">${r.soNgayLe} ngày</span>`
-          : `<span style="color:#D1D5DB;font-weight:600">—</span>`
-        }
-      </td>
       <td style="text-align:center;white-space:nowrap;">
-        <button class="cat-btn-edit" onclick="tlvOpenEdit(${r.id})">
-          <svg viewBox="0 0 14 14" fill="none"><path d="M9.5 2.5l2 2L4 12H2v-2L9.5 2.5z" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          Sửa
-        </button>
-        <button class="cat-btn-del" onclick="tlvOpenDelete(${r.id})">
-          <svg viewBox="0 0 14 14" fill="none"><polyline points="2 4 3.5 4 12 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M11 4l-.7 8a1 1 0 0 1-1 .9H4.7a1 1 0 0 1-1-.9L3 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><path d="M5.5 4V3a1 1 0 0 1 1-1h1a1 1 0 0 1 1 1v1" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
-          Xóa
-        </button>
+        <div class="cat-action-btns">
+          <button class="cat-btn-edit" onclick="tlvOpenEdit(${r.id})">
+            <svg viewBox="0 0 14 14" fill="none"><path d="M9.5 2.5l2 2L4 12H2v-2L9.5 2.5z" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Sửa
+          </button>
+          <button class="cat-btn-del" onclick="tlvOpenDelete(${r.id})">
+            <svg viewBox="0 0 14 14" fill="none"><polyline points="2 4 3.5 4 12 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M11 4l-.7 8a1 1 0 0 1-1 .9H4.7a1 1 0 0 1-1-.9L3 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><path d="M5.5 4V3a1 1 0 0 1 1-1h1a1 1 0 0 1 1 1v1" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+            Xóa
+          </button>
+        </div>
       </td>
     </tr>`).join('');
 
@@ -166,7 +162,7 @@ function tlvGoPage(page) {
 
 // ─── Xóa lỗi form ────────────────────────────────────────────────────
 function _tlvClearErrors() {
-  ['errTlvThang', 'errTlvNam', 'errTlvNgayLV', 'errTlvNgayLe'].forEach(id => {
+  ['errTlvThang', 'errTlvNam', 'errTlvNgayLV'].forEach(id => {
     const el = document.getElementById(id);
     if (el) { el.style.display = 'none'; el.textContent = ''; }
   });
@@ -192,7 +188,6 @@ function tlvOpenAdd() {
   _tlvPopulateThangOptions(null);
   document.getElementById('tlvNam').value       = new Date().getFullYear();
   document.getElementById('tlvNgayLV').value    = '';
-  document.getElementById('tlvNgayLe').value    = '0';
   _tlvClearErrors();
   document.getElementById('tlvModal').classList.add('open');
   setTimeout(() => document.getElementById('tlvThang').focus(), 100);
@@ -207,7 +202,6 @@ function tlvOpenEdit(id) {
   _tlvPopulateThangOptions(r.thang);
   document.getElementById('tlvNam').value    = r.nam;
   document.getElementById('tlvNgayLV').value = r.soNgayLamViec;
-  document.getElementById('tlvNgayLe').value = r.soNgayLe;
   _tlvClearErrors();
   document.getElementById('tlvModal').classList.add('open');
 }
@@ -221,7 +215,6 @@ function tlvSave() {
   const thang      = parseInt(document.getElementById('tlvThang').value) || 0;
   const nam        = parseInt(document.getElementById('tlvNam').value)   || 0;
   const soNgayLV   = parseInt(document.getElementById('tlvNgayLV').value) || 0;
-  const soNgayLe   = parseInt(document.getElementById('tlvNgayLe').value) || 0;
 
   let valid = true;
   const errThang = document.getElementById('errTlvThang');
@@ -249,9 +242,9 @@ function tlvSave() {
 
   if (tlvEditId) {
     const r = tlvData.find(x => x.id === tlvEditId);
-    if (r) { r.thang = thang; r.nam = nam; r.soNgayLamViec = soNgayLV; r.soNgayLe = soNgayLe; }
+    if (r) { r.thang = thang; r.nam = nam; r.soNgayLamViec = soNgayLV; }
   } else {
-    tlvData.unshift({ id: tlvNextId++, thang, nam, soNgayLamViec: soNgayLV, soNgayLe });
+    tlvData.unshift({ id: tlvNextId++, thang, nam, soNgayLamViec: soNgayLV });
   }
 
   // Cập nhật lại dropdown năm nếu có năm mới
