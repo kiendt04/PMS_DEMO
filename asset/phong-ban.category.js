@@ -71,15 +71,17 @@ function pbcRender() {
       <td style="text-align:right">${r.hsTrachNhiem.toFixed(2)}</td>
       <td>${r.ngayHieuLuc}</td>
       <td style="color:#6B7280;font-size:13px">${r.moTa || '<span style="color:#D1D5DB">—</span>'}</td>
-      <td style="text-align:center;white-space:nowrap;">
-        <button class="cat-btn-edit" onclick="pbcOpenEdit(${r.id})">
-          <svg viewBox="0 0 14 14" fill="none"><path d="M9.5 2.5l2 2L4 12H2v-2L9.5 2.5z" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          Sửa
-        </button>
-        <button class="cat-btn-del" onclick="pbcOpenDelete(${r.id})">
-          <svg viewBox="0 0 14 14" fill="none"><polyline points="2 4 3.5 4 12 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M11 4l-.7 8a1 1 0 0 1-1 .9H4.7a1 1 0 0 1-1-.9L3 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><path d="M5.5 4V3a1 1 0 0 1 1-1h1a1 1 0 0 1 1 1v1" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
-          Xóa
-        </button>
+      <td style="text-align:center; white-space:nowrap;">
+        <div class="cat-action-btns">
+          <button class="cat-btn-edit" onclick="pbcOpenEdit(${r.id})">
+            <svg viewBox="0 0 14 14" fill="none"><path d="M9.5 2.5l2 2L4 12H2v-2L9.5 2.5z" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Sửa
+          </button>
+          <button class="cat-btn-del" onclick="pbcOpenDelete(${r.id})">
+            <svg viewBox="0 0 14 14" fill="none"><polyline points="2 4 3.5 4 12 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M11 4l-.7 8a1 1 0 0 1-1 .9H4.7a1 1 0 0 1-1-.9L3 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><path d="M5.5 4V3a1 1 0 0 1 1-1h1a1 1 0 0 1 1 1v1" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+            Xóa
+          </button>
+        </div>
       </td>
     </tr>`).join('');
 
@@ -222,3 +224,11 @@ document.getElementById('pbcDeleteModal').addEventListener('click', function (e)
 
 // ─── Khởi tạo ────────────────────────────────────────────────────
 pbcRender();
+
+(function() {
+  const prevOnPageActivate = window.onPageActivate;
+  window.onPageActivate = function(page) {
+    if (prevOnPageActivate) prevOnPageActivate(page);
+    if (page === 'phong-ban') pbcRender();
+  };
+})();

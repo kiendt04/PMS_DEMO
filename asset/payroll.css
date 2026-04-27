@@ -2038,6 +2038,12 @@ tbody tr:hover td { background: #FAFAFA; }
   border-spacing: 0;
 }
 
+.cat-action-btns {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+}
+
 .cat-table th {
   background: #f8fafc;
   padding: 1.25rem 1rem;
