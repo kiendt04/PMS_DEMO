@@ -283,3 +283,11 @@ document.getElementById('tlvDeleteModal').addEventListener('click', function (e)
 // ─── Khởi tạo ───────────────────────────────────────────────────────
 tlvInitYearFilter();
 tlvRender();
+
+(function() {
+  const prevOnPageActivate = window.onPageActivate;
+  window.onPageActivate = function(page) {
+    if (prevOnPageActivate) prevOnPageActivate(page);
+    if (page === 'dm-thoi-gian-lv') tlvRender();
+  };
+})();

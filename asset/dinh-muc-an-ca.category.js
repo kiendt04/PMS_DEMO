@@ -194,10 +194,13 @@ function dmacConfirmDelete() {
 }
 
 // ─── Initialize ───────────────────────────────────────────────────
-// This will be called when the page section is activated
-window.onPageActivate = window.onPageActivate || function(page) {
-  if (page === 'dm-an-ca') dmacRender();
-};
+(function() {
+  const prevOnPageActivate = window.onPageActivate;
+  window.onPageActivate = function(page) {
+    if (prevOnPageActivate) prevOnPageActivate(page);
+    if (page === 'dm-an-ca') dmacRender();
+  };
+})();
 
 // Also call it immediately if we're already on that page (unlikely but safe)
 if (document.getElementById('page-dm-an-ca')?.classList.contains('active')) {

@@ -252,6 +252,10 @@ function pnMonthViewDetail(id) {
 function pnDetailCloseModal() { document.getElementById('pnDetailModal').classList.remove('open'); }
 
 // ─── KHỞI TẠO ───────────────────────────────────────────────────────
-window.onPageActivate = window.onPageActivate || function(page) {
-  if (page === 'dm-phan-nguon') { pnMainRender(); pnMonthRender(); }
-};
+(function() {
+  const prevOnPageActivate = window.onPageActivate;
+  window.onPageActivate = function(page) {
+    if (prevOnPageActivate) prevOnPageActivate(page);
+    if (page === 'dm-phan-nguon') { pnMainRender(); pnMonthRender(); }
+  };
+})();
