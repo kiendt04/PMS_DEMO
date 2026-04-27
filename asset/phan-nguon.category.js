@@ -198,22 +198,54 @@ function pnMonthCloseDelete() { document.getElementById('pnMonthDeleteModal').cl
 function pnMonthViewDetail(id) {
   const r = pnMonthData.find(x => x.id === id);
   if (!r) return;
+  
   document.getElementById('pnDetailTitle').textContent = `Chi tiết phân nguồn - Tháng ${r.thang}/${r.nam}`;
-  // Mock data details
-  const details = [
-    { pb: 'Phòng Kỹ thuật', nld: r.nld * 0.4, nql: r.nql * 0.4 },
-    { pb: 'Phòng Kinh doanh', nld: r.nld * 0.3, nql: r.nql * 0.3 },
-    { pb: 'Phòng Hành chính', nld: r.nld * 0.3, nql: r.nql * 0.3 },
+  
+  // 1. Tính toán & hiển thị chỉ số tổng hợp (Mock calculations)
+  const v1 = r.nld * 0.7;
+  const v2 = r.nld * 0.3;
+  const nql = r.nql;
+  const tong = r.tong;
+  const tongHS = 150.5; // Mock
+  const giaTri1HS = tongHS > 0 ? Math.round(v1 / tongHS) : 0;
+
+  document.getElementById('pnSumV1').textContent = v1.toLocaleString() + ' VNĐ';
+  document.getElementById('pnSumV2').textContent = v2.toLocaleString() + ' VNĐ';
+  document.getElementById('pnSumNQL').textContent = nql.toLocaleString() + ' VNĐ';
+  document.getElementById('pnSumTong').textContent = tong.toLocaleString() + ' VNĐ';
+  document.getElementById('pnSumHeSo').textContent = tongHS.toFixed(2);
+  document.getElementById('pnSumGiaTri1HS').textContent = giaTri1HS.toLocaleString() + ' VNĐ';
+
+  // 2. Mock data cho bảng chi tiết
+  const units = [
+    { pb: 'Ban Giám đốc', hs: 25.5, gt1hs: giaTri1HS, ghiChu: '' },
+    { pb: 'Phòng Kỹ thuật', hs: 60.2, gt1hs: giaTri1HS, ghiChu: 'Đã duyệt' },
+    { pb: 'Phòng Kinh doanh', hs: 45.8, hs: 45.8, gt1hs: giaTri1HS, ghiChu: '' },
+    { pb: 'Phòng Hành chính', hs: 19.0, gt1hs: giaTri1HS, ghiChu: '' },
   ];
+
   const tbody = document.getElementById('pnDetailTbody');
-  tbody.innerHTML = details.map(d => `
-    <tr>
-      <td style="font-weight:600">${d.pb}</td>
-      <td style="text-align:right">${d.nld.toLocaleString()}</td>
-      <td style="text-align:right">${d.nql.toLocaleString()}</td>
-      <td style="text-align:right;font-weight:700;color:#185FA5">${(d.nld + d.nql).toLocaleString()}</td>
-    </tr>
-  `).join('');
+  tbody.innerHTML = units.map((u, i) => {
+    const quyLuongKH = Math.round(u.hs * u.gt1hs);
+    const quyLuongTT = quyLuongKH; // Mock
+    const thuongCD = Math.round(quyLuongKH * 0.05); // Mock 5%
+    const thuQuy = 0; // Mock
+
+    return `
+      <tr>
+        <td style="text-align:center; color:#94A3B8">${i + 1}</td>
+        <td style="font-weight:600; color:#1E293B">${u.pb}</td>
+        <td style="text-align:right">${u.hs.toFixed(2)}</td>
+        <td style="text-align:right; color:#059669">${u.gt1hs.toLocaleString()}</td>
+        <td style="text-align:right; font-weight:700">${quyLuongKH.toLocaleString()}</td>
+        <td style="text-align:right; font-weight:700; color:#185FA5">${quyLuongTT.toLocaleString()}</td>
+        <td style="text-align:right; color:#D97706">${thuongCD.toLocaleString()}</td>
+        <td style="text-align:right">${thuQuy.toLocaleString()}</td>
+        <td style="font-size:12px; color:#64748B">${u.ghiChu || '—'}</td>
+      </tr>
+    `;
+  }).join('');
+
   document.getElementById('pnDetailModal').classList.add('open');
 }
 
