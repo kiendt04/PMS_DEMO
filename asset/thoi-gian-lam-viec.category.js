@@ -110,12 +110,13 @@ function tlvRender() {
       <td>
         <span style="display:inline-block;padding:2px 10px;border-radius:99px;font-size:12px;font-weight:600;background:#EFF6FF;color:#1D4ED8;">${r.nam}</span>
       </td>
-      <td style="text-align:center;">
+      <td style="text-align:center; white-space:nowrap;">
         <span style="display:inline-flex;align-items:center;gap:5px;font-weight:700;color:#059669;font-size:14px;">
           <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><circle cx="6.5" cy="6.5" r="5.5" stroke="currentColor" stroke-width="1.3"/><path d="M6.5 4v3l2 1.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
           ${r.soNgayLamViec} ngày
         </span>
       </td>
+      <td style="color:#6B7280;font-size:13px">${r.ghiChu || '<span style="color:#D1D5DB">—</span>'}</td>
       <td style="text-align:center;white-space:nowrap;">
         <div class="cat-action-btns">
           <button class="cat-btn-edit" onclick="tlvOpenEdit(${r.id})">
@@ -162,7 +163,7 @@ function tlvGoPage(page) {
 
 // ─── Xóa lỗi form ────────────────────────────────────────────────────
 function _tlvClearErrors() {
-  ['errTlvThang', 'errTlvNam', 'errTlvNgayLV'].forEach(id => {
+  ['errTlvThang', 'errTlvNam', 'errTlvSoNgayLV'].forEach(id => {
     const el = document.getElementById(id);
     if (el) { el.style.display = 'none'; el.textContent = ''; }
   });
@@ -187,7 +188,8 @@ function tlvOpenAdd() {
   document.getElementById('tlvModalTitle').textContent = 'Thêm thời gian làm việc';
   _tlvPopulateThangOptions(null);
   document.getElementById('tlvNam').value = new Date().getFullYear();
-  document.getElementById('tlvNgayLV').value = '';
+  document.getElementById('tlvSoNgayLV').value = '';
+  document.getElementById('tlvGhiChu').value = '';
   _tlvClearErrors();
   document.getElementById('tlvModal').classList.add('open');
   setTimeout(() => document.getElementById('tlvThang').focus(), 100);
@@ -201,7 +203,8 @@ function tlvOpenEdit(id) {
   document.getElementById('tlvModalTitle').textContent = 'Sửa thời gian làm việc';
   _tlvPopulateThangOptions(r.thang);
   document.getElementById('tlvNam').value = r.nam;
-  document.getElementById('tlvNgayLV').value = r.soNgayLamViec;
+  document.getElementById('tlvSoNgayLV').value = r.soNgayLamViec;
+  document.getElementById('tlvGhiChu').value = r.ghiChu || '';
   _tlvClearErrors();
   document.getElementById('tlvModal').classList.add('open');
 }
@@ -214,12 +217,13 @@ function tlvCloseModal() {
 function tlvSave() {
   const thang = parseInt(document.getElementById('tlvThang').value) || 0;
   const nam = parseInt(document.getElementById('tlvNam').value) || 0;
-  const soNgayLV = parseInt(document.getElementById('tlvNgayLV').value) || 0;
+  const soNgayLV = parseInt(document.getElementById('tlvSoNgayLV').value) || 0;
+  const ghiChu = document.getElementById('tlvGhiChu').value.trim();
 
   let valid = true;
   const errThang = document.getElementById('errTlvThang');
   const errNam = document.getElementById('errTlvNam');
-  const errNgayLV = document.getElementById('errTlvNgayLV');
+  const errNgayLV = document.getElementById('errTlvSoNgayLV');
 
   if (errThang) errThang.style.display = 'none';
   if (errNam) errNam.style.display = 'none';
@@ -242,9 +246,9 @@ function tlvSave() {
 
   if (tlvEditId) {
     const r = tlvData.find(x => x.id === tlvEditId);
-    if (r) { r.thang = thang; r.nam = nam; r.soNgayLamViec = soNgayLV; }
+    if (r) { r.thang = thang; r.nam = nam; r.soNgayLamViec = soNgayLV; r.ghiChu = ghiChu; }
   } else {
-    tlvData.unshift({ id: tlvNextId++, thang, nam, soNgayLamViec: soNgayLV });
+    tlvData.unshift({ id: tlvNextId++, thang, nam, soNgayLamViec: soNgayLV, ghiChu: ghiChu });
   }
 
   // Cập nhật lại dropdown năm nếu có năm mới
