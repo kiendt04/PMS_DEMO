@@ -47,7 +47,12 @@
 
   /* ── Sidebar HTML ── */
   const sidebarHTML = `
-<div class="sidebar">
+<div class="sidebar" id="appSidebar">
+  <!-- Internal Toggle Button -->
+  <div class="sidebar-toggle-inner" id="sidebarToggleInner" title="Thu gọn/Mở rộng">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+  </div>
+
   <div class="sidebar-logo">
     <div class="sidebar-logo-icon">
       <svg viewBox="0 0 20 20" fill="none">
@@ -66,14 +71,15 @@
   <div class="sidebar-nav">
 
     <!-- Dashboard -->
-    <div class="nav-item active" data-page="dashboard">
-      <svg viewBox="0 0 16 16" fill="none"><rect x="1" y="1" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.3"/><rect x="9" y="1" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.3"/><rect x="1" y="9" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.3"/><rect x="9" y="9" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.3"/></svg>
-      Dashboard
+    <div class="nav-item active" data-page="dashboard" data-tooltip="Dashboard">
+      <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><rect x="1" y="1" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.3"/><rect x="9" y="1" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.3"/><rect x="1" y="9" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.3"/><rect x="9" y="9" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.3"/></svg>
+      <span>Dashboard</span>
     </div>
 
     <!-- DANH MỤC -->
-    <div class="nav-group open" id="grp-danhmuc">
-      <div class="nav-group-hdr" onclick="sidebarToggle('grp-danhmuc')">
+    <div class="nav-group open" id="grp-danhmuc" data-group-name="Danh mục">
+      <div class="nav-group-hdr" onclick="sidebarToggle('grp-danhmuc')" data-tooltip="Danh mục">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
         <span>Danh mục</span>
         <svg class="nav-group-arrow" width="10" height="10" viewBox="0 0 10 6" fill="none"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
       </div>
@@ -92,8 +98,9 @@
     </div>
 
     <!-- TIỆN ÍCH -->
-    <div class="nav-group" id="grp-tienich">
-      <div class="nav-group-hdr" onclick="sidebarToggle('grp-tienich')">
+    <div class="nav-group" id="grp-tienich" data-group-name="Tiện ích">
+      <div class="nav-group-hdr" onclick="sidebarToggle('grp-tienich')" data-tooltip="Tiện ích">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path></svg>
         <span>Tiện ích</span>
         <svg class="nav-group-arrow" width="10" height="10" viewBox="0 0 10 6" fill="none"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
       </div>
@@ -111,9 +118,10 @@
     </div>
 
     <!-- QUẢN LÝ PHÒNG BAN -->
-    <div class="nav-group" id="grp-qlpb">
-      <div class="nav-group-hdr" onclick="sidebarToggle('grp-qlpb')">
-        <span>Quản lý phòng ban</span>
+    <div class="nav-group" id="grp-qlpb" data-group-name="Phòng ban">
+      <div class="nav-group-hdr" onclick="sidebarToggle('grp-qlpb')" data-tooltip="Phòng ban">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+        <span>Phòng ban</span>
         <svg class="nav-group-arrow" width="10" height="10" viewBox="0 0 10 6" fill="none"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
       </div>
       <div class="nav-group-items">
@@ -124,9 +132,10 @@
     </div>
 
     <!-- QUẢN LÝ HỆ THỐNG -->
-    <div class="nav-group" id="grp-hethong">
-      <div class="nav-group-hdr" onclick="sidebarToggle('grp-hethong')">
-        <span>Quản lý hệ thống</span>
+    <div class="nav-group" id="grp-hethong" data-group-name="Hệ thống">
+      <div class="nav-group-hdr" onclick="sidebarToggle('grp-hethong')" data-tooltip="Hệ thống">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+        <span>Hệ thống</span>
         <svg class="nav-group-arrow" width="10" height="10" viewBox="0 0 10 6" fill="none"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
       </div>
       <div class="nav-group-items">
@@ -139,8 +148,11 @@
 
   </div><!-- /sidebar-nav -->
 
+  <!-- Flyout Submenu Container -->
+  <div id="sidebarFlyout" class="sidebar-flyout"></div>
+
   <div class="sidebar-bottom">
-    <div class="user-row">
+    <div class="user-row" data-tooltip="Tài khoản">
       <div class="user-avatar" id="sidebarAvatar">AD</div>
       <div>
         <div class="user-name" id="sidebarName">Admin</div>
@@ -218,9 +230,146 @@
 
   /* ── Accordion toggle ── */
   window.sidebarToggle = function (groupId) {
-    const grp = document.getElementById(groupId);
-    if (grp) grp.classList.toggle('open');
+    const sidebar = document.getElementById('appSidebar');
+    const isCollapsed = sidebar && sidebar.classList.contains('collapsed');
+
+    if (isCollapsed) {
+      // Show flyout menu if collapsed
+      showFlyout(groupId);
+    } else {
+      // Toggle accordion if expanded
+      const grp = document.getElementById(groupId);
+      if (grp) grp.classList.toggle('open');
+    }
   };
+
+  /* ── Flyout Submenu Logic ── */
+  const flyout = document.getElementById('sidebarFlyout');
+  function showFlyout(groupId) {
+    const grp = document.getElementById(groupId);
+    if (!grp || !flyout) return;
+
+    const groupName = grp.getAttribute('data-group-name');
+    const items = grp.querySelectorAll('.nav-item');
+    const hdr = grp.querySelector('.nav-group-hdr');
+    const rect = hdr.getBoundingClientRect();
+
+    let html = `<div class="sidebar-flyout-hdr">${groupName}</div>`;
+    items.forEach(item => {
+      const page = item.getAttribute('data-page');
+      const text = item.textContent;
+      const isActive = item.classList.contains('active') ? 'active' : '';
+      html += `<div class="flyout-item ${isActive}" onclick="sidebarNavigate('${page}'); hideFlyout();">${text}</div>`;
+    });
+
+    flyout.innerHTML = html;
+    flyout.style.top = rect.top + 'px';
+    flyout.classList.add('active');
+
+    // Close on click outside
+    const outsideClick = (e) => {
+      if (!flyout.contains(e.target) && !hdr.contains(e.target)) {
+        hideFlyout();
+        document.removeEventListener('mousedown', outsideClick);
+      }
+    };
+    document.addEventListener('mousedown', outsideClick);
+  }
+
+  window.hideFlyout = function() {
+    if (flyout) flyout.classList.remove('active');
+  };
+
+  /* ── Sidebar show/hide toggle ── */
+  function applySidebarState(collapsed) {
+    const sidebar = document.getElementById('appSidebar');
+    const main    = document.querySelector('.main');
+    if (collapsed) {
+      if (sidebar) sidebar.classList.add('collapsed');
+      if (main)    main.classList.add('sidebar-collapsed');
+    } else {
+      if (sidebar) sidebar.classList.remove('collapsed');
+      if (main)    main.classList.remove('sidebar-collapsed');
+    }
+  }
+
+  // Restore saved state OR default to collapsed on small screens
+  const isSmallScreen = window.innerWidth < 1024;
+  const _savedCollapsed = localStorage.getItem('pms_sidebar_collapsed');
+  const initialCollapsed = _savedCollapsed !== null ? (_savedCollapsed === 'true') : isSmallScreen;
+
+  applySidebarState(initialCollapsed);
+
+  const toggleBtn = document.getElementById('sidebarToggleInner');
+  if (toggleBtn) {
+    toggleBtn.addEventListener('click', function () {
+      const sidebar = document.getElementById('appSidebar');
+      const isCollapsed = sidebar && sidebar.classList.contains('collapsed');
+      const nextCollapsed = !isCollapsed;
+      applySidebarState(nextCollapsed);
+      localStorage.setItem('pms_sidebar_collapsed', nextCollapsed);
+      
+      // Close any open flyout
+      hideFlyout();
+
+      // Re-render HOT after transition so dimensions update
+      setTimeout(function () {
+        const active = document.querySelector('.page-section.active');
+        if (active) {
+          const pageId = active.id.replace('page-', '');
+          if (typeof window.onPageActivate === 'function') window.onPageActivate(pageId);
+        }
+      }, 350);
+    });
+  }
+
+  /* ── Navigation ── */
+  function navigateTo(page) {
+    // Update nav active state
+    document.querySelectorAll('.nav-item[data-page]').forEach(n => n.classList.remove('active'));
+    const activeItems = document.querySelectorAll(`.nav-item[data-page="${page}"]`);
+    activeItems.forEach(item => {
+      item.classList.add('active');
+      // Auto-expand parent group
+      const grp = item.closest('.nav-group');
+      if (grp && !grp.classList.contains('open')) {
+        const sidebar = document.getElementById('appSidebar');
+        if (sidebar && !sidebar.classList.contains('collapsed')) {
+          grp.classList.add('open');
+        }
+      }
+    });
+
+    // Switch page section
+    document.querySelectorAll('.page-section').forEach(s => {
+      s.classList.remove('active', 'fade-in');
+    });
+    const target = document.getElementById('page-' + page);
+    if (target) {
+      target.classList.add('active');
+      void target.offsetWidth; // reflow for animation
+      target.classList.add('fade-in');
+    }
+
+    // Update topbar title
+    const titleEl = document.getElementById('topbarTitle');
+    if (titleEl) titleEl.textContent = PAGE_TITLES[page] || page;
+
+    // Trigger page-specific init
+    if (typeof window.onPageActivate === 'function') {
+      window.onPageActivate(page);
+    }
+  }
+
+  // Attach click listeners after DOM ready
+  function attachNavListeners() {
+    document.querySelectorAll('.nav-item[data-page]').forEach(item => {
+      item.addEventListener('click', function () {
+        navigateTo(this.dataset.page);
+      });
+    });
+  }
+  attachNavListeners();
 
   /* ── Logout ── */
   const logoutBtn = document.getElementById('logoutBtn');
@@ -235,3 +384,4 @@
   window.sidebarNavigate = navigateTo;
 
 })();
+
