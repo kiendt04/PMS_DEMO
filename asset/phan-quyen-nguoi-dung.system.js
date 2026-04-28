@@ -1,10 +1,15 @@
 // ══════════ PHÂN QUYỀN NGƯỜI DÙNG (USER PERMISSIONS) ══════════
 let upermData = [
   { id: 1, account: 'admin', gd: true, tcns: true, tckt: true, pgd: true, nv: true, nvnl: true },
-  { id: 2, account: 'giangdt', gd: true, tcns: false, tckt: false, pgd: false, nv: false, nvnl: false },
-  { id: 3, account: 'huongpt', gd: false, tcns: true, tckt: false, pgd: false, nv: true, nvnl: false },
-  { id: 4, account: 'minhnv', gd: false, tcns: false, tckt: true, pgd: false, nv: true, nvnl: false },
-  { id: 5, account: 'thuynt', gd: false, tcns: false, tckt: false, pgd: false, nv: false, nvnl: true },
+  { id: 2, account: 'Bùi Hải Đăng', gd: true, tcns: false, tckt: false, pgd: false, nv: false, nvnl: false },
+  { id: 3, account: 'Bùi Hồng Nhung', gd: false, tcns: true, tckt: false, pgd: false, nv: true, nvnl: false },
+  { id: 4, account: 'Bùi Hữu Tài	', gd: false, tcns: false, tckt: true, pgd: false, nv: true, nvnl: false },
+  { id: 5, account: 'Bùi Minh Khoa', gd: false, tcns: false, tckt: false, pgd: false, nv: false, nvnl: true },
+  { id: 6, account: 'Bùi Ngọc Bảo', gd: false, tcns: false, tckt: false, pgd: false, nv: false, nvnl: true },
+  { id: 7, account: 'Bùi Ngọc Hà', gd: false, tcns: false, tckt: false, pgd: false, nv: false, nvnl: true },
+  { id: 8, account: 'Bùi Ngọc Khánh', gd: false, tcns: false, tckt: false, pgd: false, nv: false, nvnl: true },
+  { id: 9, account: 'Bùi Phương Thảo', gd: false, tcns: false, tckt: false, pgd: false, nv: false, nvnl: true },
+  { id: 10, account: 'Bùi Thanh Tâm', gd: false, tcns: false, tckt: false, pgd: false, nv: false, nvnl: true },
 ];
 
 // Dữ liệu mẫu thêm để xem phân trang
@@ -21,7 +26,7 @@ for (let i = 6; i <= 20; i++) {
   });
 }
 
-let upermNextId   = 21;
+let upermNextId = 21;
 let upermCurrentPage = 1;
 const UPERM_ITEMS_PER_PAGE = 10;
 
@@ -36,13 +41,13 @@ function upermRender() {
   const totalPages = Math.ceil(totalItems / UPERM_ITEMS_PER_PAGE) || 1;
 
   if (upermCurrentPage > totalPages) upermCurrentPage = totalPages;
-  if (upermCurrentPage < 1)         upermCurrentPage = 1;
+  if (upermCurrentPage < 1) upermCurrentPage = 1;
 
   const startIndex = (upermCurrentPage - 1) * UPERM_ITEMS_PER_PAGE;
-  const pagedData  = filtered.slice(startIndex, startIndex + UPERM_ITEMS_PER_PAGE);
+  const pagedData = filtered.slice(startIndex, startIndex + UPERM_ITEMS_PER_PAGE);
 
   const tbody = document.getElementById('upermTbody');
-  const pill  = document.getElementById('upermTotal');
+  const pill = document.getElementById('upermTotal');
   if (pill) pill.textContent = totalItems + ' tài khoản';
 
   if (pagedData.length === 0) {
@@ -103,9 +108,9 @@ function upermGoPage(page) {
 }
 
 // ─── Khởi tạo ────────────────────────────────────────────────────
-(function() {
+(function () {
   const prevOnPageActivate = window.onPageActivate;
-  window.onPageActivate = function(page) {
+  window.onPageActivate = function (page) {
     if (prevOnPageActivate) prevOnPageActivate(page);
     if (page === 'phan-quyen-nd') upermRender();
   };

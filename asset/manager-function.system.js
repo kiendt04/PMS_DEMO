@@ -108,7 +108,7 @@ function funcRenderPagination(totalPages) {
 
   for (let i = 1; i <= totalPages; i++) {
     if (i === funcCurrentPage) {
-      html += `<button style="padding:4px 10px;border:1px solid #0D9488;background:#0D9488;color:#fff;cursor:default;border-radius:4px;font-size:13px;font-weight:600;">${i}</button>`;
+      html += `<button style="padding:4px 10px;border:1px solid #185FA5;background:#185FA5;color:#fff;cursor:default;border-radius:4px;font-size:13px;font-weight:600;">${i}</button>`;
     } else if (i === 1 || i === totalPages || (i >= funcCurrentPage - 2 && i <= funcCurrentPage + 2)) {
       html += `<button onclick="funcGoPage(${i})" style="padding:4px 10px;border:1px solid #E5E7EB;background:#fff;color:#374151;cursor:pointer;border-radius:4px;font-size:13px;font-weight:500;transition:all 0.2s;">${i}</button>`;
     } else if (i === funcCurrentPage - 3 || i === funcCurrentPage + 3) {
