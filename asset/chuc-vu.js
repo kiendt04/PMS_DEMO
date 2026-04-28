@@ -73,8 +73,14 @@
         <td style="color:#64748B;font-size:12px;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${r.moTa || '—'}</td>
         <td style="text-align:center">
           <div class="cat-action-btns">
-            <button class="cat-btn-edit"   onclick="cvOpenEdit(${r.id})">Sửa</button>
-            <button class="cat-btn-delete" onclick="cvOpenDelete(${r.id})">Xóa</button>
+            <button class="cat-btn-edit" onclick="cvOpenEdit(${r.id})">
+              <svg viewBox="0 0 14 14" fill="none"><path d="M9.5 2.5l2 2L4 12H2v-2L9.5 2.5z" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              Sửa
+            </button>
+            <button class="cat-btn-del" onclick="cvOpenDelete(${r.id})">
+              <svg viewBox="0 0 14 14" fill="none"><polyline points="2 4 3.5 4 12 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M11 4l-.7 8a1 1 0 0 1-1 .9H4.7a1 1 0 0 1-1-.9L3 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><path d="M5.5 4V3a1 1 0 0 1 1-1h1a1 1 0 0 1 1 1v1" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+              Xóa
+            </button>
           </div>
         </td>
       </tr>`).join('');
@@ -103,8 +109,7 @@
     ['cvTen','cvVietTat','cvMoTa'].forEach(id => document.getElementById(id).value = '');
     ['cvHSCoban','cvHSTrachNhiem','cvHSChucVu'].forEach(id => document.getElementById(id).value = '0.00');
     document.getElementById('cvNgayHieuLuc').value = new Date().toISOString().slice(0,10);
-    ['errCvTen','errCvVietTat','errCvNgayHieuLuc'].forEach(id => document.getElementById(id).textContent = '');
-    document.getElementById('cvModal').classList.add('active');
+    document.getElementById('cvModal').classList.add('open');
   };
 
   /* ── Open Edit ── */
@@ -120,12 +125,11 @@
     document.getElementById('cvHSChucVu').value      = r.hsChucVu;
     document.getElementById('cvNgayHieuLuc').value   = r.ngayHL;
     document.getElementById('cvMoTa').value          = r.moTa;
-    ['errCvTen','errCvVietTat','errCvNgayHieuLuc'].forEach(id => document.getElementById(id).textContent = '');
-    document.getElementById('cvModal').classList.add('active');
+    document.getElementById('cvModal').classList.add('open');
   };
 
   window.cvCloseModal = function () {
-    document.getElementById('cvModal').classList.remove('active');
+    document.getElementById('cvModal').classList.remove('open');
   };
 
   /* ── Save ── */
@@ -163,9 +167,9 @@
     deletingId = id;
     const r = CV_DATA.find(x => x.id === id);
     document.getElementById('cvDeleteMsg').textContent = `Bạn có chắc muốn xóa chức vụ "${r?.ten}"?`;
-    document.getElementById('cvDeleteModal').classList.add('active');
+    document.getElementById('cvDeleteModal').classList.add('open');
   };
-  window.cvCloseDelete   = function () { document.getElementById('cvDeleteModal').classList.remove('active'); };
+  window.cvCloseDelete   = function () { document.getElementById('cvDeleteModal').classList.remove('open'); };
   window.cvConfirmDelete = function () {
     CV_DATA = CV_DATA.filter(x => x.id !== deletingId);
     cvCloseDelete();
