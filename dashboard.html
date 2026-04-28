@@ -1019,21 +1019,54 @@
         <div class="page-section fade-in" id="page-ql-chuc-nang">
           <div class="cat-header">
             <div class="cat-header-left">
-              <div class="cat-icon-wrap" style="background:#FEF3E2;color:#B45309"><svg viewBox="0 0 20 20" fill="none">
+              <div class="cat-icon-wrap" style="background:#F0F9FF;color:#0369A1">
+                <svg viewBox="0 0 20 20" fill="none">
                   <rect x="2" y="2" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.6" />
                   <rect x="11" y="2" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.6" />
                   <rect x="2" y="11" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.6" />
                   <rect x="11" y="11" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.6" />
-                </svg></div>
+                </svg>
+              </div>
               <div>
                 <div class="cat-title">Quản lý chức năng</div>
-                <div class="cat-sub">Quản lý các chức năng hệ thống</div>
+                <div class="cat-sub">Cấu hình hệ thống menu và chức năng điều khiển</div>
               </div>
-            </div><button class="btn-cat-add">+ Thêm chức năng</button>
+            </div>
+            <button class="btn-cat-add" onclick="funcOpenAdd()">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                <path d="M7 1v12M1 7h12" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+              </svg>Thêm chức năng
+            </button>
           </div>
-          <div class="placeholder">
-            <p>Danh sách chức năng sẽ hiển thị tại đây</p>
+          <div class="cat-toolbar">
+            <div class="cat-search-wrap">
+              <svg viewBox="0 0 16 16" fill="none">
+                <circle cx="6.5" cy="6.5" r="4" stroke="currentColor" stroke-width="1.4" />
+                <path d="M11 11l3 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" />
+              </svg>
+              <input type="text" id="funcSearch" placeholder="Tìm theo tên menu hoặc điều khiển..." oninput="funcRender()" />
+            </div>
+            <div class="cat-count-pill" id="funcTotal"></div>
           </div>
+          <div class="cat-table-wrap">
+            <table class="cat-table">
+              <thead>
+                <tr>
+                  <th style="width:50px;text-align:center">ID</th>
+                  <th style="width:80px;text-align:center">Icon</th>
+                  <th>Tên Menu</th>
+                  <th>Menu Cha</th>
+                  <th>Điều khiển</th>
+                  <th style="width:80px;text-align:center">Sắp xếp</th>
+                  <th>Meta Title</th>
+                  <th style="width:130px;text-align:center">Thao tác</th>
+                </tr>
+              </thead>
+              <tbody id="funcTbody"></tbody>
+            </table>
+          </div>
+          <!-- Pagination -->
+          <div id="funcPagination" style="display:flex; justify-content:center; gap:5px; margin-top:15px; padding-bottom:10px;"></div>
         </div>
 
         <div class="page-section fade-in" id="page-ql-quyen">
@@ -1779,6 +1812,77 @@
     </div>
   </div>
 
+  <!-- Modal Chức năng (Function) -->
+  <div class="modal-overlay" id="funcModal">
+    <div class="cat-modal">
+      <div class="cat-modal-accent cat-modal-accent-blue"></div>
+      <div class="cat-modal-body">
+        <div class="cat-modal-header">
+          <div class="cat-modal-title-wrap">
+            <span class="cat-modal-title" id="funcModalTitle">Thêm chức năng mới</span>
+          </div>
+          <button class="cat-btn-close" onclick="funcCloseModal()">
+            <svg viewBox="0 0 14 14" fill="none">
+              <path d="M2 2l10 10M12 2L2 12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+            </svg>
+          </button>
+        </div>
+        <div class="cat-form-grid" style="grid-template-columns: 1fr 1fr;">
+          <div class="cat-field">
+            <label>Icon Menu</label>
+            <input type="text" id="funcIcon" placeholder="VD: home, users, settings..." />
+          </div>
+          <div class="cat-field">
+            <label>Tên Menu <span class="req">*</span></label>
+            <input type="text" id="funcTen" placeholder="VD: Dashboard, Quản lý..." />
+            <div class="cat-field-err" id="errFuncTen"></div>
+          </div>
+          <div class="cat-field">
+            <label>Menu Cha</label>
+            <input type="text" id="funcMenuCha" placeholder="Để trống nếu là gốc" />
+          </div>
+          <div class="cat-field">
+            <label>Tên điều khiển <span class="req">*</span></label>
+            <input type="text" id="funcDieuKhien" placeholder="VD: ql-nhan-su, dashboard..." />
+            <div class="cat-field-err" id="errFuncDieuKhien"></div>
+          </div>
+          <div class="cat-field">
+            <label>Sắp xếp</label>
+            <input type="number" id="funcSapXep" value="1" />
+          </div>
+          <div class="cat-field">
+            <label>Meta Title</label>
+            <input type="text" id="funcMetaTitle" placeholder="Tiêu đề hiển thị trình duyệt" />
+          </div>
+        </div>
+        <div class="cat-modal-footer">
+          <button class="cat-btn-cancel" onclick="funcCloseModal()">Hủy</button>
+          <button class="cat-btn-save" onclick="funcSave()">Lưu dữ liệu</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="funcDeleteModal">
+    <div class="cat-modal cat-modal-sm">
+      <div class="cat-modal-accent cat-modal-accent-red"></div>
+      <div class="cat-modal-body">
+        <div class="cat-delete-icon">
+          <svg viewBox="0 0 24 24" fill="none">
+            <polyline points="3 6 5 6 21 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+            <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </div>
+        <div class="cat-delete-title">Xác nhận xóa</div>
+        <div class="cat-delete-sub" id="funcDeleteMsg">Bạn có chắc muốn xóa chức năng này không?</div>
+        <div class="cat-modal-footer" style="justify-content:center">
+          <button class="cat-btn-cancel" onclick="funcCloseDelete()">Hủy</button>
+          <button class="cat-btn-danger" onclick="funcConfirmDelete()">Xóa</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script src="asset/sidebar.js"></script>
   <script src="asset/khoi-phong-ban.js"></script>
   <script src="asset/phong-ban.js"></script>
@@ -1817,7 +1921,7 @@
   <script src="asset/cc-phong-ban.js"></script>
   <script src="asset/danh-gia-hq.js"></script>
   <script src="asset/luong-hq.js"></script>
-  <script src="asset/ql-chuc-nang.js"></script>
+  <script src="asset/manager-function.system.js"></script>
   <script src="asset/role.system.js"></script>
   <script src="asset/phan-quyen-nd.js"></script>
   <script src="asset/phan-quyen-cn.js"></script>
