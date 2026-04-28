@@ -76,7 +76,7 @@ function roleRenderPagination(totalPages) {
 
   for (let i = 1; i <= totalPages; i++) {
     if (i === roleCurrentPage) {
-      html += `<button style="padding:4px 10px;border:1px solid #0D9488;background:#0D9488;color:#fff;cursor:default;border-radius:4px;font-size:13px;font-weight:600;">${i}</button>`;
+      html += `<button style="padding:4px 10px;border:1px solid #185FA5;background:#185FA5;color:#fff;cursor:default;border-radius:4px;font-size:13px;font-weight:600;">${i}</button>`;
     } else if (i === 1 || i === totalPages || (i >= roleCurrentPage - 2 && i <= roleCurrentPage + 2)) {
       html += `<button onclick="roleGoPage(${i})" style="padding:4px 10px;border:1px solid #E5E7EB;background:#fff;color:#374151;cursor:pointer;border-radius:4px;font-size:13px;font-weight:500;transition:all 0.2s;">${i}</button>`;
     } else if (i === roleCurrentPage - 3 || i === roleCurrentPage + 3) {
