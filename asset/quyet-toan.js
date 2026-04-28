@@ -175,11 +175,11 @@
       width:             '100%',
       stretchH:          'all',
       autoColumnSize:    false,
+      renderAllRows:     true,
       mergeCells:        merges,
       licenseKey:        'non-commercial-and-evaluation',
       rowHeights:        26,
       columnHeaderHeight: [38, 26],
-      viewportRowRenderingOffset: 'auto',
 
       cells(row, col) {
         if (deptSet.has(row)) {
@@ -218,6 +218,7 @@
       },
 
       afterGetColHeader(col, th) {
+        th.style.verticalAlign = 'middle';
         if ([4, 5, 6, 7, 8, 9, 11].includes(col)) {
           th.style.whiteSpace = 'normal';
           th.style.lineHeight = '1.25';

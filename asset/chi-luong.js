@@ -83,7 +83,7 @@
       { label: 'Họ và tên',                  colspan: 1 },
       { label: 'Mã cán bộ',                  colspan: 1 },
       { label: 'Số TK',                      colspan: 1 },
-      { label: 'Lương chế độ',               colspan: 1 },
+      { label: 'Lương<br/>chế độ',           colspan: 1 },
       { label: `Đã tạm ứng<br/>T${thang}/${nam}`, colspan: 1 },
       { label: 'Quyết toán<br/>lương',       colspan: 1 },
       { label: 'Ăn ca',                      colspan: 1 },
@@ -154,11 +154,11 @@
       width:             '100%',
       stretchH:          'all',
       autoColumnSize:    false,
+      renderAllRows:     true,
       mergeCells:        merges,
       licenseKey:        'non-commercial-and-evaluation',
       rowHeights:        26,
       columnHeaderHeight: [32],
-      viewportRowRenderingOffset: 'auto',
 
       cells(row, col) {
         if (deptSet.has(row)) {
@@ -206,6 +206,13 @@
         }
       },
 
+      afterGetColHeader(col, th) {
+        th.style.verticalAlign = 'middle';
+        if ([4, 5, 6, 8, 9].includes(col)) {
+          th.style.whiteSpace = 'normal';
+          th.style.lineHeight = '1.25';
+        }
+      },
       afterRender() {
         setTimeout(() => { _initializing = false; }, 400);
       },

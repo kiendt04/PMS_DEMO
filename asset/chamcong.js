@@ -171,10 +171,8 @@
       width:             '100%',
       stretchH:          'all',
       autoColumnSize:    false,
+      renderAllRows:     true,
       mergeCells:        merges,
-      licenseKey:        'non-commercial-and-evaluation',
-      rowHeights:        24,
-      viewportRowRenderingOffset: 'auto',
 
       cells(row, col) {
         if (deptRowSet.has(row)) {

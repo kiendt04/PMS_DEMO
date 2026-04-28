@@ -343,8 +343,8 @@
           </div>
         </div>
 
-        <!-- Phong ban (FULL IMPLEMENTATION) -->
-        <div class="page-section fade-in" id="page-phong-ban">
+        <!-- Phong ban (HANDSONTABLE IMPLEMENTATION) -->
+        <div class="page-section fade-in" id="page-dm-phong-ban">
           <div class="cat-header">
             <div class="cat-header-left">
               <div class="cat-icon-wrap cat-icon-teal"><svg viewBox="0 0 20 20" fill="none">
@@ -353,43 +353,31 @@
                 </svg></div>
               <div>
                 <div class="cat-title">Danh mục phòng ban</div>
-                <div class="cat-sub">Quản lý cơ cấu phòng ban theo từng khối</div>
+                <div class="cat-sub">Quản lý cơ cấu phòng ban và tổ chức</div>
               </div>
             </div>
-            <button class="btn-cat-add btn-cat-add-teal" onclick="pbOpenAdd()"><svg width="14" height="14"
-                viewBox="0 0 14 14" fill="none">
-                <path d="M7 1v12M1 7h12" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
-              </svg>Thêm phòng ban</button>
+            <div class="cat-header-right" style="display:flex; gap:10px;">
+              <button class="btn-cat-add btn-cat-add-teal" onclick="pbExport()"><svg width="14" height="14"
+                  viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3" />
+                </svg> Xuất Excel</button>
+              <button class="btn-cat-add btn-cat-add-teal" onclick="pbOpenAdd()"><svg width="14" height="14"
+                  viewBox="0 0 14 14" fill="none">
+                  <path d="M7 1v12M1 7h12" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                </svg> Thêm mới</button>
+            </div>
           </div>
           <div class="cat-toolbar">
-            <div class="cat-search-wrap"><svg viewBox="0 0 16 16" fill="none">
+            <div class="cat-search-wrap">
+              <svg viewBox="0 0 16 16" fill="none">
                 <circle cx="6.5" cy="6.5" r="4" stroke="currentColor" stroke-width="1.4" />
                 <path d="M11 11l3 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" />
-              </svg><input type="text" id="pbSearch" placeholder="Tìm theo tên hoặc viết tắt..." oninput="pbRender()" />
+              </svg>
+              <input type="text" id="pbSearch" placeholder="Tìm theo tên hoặc viết tắt..." />
             </div>
-            <div class="cat-filter-wrap"><svg viewBox="0 0 16 16" fill="none">
-                <path d="M2 4h12M4 8h8M6 12h4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" />
-              </svg><select id="pbFilterKhoi" onchange="pbRender()">
-                <option value="">Tất cả khối</option>
-              </select></div>
-            <div class="cat-count-pill cat-count-pill-teal" id="pbTotal"></div>
+            <div class="cat-count-pill cat-count-pill-teal" id="pbTotalPill"></div>
           </div>
-          <div class="cat-table-wrap">
-            <table class="cat-table">
-              <thead>
-                <tr>
-                  <th style="width:48px">#</th>
-                  <th style="width:56px;text-align:center">TT</th>
-                  <th>Tên phòng ban</th>
-                  <th style="width:110px">Viết tắt</th>
-                  <th style="width:180px">Khối</th>
-                  <th>Mô tả</th>
-                  <th style="width:130px;text-align:center">Thao tác</th>
-                </tr>
-              </thead>
-              <tbody id="pbTbody"></tbody>
-            </table>
-          </div>
+          <div id="pbHotContainer" style="width:100%;"></div>
         </div>
 
         <!-- Simple placeholders for other dm-* pages -->
@@ -595,14 +583,29 @@
                     stroke-linecap="round" />
                 </svg></div>
               <div>
-                <div class="cat-title">Danh mục người dùng</div>
-                <div class="cat-sub">Quản lý tài khoản người dùng</div>
+                <div class="cat-title">Quản lý nhân sự</div>
+                <div class="cat-sub">Quản lý thông tin hồ sơ và hệ số lương nhân viên</div>
               </div>
-            </div><button class="btn-cat-add">+ Thêm mới</button>
+            </div>
+            <div class="cat-header-right" style="display:flex; gap:10px;">
+              <button class="btn-cat-add" id="nsExcel"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" stroke-width="2">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3" />
+                </svg> Xuất Excel</button>
+              <button class="btn-cat-add">+ Thêm mới</button>
+            </div>
           </div>
-          <div class="placeholder">
-            <p>Danh sách người dùng sẽ hiển thị tại đây</p>
+          <div class="cat-toolbar">
+            <div class="cat-search-wrap">
+              <svg viewBox="0 0 16 16" fill="none">
+                <circle cx="6.5" cy="6.5" r="4" stroke="currentColor" stroke-width="1.4" />
+                <path d="M11 11l3 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" />
+              </svg>
+              <input type="text" id="nsSearch" placeholder="Tìm theo tên, mã hoặc tài khoản..." />
+            </div>
+            <div class="cat-count-pill" id="nsTotal"></div>
           </div>
+          <div id="nsHotContainer" style="width:100%;"></div>
         </div>
 
         <!-- Cham cong (FULL) -->
@@ -722,21 +725,6 @@
           <div id="tuHotContainer" style="width:100%;"></div>
         </div>
 
-        <!-- ═══ ĐIỀU CHUYỂN ═══ -->
-        <div class="page-section fade-in" id="page-dieu-chuyen">
-          <div class="cat-header">
-            <div class="cat-header-left">
-              <div class="cat-icon-wrap" style="background:#FEF3E2;color:#B45309"><svg viewBox="0 0 20 20" fill="none">
-                  <path d="M4 10h12M10 4l6 6-6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg></div>
-              <div>
-                <div class="cat-title">Quản lý điều chuyển</div>
-                <div class="cat-sub">Quản lý điều chuyển nhân sự</div>
-              </div>
-            </div><button class="btn-cat-add">+ Thêm mới</button>
-          </div>
-          <div class="placeholder"><p>Dữ liệu điều chuyển sẽ hiển thị tại đây</p></div>
-        </div>
 
         <!-- ═══ NGHỈ PHÉP ═══ -->
         <div class="page-section fade-in" id="page-nghi-phep">
@@ -744,11 +732,13 @@
             <div class="cc-filter-group"><label>Chọn năm</label>
               <select id="npNam" class="cc-select"></select>
             </div>
-            <div class="cc-filter-group" style="margin-left:auto;display:flex;flex-direction:row;align-items:center;gap:6px">
+            <div class="cc-filter-group"
+              style="margin-left:auto;display:flex;flex-direction:row;align-items:center;gap:6px">
               <button class="btn-cat-add" id="npExcel"
                 style="background:linear-gradient(135deg,#22c97b,#15a25e);box-shadow:0 2px 8px rgba(21,162,94,.3)">
                 <svg width="13" height="13" viewBox="0 0 14 14" fill="none">
-                  <path d="M2 10v2h10v-2M7 2v7M4 6l3 3 3-3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                  <path d="M2 10v2h10v-2M7 2v7M4 6l3 3 3-3" stroke="currentColor" stroke-width="1.8"
+                    stroke-linecap="round" stroke-linejoin="round" />
                 </svg>Xuất Excel
               </button>
             </div>
@@ -761,22 +751,30 @@
           <div class="cc-filterbar">
             <div class="cc-filter-group"><label>Chọn tháng</label>
               <select id="acThang" class="cc-select">
-                <option value="1">Tháng 1</option><option value="2">Tháng 2</option>
-                <option value="3">Tháng 3</option><option value="4" selected>Tháng 4</option>
-                <option value="5">Tháng 5</option><option value="6">Tháng 6</option>
-                <option value="7">Tháng 7</option><option value="8">Tháng 8</option>
-                <option value="9">Tháng 9</option><option value="10">Tháng 10</option>
-                <option value="11">Tháng 11</option><option value="12">Tháng 12</option>
+                <option value="1">Tháng 1</option>
+                <option value="2">Tháng 2</option>
+                <option value="3">Tháng 3</option>
+                <option value="4" selected>Tháng 4</option>
+                <option value="5">Tháng 5</option>
+                <option value="6">Tháng 6</option>
+                <option value="7">Tháng 7</option>
+                <option value="8">Tháng 8</option>
+                <option value="9">Tháng 9</option>
+                <option value="10">Tháng 10</option>
+                <option value="11">Tháng 11</option>
+                <option value="12">Tháng 12</option>
               </select>
             </div>
             <div class="cc-filter-group"><label>Chọn năm</label>
               <select id="acNam" class="cc-select"></select>
             </div>
-            <div class="cc-filter-group" style="margin-left:auto;display:flex;flex-direction:row;align-items:center;gap:6px">
+            <div class="cc-filter-group"
+              style="margin-left:auto;display:flex;flex-direction:row;align-items:center;gap:6px">
               <button class="btn-cat-add" id="acExcel"
                 style="background:linear-gradient(135deg,#22c97b,#15a25e);box-shadow:0 2px 8px rgba(21,162,94,.3)">
                 <svg width="13" height="13" viewBox="0 0 14 14" fill="none">
-                  <path d="M2 10v2h10v-2M7 2v7M4 6l3 3 3-3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                  <path d="M2 10v2h10v-2M7 2v7M4 6l3 3 3-3" stroke="currentColor" stroke-width="1.8"
+                    stroke-linecap="round" stroke-linejoin="round" />
                 </svg>Xuất Excel
               </button>
             </div>
@@ -794,11 +792,13 @@
                 <option value="2">Hợp đồng khoán</option>
               </select>
             </div>
-            <div class="cc-filter-group" style="margin-left:auto;display:flex;flex-direction:row;align-items:center;gap:6px">
+            <div class="cc-filter-group"
+              style="margin-left:auto;display:flex;flex-direction:row;align-items:center;gap:6px">
               <button class="btn-cat-add" id="hslExcel"
                 style="background:linear-gradient(135deg,#22c97b,#15a25e);box-shadow:0 2px 8px rgba(21,162,94,.3)">
                 <svg width="13" height="13" viewBox="0 0 14 14" fill="none">
-                  <path d="M2 10v2h10v-2M7 2v7M4 6l3 3 3-3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                  <path d="M2 10v2h10v-2M7 2v7M4 6l3 3 3-3" stroke="currentColor" stroke-width="1.8"
+                    stroke-linecap="round" stroke-linejoin="round" />
                 </svg>Xuất Excel
               </button>
             </div>
@@ -811,22 +811,30 @@
           <div class="cc-filterbar">
             <div class="cc-filter-group"><label>Chọn tháng</label>
               <select id="qtThang" class="cc-select">
-                <option value="1">Tháng 1</option><option value="2">Tháng 2</option>
-                <option value="3">Tháng 3</option><option value="4" selected>Tháng 4</option>
-                <option value="5">Tháng 5</option><option value="6">Tháng 6</option>
-                <option value="7">Tháng 7</option><option value="8">Tháng 8</option>
-                <option value="9">Tháng 9</option><option value="10">Tháng 10</option>
-                <option value="11">Tháng 11</option><option value="12">Tháng 12</option>
+                <option value="1">Tháng 1</option>
+                <option value="2">Tháng 2</option>
+                <option value="3">Tháng 3</option>
+                <option value="4" selected>Tháng 4</option>
+                <option value="5">Tháng 5</option>
+                <option value="6">Tháng 6</option>
+                <option value="7">Tháng 7</option>
+                <option value="8">Tháng 8</option>
+                <option value="9">Tháng 9</option>
+                <option value="10">Tháng 10</option>
+                <option value="11">Tháng 11</option>
+                <option value="12">Tháng 12</option>
               </select>
             </div>
             <div class="cc-filter-group"><label>Chọn năm</label>
               <select id="qtNam" class="cc-select"></select>
             </div>
-            <div class="cc-filter-group" style="margin-left:auto;display:flex;flex-direction:row;align-items:center;gap:6px">
+            <div class="cc-filter-group"
+              style="margin-left:auto;display:flex;flex-direction:row;align-items:center;gap:6px">
               <button class="btn-cat-add" id="qtExcel"
                 style="background:linear-gradient(135deg,#22c97b,#15a25e);box-shadow:0 2px 8px rgba(21,162,94,.3)">
                 <svg width="13" height="13" viewBox="0 0 14 14" fill="none">
-                  <path d="M2 10v2h10v-2M7 2v7M4 6l3 3 3-3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                  <path d="M2 10v2h10v-2M7 2v7M4 6l3 3 3-3" stroke="currentColor" stroke-width="1.8"
+                    stroke-linecap="round" stroke-linejoin="round" />
                 </svg>Xuất Excel
               </button>
             </div>
@@ -839,6 +847,69 @@
           <div class="cc-filterbar">
             <div class="cc-filter-group"><label>Chọn tháng</label>
               <select id="clThang" class="cc-select">
+                <option value="1">Tháng 1</option>
+                <option value="2">Tháng 2</option>
+                <option value="3">Tháng 3</option>
+                <option value="4" selected>Tháng 4</option>
+                <option value="5">Tháng 5</option>
+                <option value="6">Tháng 6</option>
+                <option value="7">Tháng 7</option>
+                <option value="8">Tháng 8</option>
+                <option value="9">Tháng 9</option>
+                <option value="10">Tháng 10</option>
+                <option value="11">Tháng 11</option>
+                <option value="12">Tháng 12</option>
+              </select>
+            </div>
+            <div class="cc-filter-group"><label>Chọn năm</label>
+              <select id="clNam" class="cc-select"></select>
+            </div>
+            <div class="cc-filter-group"
+              style="margin-left:auto;display:flex;flex-direction:row;align-items:center;gap:6px">
+              <button class="btn-cat-add" id="clExcel"
+                style="background:linear-gradient(135deg,#22c97b,#15a25e);box-shadow:0 2px 8px rgba(21,162,94,.3)">
+                <svg width="13" height="13" viewBox="0 0 14 14" fill="none">
+                  <path d="M2 10v2h10v-2M7 2v7M4 6l3 3 3-3" stroke="currentColor" stroke-width="1.8"
+                    stroke-linecap="round" stroke-linejoin="round" />
+                </svg>Xuất Excel
+              </button>
+            </div>
+          </div>
+          <div id="clHotContainer" style="width:100%;"></div>
+        </div>
+
+        <div class="page-section fade-in" id="page-cc-phong-ban">
+          <div class="cat-header">
+            <div class="cat-header-left">
+              <div class="cat-icon-wrap cat-icon-blue"><svg viewBox="0 0 20 20" fill="none">
+                  <path d="M10 2v16M2 10h16M6 6l8 8M6 14l8-8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+                </svg></div>
+              <div>
+                <div class="cat-title">BẢNG CHẤM CÔNG HÀNG NGÀY</div>
+                <div class="cat-sub">Theo dõi công, ca đêm và làm thêm giờ chi tiết</div>
+              </div>
+            </div>
+            <div class="cat-header-right" style="display:flex; gap:10px;">
+              <button class="btn-cat-add btn-cat-add-blue" onclick="ccpbOpenAdd()">+ Thêm mới</button>
+              <button class="btn-cat-add" id="ccpbExcel"
+                style="background:linear-gradient(135deg,#22c97b,#15a25e);box-shadow:0 2px 8px rgba(21,162,94,.3)">
+                <svg width="13" height="13" viewBox="0 0 14 14" fill="none">
+                  <path d="M2 10v2h10v-2M7 2v7M4 6l3 3 3-3" stroke="currentColor" stroke-width="1.8"
+                    stroke-linecap="round" stroke-linejoin="round" />
+                </svg>Xuất Excel
+              </button>
+            </div>
+          </div>
+
+          <div class="cc-filterbar">
+            <div class="cc-filter-group"><label>Phòng ban:</label>
+              <select id="ccpbDept" class="cc-select" style="min-width: 200px;">
+                <option value="1" selected>Phòng Tổng hợp HĐTV</option>
+                <option value="2">Phòng Kế hoạch Kinh doanh</option>
+              </select>
+            </div>
+            <div class="cc-filter-group"><label>Tháng:</label>
+              <select id="ccpbThang" class="cc-select">
                 <option value="1">Tháng 1</option><option value="2">Tháng 2</option>
                 <option value="3">Tháng 3</option><option value="4" selected>Tháng 4</option>
                 <option value="5">Tháng 5</option><option value="6">Tháng 6</option>
@@ -847,40 +918,27 @@
                 <option value="11">Tháng 11</option><option value="12">Tháng 12</option>
               </select>
             </div>
-            <div class="cc-filter-group"><label>Chọn năm</label>
-              <select id="clNam" class="cc-select"></select>
+            <div class="cc-filter-group"><label>Năm:</label>
+              <select id="ccpbNam" class="cc-select">
+                <option selected>2024</option>
+                <option>2023</option>
+              </select>
             </div>
-            <div class="cc-filter-group" style="margin-left:auto;display:flex;flex-direction:row;align-items:center;gap:6px">
-              <button class="btn-cat-add" id="clExcel"
-                style="background:linear-gradient(135deg,#22c97b,#15a25e);box-shadow:0 2px 8px rgba(21,162,94,.3)">
-                <svg width="13" height="13" viewBox="0 0 14 14" fill="none">
-                  <path d="M2 10v2h10v-2M7 2v7M4 6l3 3 3-3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>Xuất Excel
-              </button>
-            </div>
-          </div>
-          <div id="clHotContainer" style="width:100%;"></div>
-        </div>
-
-        <!-- ═══ QUAN LY PHONG BAN pages ═══ -->
-        <div class="page-section fade-in" id="page-cc-phong-ban">
-          <div class="cat-header">
-            <div class="cat-header-left">
-              <div class="cat-icon-wrap cat-icon-teal"><svg viewBox="0 0 20 20" fill="none">
-                  <circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="1.6" />
-                  <path d="M10 6v4l3 3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
-                </svg></div>
-              <div>
-                <div class="cat-title">Chấm công phòng ban</div>
-                <div class="cat-sub">Nhân viên phòng ban tự chấm công</div>
+            <div class="cc-filter-group"><label>Loại công:</label>
+              <div class="cc-radio-group">
+                <label class="cc-radio"><input type="radio" name="ccpbLoai" value="thoi-gian" checked /><span
+                    class="cc-radio-dot"></span>Thời gian</label>
+                <label class="cc-radio"><input type="radio" name="ccpbLoai" value="ca-dem" /><span
+                    class="cc-radio-dot"></span>Ca đêm</label>
+                <label class="cc-radio"><input type="radio" name="ccpbLoai" value="them-gio" /><span
+                    class="cc-radio-dot"></span>Thêm giờ</label>
               </div>
-            </div><button class="btn-cat-add btn-cat-add-teal">+ Chấm công</button>
+            </div>
           </div>
-          <div class="placeholder">
-            <p>Giao diện chấm công phòng ban sẽ hiển thị tại đây</p>
-          </div>
+          <div id="ccpbHotContainer" style="width:100%;"></div>
         </div>
 
+        <!-- ═══ ĐÁNH GIÁ HIỆU QUẢ ═══ -->
         <div class="page-section fade-in" id="page-danh-gia-hq">
           <div class="cat-header">
             <div class="cat-header-left">
@@ -890,15 +948,32 @@
                 </svg></div>
               <div>
                 <div class="cat-title">Đánh giá hiệu quả công việc</div>
-                <div class="cat-sub">Đánh giá KPI theo phòng ban</div>
+                <div class="cat-sub">Cập nhật chỉ số KPI và xếp loại lao động</div>
               </div>
-            </div><button class="btn-cat-add btn-cat-add-teal">+ Đánh giá</button>
+            </div>
+            <div class="cat-header-right" style="display:flex; gap:10px;">
+              <button class="btn-cat-add btn-cat-add-teal" id="dghqExcel"><svg width="14" height="14"
+                  viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3" />
+                </svg> Xuất Excel</button>
+            </div>
           </div>
-          <div class="placeholder">
-            <p>Dữ liệu đánh giá hiệu quả sẽ hiển thị tại đây</p>
+          <div class="cc-filterbar">
+            <div class="cc-filter-group"><label>Tháng/Năm</label>
+              <select class="cc-select">
+                <option selected>04/2024</option>
+              </select>
+            </div>
+            <div class="cc-filter-group"><label>Phòng ban</label>
+              <select class="cc-select">
+                <option value="1" selected>Phòng Tổng hợp HĐTV</option>
+              </select>
+            </div>
           </div>
+          <div id="dghqHotContainer" style="width:100%;"></div>
         </div>
 
+        <!-- ═══ LƯƠNG HIỆU QUẢ ═══ -->
         <div class="page-section fade-in" id="page-luong-hq">
           <div class="cat-header">
             <div class="cat-header-left">
@@ -907,14 +982,30 @@
                   <path d="M2 9h16M7 9v7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
                 </svg></div>
               <div>
-                <div class="cat-title">Lương hiệu quả công việc - phòng ban</div>
-                <div class="cat-sub">Tính lương dựa trên hiệu quả KPI</div>
+                <div class="cat-title">Lương hiệu quả công việc</div>
+                <div class="cat-sub">Bảng tính lương chi tiết theo hiệu quả công tác</div>
               </div>
-            </div><button class="btn-cat-add btn-cat-add-teal">+ Tính lương</button>
+            </div>
+            <div class="cat-header-right" style="display:flex; gap:10px;">
+              <button class="btn-cat-add btn-cat-add-teal" id="lhqExcel"><svg width="14" height="14" viewBox="0 0 24 24"
+                  fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3" />
+                </svg> Xuất Excel</button>
+            </div>
           </div>
-          <div class="placeholder">
-            <p>Dữ liệu lương hiệu quả sẽ hiển thị tại đây</p>
+          <div class="cc-filterbar">
+            <div class="cc-filter-group"><label>Kỳ lương</label>
+              <select class="cc-select">
+                <option selected>Tháng 04/2024</option>
+              </select>
+            </div>
+            <div class="cc-filter-group"><label>Phòng ban</label>
+              <select class="cc-select">
+                <option value="1" selected>Phòng Tổng hợp HĐTV</option>
+              </select>
+            </div>
           </div>
+          <div id="lhqHotContainer" style="width:100%;"></div>
         </div>
 
         <!-- ═══ QUAN LY HE THONG pages ═══ -->
@@ -1393,6 +1484,54 @@
             onclick="tlvCloseDelete()">Hủy</button><button class="cat-btn-danger"
             onclick="tlvConfirmDelete()">Xóa</button></div>
       </div>
+  <!-- Modal Chấm công (Ca đêm / Thêm giờ) -->
+  <div class="modal-overlay" id="ccpbModal">
+    <div class="cat-modal">
+      <div class="cat-modal-accent cat-modal-accent-blue"></div>
+      <div class="cat-modal-header">
+        <div class="cat-modal-title" id="ccpbModalTitle">Thêm mới công ca đêm / thêm giờ</div>
+        <button class="cat-modal-close" onclick="ccpbCloseModal()">&times;</button>
+      </div>
+      <div class="cat-modal-body">
+        <div class="cat-form-row">
+          <div class="cat-form-group">
+            <label class="cat-label">Nhân viên</label>
+            <select id="ccpbModalEmp" class="cat-input">
+              <option value="">-- Chọn nhân viên --</option>
+              <option value="NV001">Nguyễn Kiều Ly</option>
+              <option value="NV002">Bùi Hiểu Bảng</option>
+              <option value="NV003">Đỗ Trung Kiên</option>
+              <option value="NV004">Dương Văn Minh</option>
+              <option value="NV005">Hà Thu Vân</option>
+            </select>
+          </div>
+          <div class="cat-form-group">
+            <label class="cat-label">Ngày áp dụng</label>
+            <input type="date" id="ccpbModalNgay" class="cat-input" value="2024-04-27" />
+          </div>
+        </div>
+        <div class="cat-form-row">
+          <div class="cat-form-group">
+            <label class="cat-label">Loại công</label>
+            <select id="ccpbModalLoai" class="cat-input">
+              <option value="ca-dem">Ca đêm</option>
+              <option value="them-gio">Thêm giờ</option>
+            </select>
+          </div>
+          <div class="cat-form-group">
+            <label class="cat-label">Giá trị (Số giờ/ca)</label>
+            <input type="number" id="ccpbModalVal" class="cat-input" placeholder="Ví dụ: 2, 4, 8..." />
+          </div>
+        </div>
+        <div class="cat-form-group">
+          <label class="cat-label">Ghi chú</label>
+          <textarea id="ccpbModalNote" class="cat-input" style="height:80px;" placeholder="Lý do làm thêm..."></textarea>
+        </div>
+      </div>
+      <div class="cat-modal-footer">
+        <button class="cat-btn-cancel" onclick="ccpbCloseModal()">Hủy</button>
+        <button class="cat-btn-save" onclick="ccpbSaveModal()">Lưu dữ liệu</button>
+      </div>
     </div>
   </div>
 
@@ -1407,6 +1546,11 @@
   <script src="asset/quan-ly-an-ca.js"></script>
   <script src="asset/quyet-toan.js"></script>
   <script src="asset/chi-luong.js"></script>
+  <script src="asset/quan-ly-nhan-su.js"></script>
+  <script src="asset/dm-phong-ban.js"></script>
+  <script src="asset/cc-phong-ban.js"></script>
+  <script src="asset/danh-gia-hq.js"></script>
+  <script src="asset/luong-hq.js"></script>
 </body>
 
 </html>

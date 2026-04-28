@@ -53,7 +53,7 @@
   /* ── Build headers ── */
   function buildHeaders() {
     return [
-      ['STT', 'Họ và tên', 'Mã NV', 'Chức vụ', 'Hệ số lương', 'Hệ số PC', 'Tổng hệ số', 'Ghi chú']
+      ['STT', 'Họ và tên', 'Mã NV', 'Chức vụ', 'Hệ số<br/>lương', 'Hệ số<br/>PC', 'Tổng<br/>hệ số', 'Ghi chú']
     ];
   }
 
@@ -101,10 +101,10 @@
       width:             '100%',
       stretchH:          'all',
       autoColumnSize:    false,
+      renderAllRows:     true,
       mergeCells:        merges,
       licenseKey:        'non-commercial-and-evaluation',
       rowHeights:        26,
-      viewportRowRenderingOffset: 'auto',
 
       cells(row, col) {
         if (deptSet.has(row)) {
@@ -143,6 +143,13 @@
           const h2 = parseFloat(hotInstance.getDataAtCell(ri, 5)) || 0;
           hotInstance.setDataAtCell(ri, 6, +(h1 + h2).toFixed(3), 'recalc');
         });
+      },
+      afterGetColHeader(col, th) {
+        th.style.verticalAlign = 'middle';
+        if ([4, 5, 6].includes(col)) {
+          th.style.whiteSpace = 'normal';
+          th.style.lineHeight = '1.25';
+        }
       },
 
       afterRender() {

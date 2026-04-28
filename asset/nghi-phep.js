@@ -97,24 +97,22 @@
   /* ── Build nested headers ── */
   function buildHeaders(year) {
     const h1 = [
-      { label: 'TT',                                colspan: 1 },
-      { label: 'Họ và tên',                         colspan: 1 },
-      { label: 'Mã NV',                             colspan: 1 },
-      { label: `Ngày tuyển dụng`,                   colspan: 3 },
-      { label: `Số năm LĐ đến<br/>31/12/${year}`,  colspan: 2 },
-      { label: 'Phép theo<br/>chế độ',              colspan: 1 },
-      { label: 'Đã nghỉ',                           colspan: 1 },
-      { label: 'Còn lại',                           colspan: 1 },
-      { label: 'Chi tiết từng tháng',               colspan: 12 },
-      { label: `Chuyển sang<br/>01/${year + 1}`,    colspan: 1 },
+      { label: 'TT', rowspan: 2 },
+      { label: 'HỌ VÀ TÊN', rowspan: 2 },
+      { label: 'MÃ NV', rowspan: 2 },
+      { label: 'NGÀY TUYỂN DỤNG', colspan: 3 },
+      { label: `SỐ NĂM LĐ ĐẾN 31/12/${year}`, colspan: 2 },
+      { label: 'PHÉP THEO<br/>CHẾ ĐỘ', rowspan: 2 },
+      { label: 'ĐÃ NGHỈ', rowspan: 2 },
+      { label: 'CÒN LẠI', rowspan: 2 },
+      { label: 'CHI TIẾT TỪNG THÁNG', colspan: 12 },
+      { label: `CHUYỂN SANG<br/>01/${year + 1}`, rowspan: 2 },
     ];
+    // SKIP các cột đã có rowspan: 2 ở h1
     const h2 = [
-      '', '', '',
       'Ngày', 'Tháng', 'Năm',
       'Năm', 'Tháng',
-      '', '', '',
-      ...MONTH_LABELS,
-      '',
+      ...MONTH_LABELS
     ];
     return [h1, h2];
   }
@@ -173,11 +171,11 @@
       width:             '100%',
       stretchH:          'all',
       autoColumnSize:    false,
+      renderAllRows:     true,
       mergeCells:        merges,
       licenseKey:        'non-commercial-and-evaluation',
       rowHeights:        26,
-      columnHeaderHeight: [36, 22],
-      viewportRowRenderingOffset: 'auto',
+      columnHeaderHeight: [40, 26],
 
       cells(row, col) {
         if (deptSet.has(row)) {
@@ -214,12 +212,13 @@
       },
 
       afterGetColHeader(col, th) {
+        th.style.verticalAlign = 'middle';
+        th.style.textAlign = 'center';
         // Wrap text cho các header dài
-        if ([3,6,7,8,9,10,23].includes(col)) {
+        if ([3, 6, 7, 8, 9, 10, 23].includes(col)) {
           th.style.whiteSpace = 'normal';
-          th.style.lineHeight = '1.25';
-          th.style.padding    = '2px 3px';
-          th.style.wordBreak  = 'break-word';
+          th.style.lineHeight = '1.2';
+          th.style.padding = '2px 4px';
         }
       },
 

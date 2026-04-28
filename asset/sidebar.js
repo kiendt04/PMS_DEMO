@@ -14,35 +14,34 @@
   const PAGE_TITLES = {
     dashboard: 'Dashboard',
     // Danh mục
-    'dm-chuc-vu':        'Danh mục chức vụ',
-    'khoi-phong-ban':    'Danh mục nhóm phòng',
-    'phong-ban':         'Danh mục phòng ban',
-    'dm-luong-co-ban':   'Danh mục lương cơ bản',
+    'dm-chuc-vu': 'Danh mục chức vụ',
+    'khoi-phong-ban': 'Danh mục nhóm phòng',
+    'phong-ban': 'Danh mục phòng ban',
+    'dm-luong-co-ban': 'Danh mục lương cơ bản',
     'dm-he-so-danh-gia': 'Danh mục hệ số đánh giá',
-    'dm-phu-tro':        'Danh mục phụ trợ',
-    'dm-thoi-gian-lv':   'Danh mục thời gian làm việc',
-    'dm-phan-nguon':     'Danh mục phân nguồn',
-    'dm-an-ca':          'Danh mục định mức ăn ca',
-    'dm-nguoi-dung':     'Danh mục người dùng',
+    'dm-phu-tro': 'Danh mục phụ trợ',
+    'dm-thoi-gian-lv': 'Danh mục thời gian làm việc',
+    'dm-phan-nguon': 'Danh mục phân nguồn',
+    'dm-an-ca': 'Danh mục định mức ăn ca',
     // Tiện ích
-    chamcong:            'Quản lý chấm công',
-    'an-toan-dien':      'Quản lý an toàn điện',
-    'tam-ung-luong':     'Quản lý tạm ứng lương',
-    'dieu-chuyen':       'Quản lý điều chuyển',
-    'nghi-phep':         'Quản lý nghỉ phép',
-    'quan-ly-an-ca':     'Quản lý ăn ca',
-    'he-so-luong':       'Bảng hệ số lương',
-    'quyet-toan':        'Quyết toán lương',
-    'chi-luong':         'Quản lý chi lương theo tháng',
+    'dm-nguoi-dung': 'Quản lý nhân sự',
+    chamcong: 'Quản lý chấm công',
+    'an-toan-dien': 'Quản lý an toàn điện',
+    'tam-ung-luong': 'Quản lý tạm ứng lương',
+    'nghi-phep': 'Quản lý nghỉ phép',
+    'quan-ly-an-ca': 'Quản lý ăn ca',
+    'he-so-luong': 'Bảng hệ số lương',
+    'quyet-toan': 'Quyết toán lương',
+    'chi-luong': 'Quản lý chi lương theo tháng',
     // Quản lý phòng ban
-    'cc-phong-ban':      'Chấm công phòng ban',
-    'danh-gia-hq':       'Đánh giá hiệu quả công việc',
-    'luong-hq':          'Lương hiệu quả - phòng ban',
+    'cc-phong-ban': 'Chấm công phòng ban',
+    'danh-gia-hq': 'Đánh giá hiệu quả công việc',
+    'luong-hq': 'Lương hiệu quả - phòng ban',
     // Quản lý hệ thống
-    'ql-chuc-nang':      'Quản lý chức năng',
-    'ql-quyen':          'Quản lý quyền',
-    'phan-quyen-nd':     'Phân quyền người dùng',
-    'phan-quyen-cn':     'Phân quyền Quyền - chức năng',
+    'ql-chuc-nang': 'Quản lý chức năng',
+    'ql-quyen': 'Quản lý quyền',
+    'phan-quyen-nd': 'Phân quyền người dùng',
+    'phan-quyen-cn': 'Phân quyền Quyền - chức năng',
   };
 
   /* ── Sidebar HTML ── */
@@ -93,7 +92,6 @@
         <div class="nav-item" data-page="dm-thoi-gian-lv">Danh mục thời gian làm việc</div>
         <div class="nav-item" data-page="dm-phan-nguon">Danh mục phân nguồn</div>
         <div class="nav-item" data-page="dm-an-ca">Danh mục định mức ăn ca</div>
-        <div class="nav-item" data-page="dm-nguoi-dung">Danh mục người dùng</div>
       </div>
     </div>
 
@@ -105,10 +103,10 @@
         <svg class="nav-group-arrow" width="10" height="10" viewBox="0 0 10 6" fill="none"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
       </div>
       <div class="nav-group-items">
+        <div class="nav-item" data-page="dm-nguoi-dung">Quản lý nhân sự</div>
         <div class="nav-item" data-page="chamcong">Quản lý chấm công</div>
         <div class="nav-item" data-page="an-toan-dien">Quản lý an toàn điện</div>
         <div class="nav-item" data-page="tam-ung-luong">Quản lý tạm ứng lương</div>
-        <div class="nav-item" data-page="dieu-chuyen">Quản lý điều chuyển</div>
         <div class="nav-item" data-page="nghi-phep">Quản lý nghỉ phép</div>
         <div class="nav-item" data-page="quan-ly-an-ca">Quản lý ăn ca</div>
         <div class="nav-item" data-page="he-so-luong">Bảng hệ số lương</div>
@@ -276,20 +274,20 @@
     document.addEventListener('mousedown', outsideClick);
   }
 
-  window.hideFlyout = function() {
+  window.hideFlyout = function () {
     if (flyout) flyout.classList.remove('active');
   };
 
   /* ── Sidebar show/hide toggle ── */
   function applySidebarState(collapsed) {
     const sidebar = document.getElementById('appSidebar');
-    const main    = document.querySelector('.main');
+    const main = document.querySelector('.main');
     if (collapsed) {
       if (sidebar) sidebar.classList.add('collapsed');
-      if (main)    main.classList.add('sidebar-collapsed');
+      if (main) main.classList.add('sidebar-collapsed');
     } else {
       if (sidebar) sidebar.classList.remove('collapsed');
-      if (main)    main.classList.remove('sidebar-collapsed');
+      if (main) main.classList.remove('sidebar-collapsed');
     }
   }
 
@@ -308,7 +306,7 @@
       const nextCollapsed = !isCollapsed;
       applySidebarState(nextCollapsed);
       localStorage.setItem('pms_sidebar_collapsed', nextCollapsed);
-      
+
       // Close any open flyout
       hideFlyout();
 

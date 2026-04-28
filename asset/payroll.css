@@ -1475,9 +1475,10 @@ tbody tr:hover td { background: #FAFAFA; }
 #atdHotContainer .handsontable thead th {
   background:#1E3A5F !important; color:#E0EAFF !important;
   font-weight:600; font-size:11px; text-align:center !important;
-  padding:0 3px !important; height:26px !important; line-height:26px !important;
+  padding:2px 3px !important; min-height:26px !important; line-height:1.25 !important;
   border-right:1px solid #2D5A8E !important; border-bottom:1px solid #2D5A8E !important;
-  white-space:nowrap; overflow:hidden;
+  vertical-align: middle !important;
+  white-space:normal !important; overflow:hidden;
 }
 #atdHotContainer .handsontable thead tr:first-child th {
   background:#162C4A !important; font-size:12px; font-weight:700;
@@ -1957,6 +1958,35 @@ tbody tr:hover td { background: #FAFAFA; }
 #acHotContainer .wtHolder::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 3px; }
 
 /* ════════════════════════════════════════════════════
+   TẠM ỨNG LƯƠNG — #tuHotContainer
+   ════════════════════════════════════════════════════ */
+#tuHotContainer {
+  border: 1px solid #CBD5E1; border-radius: 10px;
+  overflow: hidden; margin-top: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,.07);
+}
+#tuHotContainer .handsontable thead th {
+  background: #1E3A5F !important; color: #E0EAFF !important;
+  font-weight: 600; font-size: 11px; text-align: center !important;
+  padding: 0 3px !important; min-height: 30px !important; line-height: 1.2 !important;
+  border-right: 1px solid #2D5A8E !important; border-bottom: 1px solid #2D5A8E !important;
+  vertical-align: middle !important; white-space: normal !important;
+}
+#tuHotContainer .handsontable td {
+  font-size: 12px; color: #1E293B;
+  border-right: 1px solid #E2E8F0 !important; border-bottom: 1px solid #E9EEF5 !important;
+  height: 26px !important; line-height: 26px !important; padding: 0 5px !important;
+}
+#tuHotContainer .handsontable.ht_clone_left td { border-right: 2px solid #B0C4DE !important; }
+#tuHotContainer .handsontable td.tu-even-row { background: #F0F7FF; }
+#tuHotContainer .handsontable td.tu-total {
+  background: #EFF6FF; font-weight: 700; color: #1D4ED8;
+  border-left: 2px solid #BFDBFE !important;
+}
+#tuHotContainer .wtHolder::-webkit-scrollbar { height: 6px; width: 6px; }
+#tuHotContainer .wtHolder::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 3px; }
+
+/* ════════════════════════════════════════════════════
    QUYẾT TOÁN — #qtHotContainer
    ════════════════════════════════════════════════════ */
 #qtHotContainer {
@@ -2000,9 +2030,10 @@ tbody tr:hover td { background: #FAFAFA; }
 #clHotContainer .handsontable thead th {
   background: #1E3A5F !important; color: #E0EAFF !important;
   font-weight: 600; font-size: 11px; text-align: center !important;
-  padding: 0 3px !important; height: 30px !important; line-height: 30px !important;
+  padding: 2px 3px !important; min-height: 30px !important; line-height: 1.25 !important;
   border-right: 1px solid #2D5A8E !important; border-bottom: 1px solid #2D5A8E !important;
-  white-space: nowrap; overflow: hidden;
+  white-space: normal !important; vertical-align: middle !important;
+  overflow: hidden;
 }
 #clHotContainer .handsontable td {
   font-size: 12px; color: #1E293B;
@@ -2029,8 +2060,9 @@ tbody tr:hover td { background: #FAFAFA; }
 #hslHotContainer .handsontable thead th {
   background: #1E3A5F !important; color: #E0EAFF !important;
   font-weight: 600; font-size: 11px; text-align: center !important;
-  padding: 0 3px !important; height: 30px !important; line-height: 30px !important;
+  padding: 2px 3px !important; min-height: 30px !important; line-height: 1.25 !important;
   border-right: 1px solid #2D5A8E !important; border-bottom: 1px solid #2D5A8E !important;
+  vertical-align: middle !important; white-space: normal !important;
 }
 #hslHotContainer .handsontable td {
   font-size: 12px; color: #1E293B;
@@ -2041,6 +2073,102 @@ tbody tr:hover td { background: #FAFAFA; }
 #hslHotContainer .handsontable td.hsl-even-row { background: #F0F7FF; }
 #hslHotContainer .wtHolder::-webkit-scrollbar { height: 6px; width: 6px; }
 #hslHotContainer .wtHolder::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 3px; }
+
+/* ════════════════════════════════════════════════════
+   QUẢN LÝ NHÂN SỰ — #nsHotContainer
+   ════════════════════════════════════════════════════ */
+#nsHotContainer .handsontable thead th {
+  background: #1E3A5F !important; color: #E0EAFF !important;
+  font-weight: 600; font-size: 11px; text-align: center !important;
+  padding: 2px 3px !important; min-height: 32px !important; line-height: 1.25 !important;
+  border-right: 1px solid #2D5A8E !important; border-bottom: 1px solid #2D5A8E !important;
+  vertical-align: middle !important; white-space: normal !important;
+}
+#nsHotContainer .handsontable td {
+  font-size: 12px; color: #1E293B;
+  border-right: 1px solid #E2E8F0 !important; border-bottom: 1px solid #E9EEF5 !important;
+  height: 26px !important; line-height: 26px !important; padding: 0 5px !important;
+}
+#nsHotContainer .handsontable td.ns-even-row { background: #F8FAFC; }
+
+/* ════════════════════════════════════════════════════
+   DANH MỤC PHÒNG BAN — #pbHotContainer
+   ════════════════════════════════════════════════════ */
+#pbHotContainer .handsontable thead th {
+  background: #134E4A !important; color: #F0FDFA !important; /* Teal style */
+  font-weight: 600; font-size: 11px; text-align: center !important;
+  padding: 2px 3px !important; min-height: 32px !important; line-height: 1.25 !important;
+  border-right: 1px solid #14B8A6 !important; border-bottom: 1px solid #14B8A6 !important;
+  vertical-align: middle !important; white-space: normal !important;
+}
+#pbHotContainer .handsontable td {
+  font-size: 12px; color: #0F172A;
+  border-right: 1px solid #F1F5F9 !important; border-bottom: 1px solid #F1F5F9 !important;
+  height: 28px !important; line-height: 28px !important; padding: 0 8px !important;
+}
+#pbHotContainer .handsontable td.pb-even-row { background: #F0FDFA; }
+
+/* ════════════════════════════════════════════════════
+   CHẤM CÔNG PHÒNG BAN — #ccpbHotContainer
+   ════════════════════════════════════════════════════ */
+#ccpbHotContainer .handsontable thead th {
+  background: #1E3A5F !important; color: #E0EAFF !important;
+  font-weight: 600; font-size: 11px; text-align: center !important;
+  padding: 2px 3px !important; min-height: 32px !important; line-height: 1.25 !important;
+  border-right: 1px solid #2D5A8E !important; border-bottom: 1px solid #2D5A8E !important;
+  vertical-align: middle !important;
+}
+#ccpbHotContainer .handsontable td {
+  font-size: 12px; color: #0F172A; height: 26px !important; line-height: 26px !important;
+  border-right: 1px solid #F1F5F9 !important; border-bottom: 1px solid #F1F5F9 !important;
+}
+#ccpbHotContainer .handsontable td.ccpb-even-row { background: #F0FDFA; }
+
+/* ════════════════════════════════════════════════════
+   ĐÁNH GIÁ HIỆU QUẢ — #dghqHotContainer
+   ════════════════════════════════════════════════════ */
+#dghqHotContainer .handsontable thead th {
+  background: #134E4A !important; color: #F0FDFA !important;
+  font-weight: 600; font-size: 11px; text-align: center !important;
+  padding: 2px 3px !important; min-height: 32px !important; line-height: 1.25 !important;
+  border-right: 1px solid #14B8A6 !important; border-bottom: 1px solid #14B8A6 !important;
+  vertical-align: middle !important;
+}
+#dghqHotContainer .handsontable td {
+  font-size: 12px; color: #0F172A; height: 26px !important; line-height: 26px !important;
+  border-right: 1px solid #F1F5F9 !important; border-bottom: 1px solid #F1F5F9 !important;
+}
+
+/* ════════════════════════════════════════════════════
+   LƯƠNG HIỆU QUẢ — #lhqHotContainer
+   ════════════════════════════════════════════════════ */
+#lhqHotContainer .handsontable thead th {
+  background: #134E4A !important; color: #F0FDFA !important;
+  font-weight: 600; font-size: 11px; text-align: center !important;
+  padding: 2px 3px !important; min-height: 32px !important; line-height: 1.25 !important;
+  border-right: 1px solid #14B8A6 !important; border-bottom: 1px solid #14B8A6 !important;
+  vertical-align: middle !important;
+}
+#lhqHotContainer .handsontable td {
+  font-size: 11.5px; color: #0F172A; height: 26px !important; line-height: 26px !important;
+  border-right: 1px solid #F1F5F9 !important; border-bottom: 1px solid #F1F5F9 !important;
+}
+
+/* ════════════════════════════════════════════════════
+   QUẢN LÝ NGHỈ PHÉP — #npHotContainer
+   ════════════════════════════════════════════════════ */
+#npHotContainer .handsontable thead th {
+  background: #1E3A5F !important; color: #E0EAFF !important;
+  font-weight: 600; font-size: 11px; text-align: center !important;
+  padding: 2px 3px !important; line-height: 1.25 !important;
+  border-right: 1px solid #2D5A8E !important; border-bottom: 1px solid #2D5A8E !important;
+  vertical-align: middle !important;
+}
+/* Force rowspan cells to look merged */
+#npHotContainer .handsontable th[rowspan="2"] {
+  height: 66px !important;
+  vertical-align: middle !important;
+}
 
 /* Force center headers and cells for STT column */
 .handsontable th.htCenter, 
@@ -2066,6 +2194,18 @@ tbody tr:hover td { background: #FAFAFA; }
 }
 .handsontable table {
   width: 100% !important;
+}
+
+/* Force all tables to expand to full height when height:auto is set in JS */
+.handsontable.htAutoHeight {
+  height: auto !important;
+}
+.handsontable.htAutoHeight .wtHolder {
+  height: auto !important;
+  overflow: hidden !important; /* No vertical scrollbar inside table */
+}
+.handsontable.htAutoHeight .wtHider {
+  height: auto !important;
 }
 
 /* ══════════════════════════════════════════════════════════════
