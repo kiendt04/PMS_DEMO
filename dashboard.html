@@ -1039,19 +1039,48 @@
         <div class="page-section fade-in" id="page-ql-quyen">
           <div class="cat-header">
             <div class="cat-header-left">
-              <div class="cat-icon-wrap" style="background:#FEF3E2;color:#B45309"><svg viewBox="0 0 20 20" fill="none">
+              <div class="cat-icon-wrap" style="background:#FEF3E2;color:#B45309">
+                <svg viewBox="0 0 20 20" fill="none">
                   <rect x="4" y="8" width="12" height="10" rx="1.5" stroke="currentColor" stroke-width="1.6" />
                   <path d="M7 8V6a3 3 0 0 1 6 0v2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
-                </svg></div>
+                </svg>
+              </div>
               <div>
                 <div class="cat-title">Quản lý quyền</div>
-                <div class="cat-sub">Cấu hình các nhóm quyền truy cập</div>
+                <div class="cat-sub">Cấu hình các nhóm quyền truy cập hệ thống</div>
               </div>
-            </div><button class="btn-cat-add">+ Thêm quyền</button>
+            </div>
+            <button class="btn-cat-add" onclick="roleOpenAdd()">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                <path d="M7 1v12M1 7h12" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+              </svg>Thêm quyền
+            </button>
           </div>
-          <div class="placeholder">
-            <p>Danh sách quyền sẽ hiển thị tại đây</p>
+          <div class="cat-toolbar">
+            <div class="cat-search-wrap">
+              <svg viewBox="0 0 16 16" fill="none">
+                <circle cx="6.5" cy="6.5" r="4" stroke="currentColor" stroke-width="1.4" />
+                <path d="M11 11l3 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" />
+              </svg>
+              <input type="text" id="roleSearch" placeholder="Tìm theo tên hoặc mô tả quyền..." oninput="roleRender()" />
+            </div>
+            <div class="cat-count-pill" id="roleTotal"></div>
           </div>
+          <div class="cat-table-wrap">
+            <table class="cat-table">
+              <thead>
+                <tr>
+                  <th style="width:50px;text-align:center">ID</th>
+                  <th style="width:250px">Tên quyền</th>
+                  <th>Mô tả</th>
+                  <th style="width:130px;text-align:center">Thao tác</th>
+                </tr>
+              </thead>
+              <tbody id="roleTbody"></tbody>
+            </table>
+          </div>
+          <!-- Pagination -->
+          <div id="rolePagination" style="display:flex; justify-content:center; gap:5px; margin-top:15px; padding-bottom:10px;"></div>
         </div>
 
         <div class="page-section fade-in" id="page-phan-quyen-nd">
@@ -1696,6 +1725,60 @@
     </div>
   </div>
 
+  <!-- Modal Quyền (Role) -->
+  <div class="modal-overlay" id="roleModal">
+    <div class="cat-modal">
+      <div class="cat-modal-accent cat-modal-accent-blue"></div>
+      <div class="cat-modal-body">
+        <div class="cat-modal-header">
+          <div class="cat-modal-title-wrap">
+            <span class="cat-modal-title" id="roleModalTitle">Thêm quyền mới</span>
+          </div>
+          <button class="cat-btn-close" onclick="roleCloseModal()">
+            <svg viewBox="0 0 14 14" fill="none">
+              <path d="M2 2l10 10M12 2L2 12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+            </svg>
+          </button>
+        </div>
+        <div class="cat-form-grid" style="grid-template-columns: 1fr;">
+          <div class="cat-field">
+            <label>Tên quyền <span class="req">*</span></label>
+            <input type="text" id="roleTen" placeholder="VD: Admin, Manager, Employee..." />
+            <div class="cat-field-err" id="errRoleTen"></div>
+          </div>
+          <div class="cat-field">
+            <label>Mô tả</label>
+            <textarea id="roleMoTa" placeholder="Mô tả các chức năng hoặc phạm vi của quyền này..."></textarea>
+          </div>
+        </div>
+        <div class="cat-modal-footer">
+          <button class="cat-btn-cancel" onclick="roleCloseModal()">Hủy</button>
+          <button class="cat-btn-save" onclick="roleSave()">Lưu dữ liệu</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="roleDeleteModal">
+    <div class="cat-modal cat-modal-sm">
+      <div class="cat-modal-accent cat-modal-accent-red"></div>
+      <div class="cat-modal-body">
+        <div class="cat-delete-icon">
+          <svg viewBox="0 0 24 24" fill="none">
+            <polyline points="3 6 5 6 21 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+            <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </div>
+        <div class="cat-delete-title">Xác nhận xóa</div>
+        <div class="cat-delete-sub" id="roleDeleteMsg">Bạn có chắc muốn xóa quyền này không?</div>
+        <div class="cat-modal-footer" style="justify-content:center">
+          <button class="cat-btn-cancel" onclick="roleCloseDelete()">Hủy</button>
+          <button class="cat-btn-danger" onclick="roleConfirmDelete()">Xóa</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script src="asset/sidebar.js"></script>
   <script src="asset/khoi-phong-ban.js"></script>
   <script src="asset/phong-ban.js"></script>
@@ -1735,7 +1818,7 @@
   <script src="asset/danh-gia-hq.js"></script>
   <script src="asset/luong-hq.js"></script>
   <script src="asset/ql-chuc-nang.js"></script>
-  <script src="asset/ql-quyen.js"></script>
+  <script src="asset/role.system.js"></script>
   <script src="asset/phan-quyen-nd.js"></script>
   <script src="asset/phan-quyen-cn.js"></script>
   <script src="asset/phu-tro.category.js"></script>
