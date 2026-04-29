@@ -4316,7 +4316,6 @@ tbody tr:hover td {
   background: #e2e8f0;
 }
 
-<<<<<<< HEAD
 
 /* ══════════ PERMISSION STYLES ══════════ */
 .perm-row-checked td {
@@ -4343,7 +4342,7 @@ tbody tr:hover td {
   background-color: #F0F9FF !important;
 }
 
-=======
+
 /* ══════════════════════════════════════════════════════════════
    GLOBAL HANDSONTABLE HEADER UNIFICATION
    Applied last — highest cascade priority.
