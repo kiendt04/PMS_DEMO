@@ -52,6 +52,7 @@
     if (!container || typeof Handsontable === 'undefined') return;
 
     if (hotInstance) hotInstance.destroy();
+    container.style.height = 'auto';
 
     hotInstance = new Handsontable(container, {
       data: EMPLOYEES,
@@ -103,20 +104,19 @@
     hotInstance.loadData(filtered);
   });
 
-  window.onPageActivate = (function (orig) {
-    return function (page) {
-      if (typeof orig === 'function') orig(page);
-      if (page === 'ns') setTimeout(initHot, 100);
-    };
-  })(window.onPageActivate);
+  const _orig = window.onPageActivate;
+  window.onPageActivate = function (page) {
+    if (typeof _orig === 'function') _orig(page);
+    if (page === 'dm-nguoi-dung') setTimeout(initHot, 100);
+  };
 
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => {
-      if (document.querySelector('.nav-item.active')?.dataset.page === 'ns') initHot();
+      if (document.querySelector('.nav-item.active')?.dataset.page === 'dm-nguoi-dung') initHot();
     });
   } else {
     setTimeout(() => {
-       if (document.querySelector('.nav-item.active')?.dataset.page === 'ns') initHot();
+       if (document.querySelector('.nav-item.active')?.dataset.page === 'dm-nguoi-dung') initHot();
     }, 500);
   }
 

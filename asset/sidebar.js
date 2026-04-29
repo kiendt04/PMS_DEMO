@@ -18,25 +18,32 @@
     'khoi-phong-ban': 'Danh mục nhóm phòng',
     'phong-ban': 'Danh mục phòng ban',
     'dm-luong-co-ban': 'Danh mục lương cơ bản',
-    'dm-he-so-danh-gia': 'Danh mục hệ số đánh giá',
+    'dm-he-so-danh-gia': 'Danh mục loại ngày công',
     'dm-phu-tro': 'Danh mục phụ trợ',
     'dm-thoi-gian-lv': 'Danh mục thời gian làm việc',
     'dm-phan-nguon': 'Danh mục phân nguồn',
     'dm-an-ca': 'Danh mục định mức ăn ca',
+    'dm-dinh-muc-dt': 'Danh mục định mức điện thoại',
     // Tiện ích
-    'dm-nguoi-dung': 'Quản lý nhân sự',
-    chamcong: 'Quản lý chấm công',
-    'an-toan-dien': 'Quản lý an toàn điện',
-    'tam-ung-luong': 'Quản lý tạm ứng lương',
+    // Quản lý phòng ban
+    'cc-phong-ban': 'Chấm công',
+    'danh-gia-hq': 'Đánh giá',
+    // Quản lý Chấm công
+    'chamcong': 'Quản lý chấm công',
     'nghi-phep': 'Quản lý nghỉ phép',
+    'an-toan-dien': 'Quản lý an toàn điện',
+    // Tính lương Nhân viên
+    'tam-ung-luong': 'Tạm ứng',
+    'quyet-toan': 'Quyết toán',
+    'luong-hq': 'Chi lương hiệu quả',
+    // Tính lương NQL
+    'hdtv-chuyen-trach': 'HĐTV chuyên trách',
+    'hdtv-khong-chuyen-trach': 'HĐTV không chuyên trách',
+    // Tiện ích / Khác
+    'dm-nguoi-dung': 'Quản lý nhân sự',
     'quan-ly-an-ca': 'Quản lý ăn ca',
     'he-so-luong': 'Bảng hệ số lương',
-    'quyet-toan': 'Quyết toán lương',
     'chi-luong': 'Quản lý chi lương theo tháng',
-    // Quản lý phòng ban
-    'cc-phong-ban': 'Chấm công phòng ban',
-    'danh-gia-hq': 'Đánh giá hiệu quả công việc',
-    'luong-hq': 'Lương hiệu quả - phòng ban',
     // Quản lý hệ thống
     'ql-chuc-nang': 'Quản lý chức năng',
     'ql-quyen': 'Quản lý quyền',
@@ -87,45 +94,81 @@
         <div class="nav-item" data-page="dm-phong-ban">Danh mục phòng ban</div>
         <div class="nav-item" data-page="khoi-phong-ban">Danh mục nhóm phòng</div>
         <div class="nav-item" data-page="dm-luong-co-ban">Danh mục lương cơ bản</div>
-        <div class="nav-item" data-page="dm-he-so-danh-gia">Danh mục hệ số đánh giá</div>
+        <div class="nav-item" data-page="dm-he-so-danh-gia">Danh mục loại ngày công</div>
         <div class="nav-item" data-page="dm-phu-tro">Danh mục phụ trợ</div>
         <div class="nav-item" data-page="dm-thoi-gian-lv">Danh mục thời gian làm việc</div>
         <div class="nav-item" data-page="dm-phan-nguon">Danh mục phân nguồn</div>
         <div class="nav-item" data-page="dm-an-ca">Danh mục định mức ăn ca</div>
+        <div class="nav-item" data-page="dm-dinh-muc-dt">Danh mục định mức điện thoại</div>
       </div>
     </div>
 
-    <!-- TIỆN ÍCH -->
-    <div class="nav-group" id="grp-tienich" data-group-name="Tiện ích">
-      <div class="nav-group-hdr" onclick="sidebarToggle('grp-tienich')" data-tooltip="Tiện ích">
-        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path></svg>
-        <span>Tiện ích</span>
-        <svg class="nav-group-arrow" width="10" height="10" viewBox="0 0 10 6" fill="none"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-      </div>
-      <div class="nav-group-items">
-        <div class="nav-item" data-page="dm-nguoi-dung">Quản lý nhân sự</div>
-        <div class="nav-item" data-page="chamcong">Quản lý chấm công</div>
-        <div class="nav-item" data-page="an-toan-dien">Quản lý an toàn điện</div>
-        <div class="nav-item" data-page="tam-ung-luong">Quản lý tạm ứng lương</div>
-        <div class="nav-item" data-page="nghi-phep">Quản lý nghỉ phép</div>
-        <div class="nav-item" data-page="quan-ly-an-ca">Quản lý ăn ca</div>
-        <div class="nav-item" data-page="he-so-luong">Bảng hệ số lương</div>
-        <div class="nav-item" data-page="quyet-toan">Quyết toán lương</div>
-        <div class="nav-item" data-page="chi-luong">Quản lý chi lương theo tháng</div>
-      </div>
-    </div>
-
-    <!-- QUẢN LÝ PHÒNG BAN -->
-    <div class="nav-group" id="grp-qlpb" data-group-name="Phòng ban">
-      <div class="nav-group-hdr" onclick="sidebarToggle('grp-qlpb')" data-tooltip="Phòng ban">
+    <!-- PHÒNG BAN -->
+    <div class="nav-group open" id="grp-phongban" data-group-name="Phòng ban">
+      <div class="nav-group-hdr" onclick="sidebarToggle('grp-phongban')" data-tooltip="Phòng ban">
         <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
         <span>Phòng ban</span>
         <svg class="nav-group-arrow" width="10" height="10" viewBox="0 0 10 6" fill="none"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
       </div>
       <div class="nav-group-items">
-        <div class="nav-item" data-page="cc-phong-ban">Chấm công phòng ban</div>
-        <div class="nav-item" data-page="danh-gia-hq">Đánh giá hiệu quả công việc</div>
-        <div class="nav-item" data-page="luong-hq">Lương hiệu quả công việc</div>
+        <div class="nav-item" data-page="cc-phong-ban">Chấm công</div>
+        <div class="nav-item" data-page="danh-gia-hq">Đánh giá</div>
+      </div>
+    </div>
+
+    <!-- CHẤM CÔNG -->
+    <div class="nav-group" id="grp-chamcong" data-group-name="Chấm công">
+      <div class="nav-group-hdr" onclick="sidebarToggle('grp-chamcong')" data-tooltip="Chấm công">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+        <span>Chấm công</span>
+        <svg class="nav-group-arrow" width="10" height="10" viewBox="0 0 10 6" fill="none"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+      </div>
+      <div class="nav-group-items">
+        <div class="nav-item" data-page="chamcong">Quản lý chấm công</div>
+        <div class="nav-item" data-page="nghi-phep">Quản lý nghỉ phép</div>
+        <div class="nav-item" data-page="an-toan-dien">Quản lý an toàn điện</div>
+      </div>
+    </div>
+
+    <!-- TÍNH LƯƠNG NHÂN VIÊN -->
+    <div class="nav-group" id="grp-luongnv" data-group-name="Tính lương Nhân viên">
+      <div class="nav-group-hdr" onclick="sidebarToggle('grp-luongnv')" data-tooltip="Tính lương Nhân viên">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
+        <span>Tính lương Nhân viên</span>
+        <svg class="nav-group-arrow" width="10" height="10" viewBox="0 0 10 6" fill="none"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+      </div>
+      <div class="nav-group-items">
+        <div class="nav-item" data-page="tam-ung-luong">Tạm ứng</div>
+        <div class="nav-item" data-page="quyet-toan">Quyết toán</div>
+        <div class="nav-item" data-page="luong-hq">Chi lương hiệu quả</div>
+      </div>
+    </div>
+
+    <!-- TÍNH LƯƠNG NQL -->
+    <div class="nav-group" id="grp-luongnql" data-group-name="Tính lương NQL">
+      <div class="nav-group-hdr" onclick="sidebarToggle('grp-luongnql')" data-tooltip="Tính lương NQL">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><polyline points="16 11 18 13 22 9"></polyline></svg>
+        <span>Tính lương NQL</span>
+        <svg class="nav-group-arrow" width="10" height="10" viewBox="0 0 10 6" fill="none"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+      </div>
+      <div class="nav-group-items">
+        <div class="nav-item" data-page="hdtv-chuyen-trach">HĐTV chuyên trách</div>
+        <div class="nav-item" data-page="hdtv-khong-chuyen-trach">HĐTV không chuyên trách</div>
+      </div>
+    </div>
+
+    <!-- TIỆN ÍCH KHÁC -->
+    <div class="nav-group" id="grp-tienich" data-group-name="Tiện ích khác">
+      <div class="nav-group-hdr" onclick="sidebarToggle('grp-tienich')" data-tooltip="Tiện ích khác">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path></svg>
+        <span>Tiện ích khác</span>
+        <svg class="nav-group-arrow" width="10" height="10" viewBox="0 0 10 6" fill="none"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+      </div>
+      <div class="nav-group-items">
+        <div class="nav-item" data-page="dm-nguoi-dung">Quản lý nhân sự</div>
+        <div class="nav-item" data-page="quan-ly-an-ca">Quản lý ăn ca</div>
+        <div class="nav-item" data-page="he-so-luong">Bảng hệ số lương</div>
+        <div class="nav-item" data-page="chi-luong">Quản lý chi lương theo tháng</div>
       </div>
     </div>
 
@@ -175,11 +218,16 @@
   if (av) av.textContent = (_userData.name || 'AD').substring(0, 2).toUpperCase();
   if (nm) nm.textContent = _userData.name || 'Admin';
 
-  /* ── Topbar date ── */
+  /* ── Topbar date & user ── */
   const dateEl = document.getElementById('topbarDate');
   if (dateEl) dateEl.textContent = new Date().toLocaleDateString('vi-VN', {
     weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
   });
+
+  const topName = document.getElementById('topbarUserName');
+  const topAvatar = document.getElementById('topbarAvatar');
+  if (topName) topName.textContent = _userData.name || 'Admin';
+  if (topAvatar) topAvatar.textContent = (_userData.name || 'AD').substring(0, 2).toUpperCase();
 
   /* ── Navigation ── */
   function navigateTo(page) {
@@ -214,17 +262,13 @@
     if (typeof window.onPageActivate === 'function') {
       window.onPageActivate(page);
     }
+    // Save state
+    sessionStorage.setItem('pms_active_page', page);
   }
 
-  // Attach click listeners after DOM ready
-  function attachNavListeners() {
-    document.querySelectorAll('.nav-item[data-page]').forEach(item => {
-      item.addEventListener('click', function () {
-        navigateTo(this.dataset.page);
-      });
-    });
-  }
-  attachNavListeners();
+  // Initial navigation
+  const _savedPage = sessionStorage.getItem('pms_active_page') || 'dashboard';
+  setTimeout(() => { navigateTo(_savedPage); }, 100);
 
   /* ── Accordion toggle ── */
   window.sidebarToggle = function (groupId) {

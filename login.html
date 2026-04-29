@@ -1136,9 +1136,9 @@
             btnTextSpan.textContent = 'Thành công ✓';
             // Store session
             sessionStorage.setItem('pms_user', JSON.stringify({ name: username, role: 'admin' }));
-            // Redirect to dashboard (index.html as per original design, but could be dashboard)
+            // Redirect to dashboard
             setTimeout(() => {
-              window.location.href = 'index.html';
+              window.location.href = 'dashboard.html';
             }, 800);
           } else {
             showErr('Tên đăng nhập hoặc mật khẩu không đúng.');

@@ -108,11 +108,14 @@
       const page = document.querySelector('.page-section.active');
       if (page?.id === 'page-dm-phong-ban') { clearTimeout(_t); _t = setTimeout(refresh, 300); }
     };
-    if (typeof ResizeObserver !== 'undefined') {
-      const ro = new ResizeObserver(_cb);
-      const el = document.querySelector('.main') || document.getElementById('pbHotContainer');
-      if (el) ro.observe(el);
-    } else { window.addEventListener('resize', _cb); }
+    let _resizeTimer = null;
+    window.addEventListener('resize', () => {
+      const page = document.querySelector('.page-section.active');
+      if (page && page.id === 'page-dm-phong-ban') {
+        clearTimeout(_resizeTimer);
+        _resizeTimer = setTimeout(refresh, 300);
+      }
+    });
   }
 
   const _orig = window.onPageActivate;

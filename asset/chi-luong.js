@@ -1,13 +1,12 @@
 /**
- * chi-luong.js — Quản lý chi lương theo tháng với Handsontable
- * Alignment: tên/STK/ngày chi/ghi chú → htLeft | tiền → htRight | mã/stt → htCenter
+ * chi-luong.js — Quản lý chi lương theo tháng
+ * Fix lỗi lệch dòng và chênh lệch chiều cao header bằng cách đồng nhất cấu trúc CSS và Handsontable.
  */
 (function () {
   'use strict';
 
   const FIXED = 4; // STT | Họ và tên | Mã CB | Số TK
 
-  /* ── Mock data ── */
   const DEPTS = [
     { name: 'Phòng Tổng hợp HĐTV', employees: [
       { stt:1,  name:'Nguyễn Kiều Ly',       ma:'NV001', stk:'1234567891',    luongCD:7020000, tamUng:3660000, qt:3360000, anCa:770000, cdTg:0,      truyLinh:0,       truyThu:0,      ngayChi:'15/04/2025' },
@@ -46,21 +45,17 @@
   ];
 
   let hotInstance = null;
-  let deptSet     = new Set();
+  let deptRowSet = new Set();
   let _initializing = false;
 
-  /* ── Build data ── */
   function buildData() {
     const rows = [];
-    deptSet = new Set();
-
+    deptRowSet = new Set();
     DEPTS.forEach(dept => {
-      const di = rows.length;
-      deptSet.add(di);
+      deptRowSet.add(rows.length);
       const dRow = new Array(14).fill('');
-      dRow[0] = dept.name;
+      dRow[1] = dept.name; // Move to index 1
       rows.push(dRow);
-
       dept.employees.forEach(emp => {
         const thucLinh = emp.qt + emp.anCa + emp.cdTg + (emp.truyLinh || 0) - (emp.truyThu || 0);
         rows.push([
@@ -76,179 +71,114 @@
     return rows;
   }
 
-  /* ── Build nested headers ── */
-  function buildHeaders(thang, nam) {
-    const h1 = [
-      { label: 'TT',                         colspan: 1 },
-      { label: 'Họ và tên',                  colspan: 1 },
-      { label: 'Mã cán bộ',                  colspan: 1 },
-      { label: 'Số TK',                      colspan: 1 },
-      { label: 'Lương<br/>chế độ',           colspan: 1 },
-      { label: `Đã tạm ứng<br/>T${thang}/${nam}`, colspan: 1 },
-      { label: 'Quyết toán<br/>lương',       colspan: 1 },
-      { label: 'Ăn ca',                      colspan: 1 },
-      { label: 'Ca đêm,<br/>thêm giờ',       colspan: 1 },
-      { label: 'Truy lĩnh',                  colspan: 1 },
-      { label: 'Truy thu',                   colspan: 1 },
-      { label: 'THỰC LĨNH',                  colspan: 1 },
-      { label: 'Ngày chi',                   colspan: 1 },
-      { label: 'Ghi chú',                    colspan: 1 },
-    ];
-    return [h1];
-  }
-
-  /* ── Build column config ── */
-  function buildCols() {
-    const C   = 'htCenter htMiddle';
-    const L   = 'htLeft   htMiddle';
-    const R   = 'htRight  htMiddle';
-    const FMT = { type:'numeric', numericFormat:{ pattern:'0,0' } };
-    return [
-      { data:0,  readOnly:true, type:'numeric', width:35,  className: C },
-      { data:1,  readOnly:true, type:'text',    width:145, className: L },
-      { data:2,  readOnly:true, type:'text',    width:80,  className: C },
-      { data:3,  readOnly:true, type:'text',    width:118, className: C },
-      // Cột tiền — right
-      { data:4,  readOnly:true, ...FMT, width:100, className: R },
-      { data:5,  readOnly:true, ...FMT, width:100, className: R },
-      { data:6,  readOnly:true, ...FMT, width:100, className: R },
-      { data:7,  readOnly:true, ...FMT, width:88,  className: R },
-      { data:8,  readOnly:true, ...FMT, width:88,  className: R },
-      // Truy lĩnh / truy thu — editable, right
-      { data:9,  ...FMT, width:82, className: R },
-      { data:10, ...FMT, width:82, className: R },
-      // THỰC LĨNH — right + highlight
-      { data:11, readOnly:true, ...FMT, width:108, className: R + ' cl-total' },
-      // Ngày chi — center
-      { data:12, readOnly:true, type:'text', width:90, className: C },
-      // Ghi chú — center
-      { data:13, type:'text', width:100, className: C },
-    ];
-  }
-
-  /* ── initHot ── */
   function initHot(thang, nam) {
     if (_initializing) return;
     _initializing = true;
-
     const container = document.getElementById('clHotContainer');
     if (!container || typeof Handsontable === 'undefined') { _initializing = false; return; }
 
-    const data      = buildData();
-    const headers   = buildHeaders(thang, nam);
-    const cols      = buildCols();
-    const totalCols = cols.length;
-    const merges    = [];
-    deptSet.forEach(ri => merges.push({ row: ri, col: 0, rowspan: 1, colspan: totalCols }));
+    const data = buildData();
+    const headers = [
+      { label: 'TT', colspan: 1 },
+      { label: 'Họ và tên', colspan: 1 },
+      { label: 'Mã cán bộ', colspan: 1 },
+      { label: 'Số TK', colspan: 1 },
+      { label: 'Lương<br/>chế độ', colspan: 1 },
+      { label: `Đã tạm ứng<br/>T${thang}/${nam}`, colspan: 1 },
+      { label: 'Quyết toán<br/>lương', colspan: 1 },
+      { label: 'Ăn ca', colspan: 1 },
+      { label: 'Ca đêm,<br/>thêm giờ', colspan: 1 },
+      { label: 'Truy lĩnh', colspan: 1 },
+      { label: 'Truy thu', colspan: 1 },
+      { label: 'THỰC LĨNH', colspan: 1 },
+      { label: 'Ngày chi', colspan: 1 },
+      { label: 'Ghi chú', colspan: 1 },
+    ];
+
+    const merges = [];
+    deptRowSet.forEach(ri => merges.push({ row: ri, col: 0, rowspan: 1, colspan: 14 }));
 
     if (hotInstance) { hotInstance.destroy(); hotInstance = null; }
-    container.style.height = 'auto';
 
     hotInstance = new Handsontable(container, {
       data,
-      nestedHeaders:     headers,
-      columns:           cols,
-      rowHeaders:        false,
+      nestedHeaders: [headers],
+      colHeaders: false,
+      rowHeaders: false,
       fixedColumnsStart: FIXED,
-      height:            'auto',
-      width:             '100%',
-      stretchH:          'all',
-      autoColumnSize:    false,
-      renderAllRows:     true,
-      mergeCells:        merges,
-      licenseKey:        'non-commercial-and-evaluation',
-      rowHeights:        26,
-      columnHeaderHeight: [32],
+      height: 'auto',
+      width: '100%',
+      stretchH: 'all',
+      autoColumnSize: false,
+      autoRowSize: false,
+      renderAllRows: true,
+      renderAllRows: true,
+      licenseKey: 'non-commercial-and-evaluation',
+
+      columns: [
+        { width: 40, type: 'numeric', className: 'htCenter htMiddle' },
+        { width: 160, type: 'text', className: 'htLeft htMiddle' },
+        { width: 100, type: 'text', className: 'htCenter htMiddle' },
+        { width: 110, type: 'text', className: 'htCenter htMiddle' },
+        { width: 100, type: 'numeric', numericFormat: { pattern: '0,0' }, className: 'htRight htMiddle' },
+        { width: 100, type: 'numeric', numericFormat: { pattern: '0,0' }, className: 'htRight htMiddle' },
+        { width: 100, type: 'numeric', numericFormat: { pattern: '0,0' }, className: 'htRight htMiddle' },
+        { width: 85, type: 'numeric', numericFormat: { pattern: '0,0' }, className: 'htRight htMiddle' },
+        { width: 85, type: 'numeric', numericFormat: { pattern: '0,0' }, className: 'htRight htMiddle' },
+        { width: 85, type: 'numeric', numericFormat: { pattern: '0,0' }, className: 'htRight htMiddle' },
+        { width: 85, type: 'numeric', numericFormat: { pattern: '0,0' }, className: 'htRight htMiddle' },
+        { width: 110, type: 'numeric', numericFormat: { pattern: '0,0' }, className: 'htRight htMiddle cl-total' },
+        { width: 95, type: 'text', className: 'htCenter htMiddle' },
+        { width: 100, type: 'text', className: 'htCenter htMiddle' },
+      ],
 
       cells(row, col) {
-        if (deptSet.has(row)) {
+        if (deptRowSet.has(row)) {
           return {
             readOnly: true,
-            renderer(inst, td, r, c, prop, value) {
-              td.innerHTML = '';
-              td.style.cssText = 'background:#DBEAFE;border-bottom:1px solid #93C5FD;border-right:1px solid #BFDBFE;height:26px;';
-              if (c === 0) {
-                td.style.color      = '#1E40AF';
-                td.style.fontWeight = '700';
-                td.style.fontSize   = '12px';
-                td.style.padding    = '0 8px';
-                td.style.textAlign  = 'left';
-                td.textContent      = value || '';
-              }
-            }
+            className: 'dept-row htLeft htMiddle'
           };
         }
         const props = {};
-        const classes = [];
-        if (row % 2 === 0) classes.push('cl-even-row');
-        if (col === 1) classes.push('htLeft');
-        else if (col >= 4 && col <= 11) classes.push('htRight');
-        else classes.push('htCenter');
-        classes.push('htMiddle');
-        if (col === 11)    classes.push('cl-total');
-        if (classes.length) props.className = classes.join(' ');
+        if (row % 2 === 0) props.className = (this.columns[col].className || '') + ' cl-even-row';
         return props;
       },
 
       afterChange(changes) {
         if (!changes) return;
-        const affected = new Set(changes.filter(([,,,src]) => src !== 'recalc').map(([r]) => r));
-        affected.forEach(ri => recalcTotal(ri));
+        changes.forEach(([ri, cp, oldV, newV]) => {
+          if (cp >= 4 && cp <= 10 && oldV !== newV) recalcTotal(ri);
+        });
       },
 
-      afterGetColHeader(col, th) {
-        // Wrap header dài
-        if ([5, 6, 8].includes(col)) {
-          th.style.whiteSpace = 'normal';
-          th.style.lineHeight = '1.25';
-          th.style.padding    = '2px 3px';
-          th.style.wordBreak  = 'break-word';
-        }
-      },
-
-      afterGetColHeader(col, th) {
-        th.style.verticalAlign = 'middle';
-        if ([4, 5, 6, 8, 9].includes(col)) {
-          th.style.whiteSpace = 'normal';
-          th.style.lineHeight = '1.25';
-        }
-      },
       afterRender() {
         setTimeout(() => { _initializing = false; }, 400);
       },
     });
   }
 
-  /* ── Recalc THỰC LĨNH ── */
   function recalcTotal(ri) {
-    if (!hotInstance || deptSet.has(ri)) return;
-    const qt = parseFloat(hotInstance.getDataAtCell(ri, 6))  || 0;
-    const ac = parseFloat(hotInstance.getDataAtCell(ri, 7))  || 0;
-    const cd = parseFloat(hotInstance.getDataAtCell(ri, 8))  || 0;
-    const tl = parseFloat(hotInstance.getDataAtCell(ri, 9))  || 0;
-    const tt = parseFloat(hotInstance.getDataAtCell(ri, 10)) || 0;
-    hotInstance.setDataAtCell(ri, 11, qt + ac + cd + tl - tt || '', 'recalc');
+    if (!hotInstance || deptRowSet.has(ri)) return;
+    const r = hotInstance.getDataAtRow(ri);
+    const qt = parseFloat(r[6]) || 0;
+    const ac = parseFloat(r[7]) || 0;
+    const cd = parseFloat(r[8]) || 0;
+    const tl = parseFloat(r[9]) || 0;
+    const tt = parseFloat(r[10]) || 0;
+    hotInstance.setDataAtCell(ri, 11, qt + ac + cd + tl - tt, 'recalc');
   }
 
-  /* ── Export CSV ── */
   function exportCSV() {
     if (!hotInstance) return;
-    const t = document.getElementById('clThang')?.value || '';
-    const n = document.getElementById('clNam')?.value   || '';
-    hotInstance.getPlugin('exportFile').downloadFile('csv', {
-      bom: true, columnHeaders: true, fileExtension: 'csv',
-      filename: `ChiLuong_T${t}_${n}`, mimeType: 'text/csv',
-      rowDelimiter: '\r\n', rowHeaders: false,
-    });
+    hotInstance.getPlugin('exportFile').downloadFile('csv', { bom: true, filename: 'ChiLuongThang' });
   }
 
   function refresh() {
     const thang = parseInt(document.getElementById('clThang')?.value) || new Date().getMonth() + 1;
-    const nam   = parseInt(document.getElementById('clNam')?.value)   || new Date().getFullYear();
+    const nam = parseInt(document.getElementById('clNam')?.value) || new Date().getFullYear();
     initHot(thang, nam);
   }
 
-  /* ── Init ── */
   function init() {
     const ySel = document.getElementById('clNam');
     if (ySel && ySel.options.length === 0) {
@@ -264,18 +194,6 @@
     document.getElementById('clNam')?.addEventListener('change', refresh);
     document.getElementById('clExcel')?.addEventListener('click', exportCSV);
     setTimeout(refresh, 150);
-
-    let _t = null;
-    const _cb = () => {
-      if (_initializing) return;
-      const page = document.querySelector('.page-section.active');
-      if (page?.id === 'page-chi-luong') { clearTimeout(_t); _t = setTimeout(refresh, 300); }
-    };
-    if (typeof ResizeObserver !== 'undefined') {
-      const ro = new ResizeObserver(_cb);
-      const el = document.querySelector('.main') || document.getElementById('clHotContainer');
-      if (el) ro.observe(el);
-    } else { window.addEventListener('resize', _cb); }
   }
 
   const _orig = window.onPageActivate;
@@ -283,6 +201,25 @@
     if (typeof _orig === 'function') _orig(page);
     if (page === 'chi-luong') setTimeout(refresh, 50);
   };
+
+  if (!document.getElementById('cl-style')) {
+    const s = document.createElement('style');
+    s.id = 'cl-style';
+    s.textContent = `
+      #clHotContainer .wtHolder { overflow-x: auto !important; overflow-y: visible !important; height: auto !important; }
+      #clHotContainer .ht_master .wtHolder { overflow-x: auto !important; overflow-y: visible !important; }
+      #clHotContainer .ht_clone_top .wtHolder { overflow: hidden !important; }
+      .handsontable td { white-space: nowrap !important; font-size: 13px !important; color: #333 !important; }
+      .handsontable th { background: #1E3A5F !important; color: #fff !important; font-weight: 700 !important; vertical-align: middle !important; text-align: center !important; height: 32px !important; }
+      .handsontable span.colHeader { white-space: normal !important; line-height: 1.1 !important; display: block !important; }
+      #clHotContainer .cl-even-row { background-color: #fafafa !important; }
+      #clHotContainer .cl-total { font-weight: 700 !important; color: #1e40af !important; background: #eff6ff !important; }
+      #clHotContainer .htCenter { text-align: center !important; }
+      #clHotContainer .htRight { text-align: right !important; }
+      #clHotContainer .htLeft { text-align: left !important; }
+    `;
+    document.head.appendChild(s);
+  }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
   else setTimeout(init, 200);

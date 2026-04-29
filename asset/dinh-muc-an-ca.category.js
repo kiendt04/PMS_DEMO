@@ -1,11 +1,12 @@
 // ══════════ DANH MỤC ĐỊNH MỨC ĂN CA ══════════
 let dmacData = [
-  { id: 1, tenLoai: 'Ăn ca trưa', giaTri: 30000, moTa: 'Định mức ăn trưa cho nhân viên', ngayHieuLuc: '2024-01-01', ngayKetThuc: null },
-  { id: 2, tenLoai: 'Ăn ca tối', giaTri: 25000, moTa: 'Định mức ăn tối cho nhân viên tăng ca', ngayHieuLuc: '2024-01-01', ngayKetThuc: null },
-  { id: 3, tenLoai: 'Ăn ca đêm', giaTri: 35000, moTa: 'Định mức ăn đêm cho nhân viên trực ca', ngayHieuLuc: '2024-01-01', ngayKetThuc: null },
+  { id: 2, tenLoai: 'Loại 2', giaTri: 730000, moTa: 'Số công hưởng ăn ca dưới 730000đ/tháng', ngayHieuLuc: '2024-01-01', ngayKetThuc: null },
+  { id: 3, tenLoai: 'Loại 3', giaTri: 31000, moTa: 'Số công hưởng(31000đ/ngày)', ngayHieuLuc: '2024-01-01', ngayKetThuc: null },
+  { id: 4, tenLoai: 'Loại 4', giaTri: 27000, moTa: 'Số công hưởng(27000đ/ngày)', ngayHieuLuc: '2024-01-01', ngayKetThuc: null },
+  { id: 1, tenLoai: 'Loại 1', giaTri: 730000, moTa: 'Số công hưởng ăn ca trên 730000đ/tháng', ngayHieuLuc: '2023-01-01', ngayKetThuc: null },
 ];
 
-let dmacNextId = 4;
+let dmacNextId = 5;
 let dmacEditId = null;
 let dmacDeleteId = null;
 let dmacCurrentPage = 1;

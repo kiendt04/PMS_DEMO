@@ -1,0 +1,71 @@
+<!-- partial: dm-nguoi-dung.html -->
+<div class="mod-header">
+    <div class="mod-title-wrap">
+        <div class="mod-breadcrumb">
+            <span>Trang chủ</span>
+            <span>Tiện ích</span>
+            <span>Quản lý nhân sự</span>
+        </div>
+        <h2 class="mod-title">Quản lý nhân sự</h2>
+    </div>
+    <div class="mod-actions">
+        <button class="btn-premium btn-premium-blue">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+            Thêm nhân viên
+        </button>
+        <button class="btn-premium btn-premium-green" id="nsExcel">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+            Xuất Excel
+        </button>
+    </div>
+</div>
+
+<div class="cc-filterbar">
+    <div class="cc-filter-group" style="flex: 1; min-width: 300px;">
+        <label>Tìm kiếm nhanh</label>
+        <div class="cat-search-wrap" style="width: 100%; margin-top: 0;">
+            <svg viewBox="0 0 16 16" fill="none">
+                <circle cx="6.5" cy="6.5" r="4" stroke="currentColor" stroke-width="1.4" />
+                <path d="M11 11l3 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" />
+            </svg>
+            <input type="text" id="nsSearch" placeholder="Tìm theo tên, mã hoặc tài khoản..." style="height: 38px;" />
+        </div>
+    </div>
+    <div class="cc-filter-group">
+        <label>Trạng thái</label>
+        <select class="cc-select">
+            <option value="1">Đang làm việc</option>
+            <option value="0">Đã nghỉ việc</option>
+        </select>
+    </div>
+</div>
+
+<div class="table-card">
+    <div id="nsHotContainer" style="width:100%; height: 500px;"></div>
+</div>
+
+<script>
+    (function() {
+        const container = document.getElementById('nsHotContainer');
+        const data = [
+            { id: 'NV001', name: 'Nguyễn Văn An', user: 'annv', dept: 'Phòng Kỹ thuật', role: 'Trưởng phòng', status: 'Đang làm việc' },
+            { id: 'NV002', name: 'Trần Thị Bình', user: 'binhtt', dept: 'Phòng Kinh doanh', role: 'Chuyên viên', status: 'Đang làm việc' },
+            { id: 'NV003', name: 'Lê Hoàng Cường', user: 'cuonglh', dept: 'Phòng Hành chính', role: 'Nhân viên', status: 'Đang làm việc' },
+            { id: 'NV004', name: 'Phạm Minh Đức', user: 'ducpm', dept: 'Phòng Kỹ thuật', role: 'Chuyên viên', status: 'Đang làm việc' },
+        ];
+        new Handsontable(container, {
+            data: data,
+            colHeaders: ['Mã NV', 'Họ tên', 'Tài khoản', 'Phòng ban', 'Chức vụ', 'Trạng thái'],
+            columns: [
+                { data: 'id', width: 80 },
+                { data: 'name', width: 180 },
+                { data: 'user', width: 120 },
+                { data: 'dept', width: 180 },
+                { data: 'role', width: 140 },
+                { data: 'status', width: 120 }
+            ],
+            stretchH: 'all',
+            licenseKey: 'non-commercial-and-evaluation'
+        });
+    })();
+</script>

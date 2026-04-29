@@ -229,6 +229,6 @@ pbcRender();
   const prevOnPageActivate = window.onPageActivate;
   window.onPageActivate = function(page) {
     if (prevOnPageActivate) prevOnPageActivate(page);
-    if (page === 'phong-ban') pbcRender();
+    if (page === 'dm-phong-ban') pbcRender();
   };
 })();
