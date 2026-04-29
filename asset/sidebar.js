@@ -77,14 +77,14 @@
   <div class="sidebar-nav">
 
     <!-- Dashboard -->
-    <div class="nav-item active" data-page="dashboard" data-tooltip="Dashboard">
+    <div class="nav-item active" data-page="dashboard">
       <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><rect x="1" y="1" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.3"/><rect x="9" y="1" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.3"/><rect x="1" y="9" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.3"/><rect x="9" y="9" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.3"/></svg>
       <span>Dashboard</span>
     </div>
 
     <!-- DANH MỤC -->
     <div class="nav-group open" id="grp-danhmuc" data-group-name="Danh mục">
-      <div class="nav-group-hdr" onclick="sidebarToggle('grp-danhmuc')" data-tooltip="Danh mục">
+      <div class="nav-group-hdr" onclick="sidebarToggle('grp-danhmuc')">
         <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
         <span>Danh mục</span>
         <svg class="nav-group-arrow" width="10" height="10" viewBox="0 0 10 6" fill="none"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
@@ -174,7 +174,7 @@
 
     <!-- QUẢN LÝ HỆ THỐNG -->
     <div class="nav-group" id="grp-hethong" data-group-name="Hệ thống">
-      <div class="nav-group-hdr" onclick="sidebarToggle('grp-hethong')" data-tooltip="Hệ thống">
+      <div class="nav-group-hdr" onclick="sidebarToggle('grp-hethong')">
         <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
         <span>Hệ thống</span>
         <svg class="nav-group-arrow" width="10" height="10" viewBox="0 0 10 6" fill="none"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
@@ -193,7 +193,7 @@
   <div id="sidebarFlyout" class="sidebar-flyout"></div>
 
   <div class="sidebar-bottom">
-    <div class="user-row" data-tooltip="Tài khoản">
+    <div class="user-row">
       <div class="user-avatar" id="sidebarAvatar">AD</div>
       <div>
         <div class="user-name" id="sidebarName">Admin</div>
