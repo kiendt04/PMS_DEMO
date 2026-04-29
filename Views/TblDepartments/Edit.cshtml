@@ -1,0 +1,115 @@
+﻿@model PMS.Models.TblDepartment
+
+@{
+    ViewData["Title"] = "Chỉnh sửa phòng ban";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@using (Html.BeginForm("Edit", "TblDepartments", FormMethod.Post))
+{
+    @Html.AntiForgeryToken()
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title">Thông tin chi tiết phòng ban</h4>
+                    <p class="card-subtitle text-muted">
+                        Lưu ý: <code>*</code> là các trường bắt buộc
+                    </p>
+
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+                    @Html.HiddenFor(model => model.Id)
+
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <div class="form-group">
+                                <div class="boldText">Tên phòng ban:<code>*</code></div>
+                                @Html.EditorFor(model => model.Name, new { htmlAttributes = new { @class = "form-control", placeholder = "Nhập tên phòng ban" } })
+                                @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="form-group">
+                                <div class="boldText">Tên viết tắt:</div>
+                                @Html.EditorFor(model => model.ShortName, new { htmlAttributes = new { @class = "form-control", placeholder = "Nhập tên viết tắt" } })
+                                @Html.ValidationMessageFor(model => model.ShortName, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <div class="form-group">
+                                <div class="boldText">Mô tả:</div>
+                                @Html.TextAreaFor(model => model.Description, new { @class = "form-control", rows = "3", placeholder = "Nhập mô tả" })
+                                @Html.ValidationMessageFor(model => model.Description, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="form-group">
+                                <div class="boldText">Ghi chú:</div>
+                                @Html.TextAreaFor(model => model.Note, new { @class = "form-control", rows = "3", placeholder = "Nhập ghi chú" })
+                                @Html.ValidationMessageFor(model => model.Note, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <div class="form-group">
+                                <div class="boldText">Thứ tự hiển thị:</div>
+                                @Html.TextBoxFor(model => model.OrderNumber, new { @class = "form-control", type = "number", placeholder = "Nhập số thứ tự" })
+                                @Html.ValidationMessageFor(model => model.OrderNumber, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="form-group">
+                                <div class="boldText">Thuộc phòng ban:</div>
+                                @Html.DropDownListFor(model => model.Type, (SelectList)ViewBag.ParentDepartments, "--- Là phòng ban chung ---", new { @class = "form-control" })
+                                @Html.ValidationMessageFor(model => model.Type, "", new { @class = "text-danger" })
+                                <small class="form-text text-muted">Chọn phòng ban cấp trên (nếu có)</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <div class="form-group">
+                                <div class="boldText">Trạng thái:<code>*</code></div>
+                                @Html.DropDownListFor(model => model.Status,
+                                         new List<SelectListItem> {
+                            new SelectListItem { Text = "Hoạt động", Value = "1", Selected = Model.Status == 1 },
+                            new SelectListItem { Text = "Ngưng hoạt động", Value = "0", Selected = Model.Status == 0 }
+                            },
+                                         new { @class = "form-control" })
+                                @Html.ValidationMessageFor(model => model.Status, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-success waves-effect waves-light m-r-10">
+                        <i class="fa fa-save"></i> Lưu thay đổi
+                    </button>
+                    @Html.ActionLink("Quay lại", "Index", null, new { @class = "btn btn-secondary" })
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@section Scripts {
+    <script>
+        // Tự động tạo ShortName dựa trên Name
+        $(document).ready(function () {
+            $('#Name').on('input', function () {
+                let name = $(this).val().trim();
+                if (!name) {
+                    $('#ShortName').val('');
+                    return;
+                }
+                let words = name.split(/\s+/);
+                let shortName = words.map(w => w[0]?.toUpperCase()).join('');
+                $('#ShortName').val(shortName);
+            });
+        });
+    </script>
+}

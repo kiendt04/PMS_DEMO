@@ -1,0 +1,35 @@
+<!-- partial: nghi-phep.html -->
+<div class="mod-header">
+    <div class="mod-title-wrap">
+        <div class="mod-breadcrumb">
+            <span>Trang chủ</span>
+            <span>Tiện ích</span>
+            <span>Quản lý nghỉ phép</span>
+        </div>
+        <h2 class="mod-title">Quản lý nghỉ phép</h2>
+    </div>
+    <div class="mod-actions">
+        <button class="btn-premium btn-premium-green" id="npExcel">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+            Xuất Excel
+        </button>
+    </div>
+</div>
+
+<div class="cc-filterbar">
+    <div class="cc-filter-group">
+        <label>Chọn tháng</label>
+        <select id="npThang" class="cc-select">
+            <option value="1">Tháng 1</option><option value="2">Tháng 2</option><option value="3">Tháng 3</option>
+            <option value="4" selected>Tháng 4</option><option value="5">Tháng 5</option>
+        </select>
+    </div>
+    <div class="cc-filter-group">
+        <label>Chọn năm</label>
+        <select id="npNam" class="cc-select"><option>2024</option></select>
+    </div>
+</div>
+
+<div class="table-card">
+    <div id="npHotContainer" style="width:100%; height: 500px;"></div>
+</div>

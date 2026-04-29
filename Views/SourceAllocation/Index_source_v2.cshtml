@@ -1,0 +1,177 @@
+﻿@model IEnumerable<PMS.Models.TblSoureAllocation>
+
+@{
+    ViewData["Title"] = "DANH MỤC PHÂN NGUỒN";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-lg-5">
+                        <h4 class="card-title" style="margin-bottom:0px;">Thông tin chi tiết</h4>
+                    </div>
+                    <div class="col-lg-7" style="text-align: right;">
+                        <div class="row align-items-center justify-content-end mt-2 mb-2">
+                            <div class="col-auto d-flex align-items-center mb-2">
+                                <label class="fw-bold me-2 mb-0" style="min-width: 70px;">Chọn quý:</label>
+                                <select class="form-control form-select-sm" id="selectQuarter" style="width: 100px;">
+                                    <option value="0">Tất cả</option>
+                                    <option value="1">Quý 1</option>
+                                    <option value="2">Quý 2</option>
+                                    <option value="3">Quý 3</option>
+                                    <option value="4">Quý 4</option>
+                                </select>
+                            </div>
+                            <div class="col-auto d-flex align-items-center mb-2">
+                                <label class="fw-bold me-2 mb-0" style="min-width: 70px;">Chọn năm:</label>
+                                <select id="selectYear" class="form-control">
+                                    <option value="">Tất cả năm</option>
+                                    @foreach (var yearItem in ViewBag.AvailableYears)
+                                    {
+                                        var isSelected = ViewBag.SelectedYear != null && ViewBag.SelectedYear == yearItem;
+                                        <option value="@yearItem" selected="@isSelected">@yearItem</option>
+                                    }
+                                </select>
+                            </div>
+                            <div class="col-auto mb-2">
+                                <a class="btn btn-sm btn-primary" href="@Url.Action("Create")">Thêm mới phân nguồn</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="table-responsive mt-2">
+                    <table id="myTable" class="table table-bordered table-striped">
+                        <thead>
+                            <tr>
+                                <th class="text-center">#</th>
+                                <th>Năm</th>
+                                <th>Quý</th>
+                                <th>Tháng</th>
+                                <th>NLĐ (tháng)</th>
+                                <th>NQL (tháng)</th>
+                                <th>Tổng</th>
+                                <th>Ghi chú</th>
+                                <th>Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (Model != null)
+                            {
+                                int i = 1;
+                                foreach (var item in Model.OrderBy(a => a.BudgetPlan.Year).ThenBy(a=> a.MonthNumber))
+                                {
+                                    <tr data-quarter="@item.Quarter">
+                                        <td class="text-center">@i</td>
+                                        <td>@item.BudgetPlan?.Year</td>
+                                        <td>@item.Quarter</td>
+                                        <td>@item.MonthNumber</td>
+                                        <td>@string.Format("{0:N2}", item.MonthEmployee)</td>
+                                        <td>@string.Format("{0:N2}", item.MonthManager)</td>
+                                        <td>@string.Format("{0:N2}", item.MonthManager + item.MonthEmployee)</td>
+                                        <td>@item.Note</td>
+                                        <td class="text-nowrap">
+                                            <a href="@Url.Action("Edit_v2", new { id = item.Id })" class="btn btn-sm btn-outline-success">
+                                                <i class="fa fa-pencil"></i>
+                                            </a>
+                                            <form asp-action="Delete_v2" asp-route-id="@item.Id" method="post" class="d-inline"
+                                                  onsubmit="return confirm('Bạn có chắc chắn muốn xóa dữ liệu này không?');">
+                                                <button type="submit" class="btn btn-sm btn-outline-danger">
+                                                    <i class="fa fa-trash"></i>
+                                                </button>
+                                            </form>
+                                            <a href="@Url.Action("Distribution", new { id = item.Id })" class="btn btn-info btn-sm">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    i++;
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/assets/node_modules/datatables/jquery.dataTables.min.js"></script>
+    <script>
+        var dataTable;
+
+        $(document).ready(function () {
+            initializeDataTable();
+
+            // Lọc theo năm và quý
+            $('#selectYear, #selectQuarter').change(function () {
+                filterTableData();
+            });
+
+            // Hiển thị thông báo
+            @if (TempData["SuccessMessage"] != null)
+            {
+                        <text>
+                        toastr.success('@TempData["SuccessMessage"]');
+                        </text>
+            }
+        });
+
+        function initializeDataTable() {
+            dataTable = $('#myTable').DataTable({
+                "pageLength": 10,
+                "ordering": true,
+                "searching": true,
+                "lengthChange": true,
+                "language": {
+                    "search": "Tìm kiếm:",
+                    "lengthMenu": "Hiển thị _MENU_ bản ghi",
+                    "info": "Hiển thị _START_ đến _END_ của _TOTAL_ bản ghi",
+                    "paginate": {
+                        "first": "Đầu",
+                        "last": "Cuối",
+                        "next": "Tiếp",
+                        "previous": "Trước"
+                    }
+                }
+            });
+        }
+
+        function filterTableData() {
+            var year = $('#selectYear').val();
+            var quarter = $('#selectQuarter').val();
+
+            // Xóa tất cả filter cũ
+            dataTable.columns().search('');
+
+            // Filter theo năm (cột 1)
+            if (year !== '') {
+                dataTable.column(1).search('^' + year + '$', true, false);
+            }
+
+            // Custom filter cho quý
+            $.fn.dataTable.ext.search.push(
+                function(settings, data, dataIndex) {
+                    var row = dataTable.row(dataIndex).node();
+                    var rowQuarter = $(row).data('quarter'); // Sửa lỗi ở đây
+
+                    // Check quý
+                    if (quarter !== '0') {
+                        return rowQuarter == quarter;
+                    }
+
+                    return true;
+                }
+            );
+
+            dataTable.draw();
+
+            // Xóa filter sau khi draw
+            $.fn.dataTable.ext.search.pop();
+        }
+    </script>
+}

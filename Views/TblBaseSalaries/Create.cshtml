@@ -1,0 +1,69 @@
+﻿@model PMS.Models.TblBaseSalary
+
+@{
+    ViewData["Title"] = "Thêm mới lương cơ sở";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@using (Html.BeginForm("Create", "TblBaseSalaries", FormMethod.Post))
+{
+    @Html.AntiForgeryToken()
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title">Thông tin chi tiết mức lương cơ sở</h4>
+                    <h6 class="card-subtitle text-muted mb-3">
+                        Lưu ý: <span class="text-danger">*</span> là các trường bắt buộc
+                    </h6>
+
+                    @Html.ValidationSummary(true, "", new { @class = "alert alert-danger" })
+
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <div class="form-group">
+                                <div class="boldText">Tên mức lương:<code>*</code></div>
+                                @Html.EditorFor(model => model.Name, new { htmlAttributes = new { @class = "form-control", placeholder = "Nhập tên mức lương" } })
+                                @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="form-group">
+                                <div class="boldText">Giá trị (VNĐ):<code>*</code></div>
+                                @Html.EditorFor(model => model.Value, new { htmlAttributes = new { @class = "form-control", @type = "number", placeholder = "Nhập giá trị" } })
+                                @Html.ValidationMessageFor(model => model.Value, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <div class="form-group">
+                                <div class="boldText">Ngày ban hành:<code>*</code></div>
+                                @Html.EditorFor(model => model.DateIssued, new { htmlAttributes = new { @class = "form-control", @type = "date", @min = "1753-01-01", @max = "9999-12-31" } })
+                                @Html.ValidationMessageFor(model => model.DateIssued, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="form-group">
+                                <div class="boldText">Mô tả:</div>
+                                @Html.TextAreaFor(model => model.Description, new { @class = "form-control", rows = "4", placeholder = "Nhập mô tả" })
+                                @Html.ValidationMessageFor(model => model.Description, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-success waves-effect waves-light m-r-10">
+                        <i class="fa fa-save"></i> Ghi dữ liệu
+                    </button>
+                    @Html.ActionLink("Quay lại", "Index", null, new { @class = "btn btn-secondary" })
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

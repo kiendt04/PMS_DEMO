@@ -1,0 +1,941 @@
+﻿                                                                                                                                                                                                                                                                                                                @{
+    ViewData["Title"] = "BẢNG CHẤM CÔNG";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/handsontable@14.3.0/dist/handsontable.full.min.css" />
+
+<style>
+    /* Rút ngắn chiều ngang combobox */
+    #selectDepartment {
+        width: auto;
+        min-width: 200px;
+    }
+    #selectMonth {
+        width: 50px;
+    }
+    #selectYear {
+        width: 80px;
+    }
+    @@media (max-width: 576px) {
+        #selectDepartment {
+            width: auto;
+            min-width: 150px;
+        }
+        #selectMonth {
+            width: 50px;
+        }
+        #selectYear {
+            width: 90px;
+        }
+    }
+    
+    /* Style cho Handsontable */
+    .htDisabled {
+        background-color: #f0f0f0 !important;   
+        color: #999 !important;
+    }
+    
+    .htCenter {
+        text-align: center !important;
+    }
+    
+    .htLeft {
+        text-align: left !important;
+    }
+    
+    /* Tăng font-size và màu chữ */
+    .handsontable td {
+        color: #333333 !important;
+        font-size: 14px !important;
+    }
+    .handsontable span.colHeader {
+        color: #333333 !important;
+        font-weight: 700 !important;
+    }
+    /* Ẩn scrollbar dọc của Handsontable, giữ scrollbar ngang ở dưới */
+    #attendanceTable .wtHolder {
+        overflow-x: auto !important;
+        overflow-y: visible !important;
+        height: auto !important;
+    }
+    #attendanceTable .ht_master .wtHolder {
+        overflow-x: auto !important;
+        overflow-y: visible !important;
+    }
+    /* Ẩn scrollbar của header clone - chỉ giữ 1 scroll ở dưới */
+    #attendanceTable .ht_clone_top .wtHolder {
+        overflow: hidden !important;
+    }
+</style>
+
+<style>
+    .search-box {
+        display: flex;
+        align-items: center;
+        width: 100%;
+        max-width: 100%;
+        background: #ffffff;
+        border: 1px solid #dcdcdc;
+        border-radius: 8px;
+        padding: 8px 12px;
+        box-shadow: 0 0 3px rgba(0,0,0,0.1);
+    }
+
+        .search-box .icon {
+            font-size: 10px;
+            margin-right: 10px;
+            color: #555;
+        }
+
+    .search-input {
+        border: none;
+        outline: none;
+        width: 100%;
+        font-size: 12px;
+    }
+
+</style>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <!-- Bộ lọc -->
+                <div class="row mt-3 mb-3 align-items-end">
+                    <div class="col-auto">
+                        <label class="mb-1">Chọn phòng ban:</label>
+                        <select class="form-control" id="selectDepartment">
+                            <option value="">-- Tất cả phòng ban --</option>
+                        </select>
+                    </div>
+                    <div class="col-auto">
+                        <label class="mb-1">Chọn tháng:</label>
+                        <select class="form-control" style="width: 70px;" id="selectMonth">
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                            <option value="5">5</option>
+                            <option value="6">6</option>
+                            <option value="7">7</option>
+                            <option value="8">8</option>
+                            <option value="9">9</option>
+                            <option value="10">10</option>
+                            <option value="11">11</option>
+                            <option value="12">12</option>
+                        </select>
+                    </div>
+                    <div class="col-auto">
+                        <label class="mb-1">Chọn năm:</label>
+                        <select class="form-control" id="selectYear" style="width : 100px !important">
+                        </select>
+                    </div>
+                    <div class="col-auto d-flex align-items-center" style="gap: 0.5rem;">
+                        <label class="mb-1">Loại công:</label>
+                        <div class="form-check form-check-inline mb-1">
+                            <input class="form-check-input" type="radio" name="loaiCong" id="radioThoiGian" value="thoi_gian" checked>
+                            <label class="form-check-label" for="radioThoiGian">Thời gian</label>
+                        </div>
+                        <div class="form-check form-check-inline mb-1">
+                            <input class="form-check-input" type="radio" name="loaiCong" id="radioCaDem" value="ca_dem">
+                            <label class="form-check-label" for="radioCaDem">Ca đêm</label>
+                        </div>
+                        <div class="form-check form-check-inline mb-1">
+                            <input class="form-check-input" type="radio" name="loaiCong" id="radioThemGio" value="them_gio">
+                            <label class="form-check-label" for="radioThemGio">Thêm giờ</label>
+                        </div>
+                    </div>
+                    <div class="col-auto ms-auto">
+                        <button id="btnExportExcel" class="btn btn-primary" title="Xuất dữ liệu">
+                            <i class="fa fa-download"></i> Xuất Excel
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Kết quả load dữ liệu -->
+                <div class="table-responsive" id="attendanceWrapper" style="overflow:visible;">
+                    <div id="attendanceTable"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/handsontable@14.3.0/dist/handsontable.full.min.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const container = document.getElementById('attendanceTable');
+        const departmentSelect = document.getElementById('selectDepartment');
+        const monthSelect = document.getElementById('selectMonth');
+        const yearSelect = document.getElementById('selectYear');
+        
+        // Biến lưu số ngày trong tháng hiện tại
+        let daysInMonth = 31;
+
+        // Queue để xử lý batch updates
+        let updateQueue = new Set();
+        let updateTimer = null;
+        let isCalculating = false;
+
+        // Load danh sách phòng ban từ server
+        function loadDepartments() {
+            fetch('/DailyAttendance/GetDepartments')
+                .then(response => response.json())
+                .then(result => {
+                    if (result.success && result.data) {
+                        result.data.forEach(dept => {
+                            const option = document.createElement('option');
+                            option.value = dept.id;
+                            option.text = dept.name;
+                            departmentSelect.appendChild(option);
+                        });
+
+                        // Tự động chọn phòng ban của user hiện tại
+                        const currentUserDeptId = @(ViewBag.CurrentUserDepartmentId ?? 0);
+                        const isSuperAdmin = @((ViewBag.IsSuperAdmin ?? false).ToString().ToLower());
+
+                        if (currentUserDeptId > 0) {
+                            departmentSelect.value = currentUserDeptId;
+                            
+                            // Nếu không phải admin (RoleId != 1) thì disable selection
+                            if (!isSuperAdmin) {
+                                departmentSelect.disabled = true;
+                            }
+                        }
+
+                        // Load dữ liệu sau khi đã chọn phòng ban
+                        loadBangChamCong();
+                    }
+                })
+                .catch(error => {
+                    alert('Không thể tải danh sách phòng ban. Vui lòng thử lại.');
+                });
+        }
+
+        // Populate year dropdown
+        const currentYear = new Date().getFullYear();
+        for (let y = currentYear - 5; y <= currentYear + 1; y++) {
+            const option = document.createElement('option');
+            option.value = y;
+            option.text = y;
+            if (y === currentYear) option.selected = true;
+            yearSelect.appendChild(option);
+        }
+
+        // Set current month
+        const currentMonth = new Date().getMonth() + 1;
+        monthSelect.value = currentMonth;
+
+        // Load departments
+        loadDepartments();
+
+        // Hàm tính số ngày trong tháng
+        function getDaysInMonth(month, year) {
+            return new Date(year, month, 0).getDate();
+        }
+
+        // Hàm load bảng chấm công theo loại
+        function loadBangChamCong() {
+            const loai = document.querySelector('input[name="loaiCong"]:checked').value;
+            const departmentId = departmentSelect.value || '';
+            const month = parseInt(monthSelect.value);
+            const year = parseInt(yearSelect.value);
+            daysInMonth = getDaysInMonth(month, year);
+
+            if (loai === 'thoi_gian') {
+                loadRegularAttendance(departmentId, month, year);
+            } else if (loai === 'ca_dem') {
+                loadNightShiftAttendance(departmentId, month, year);
+            } else if (loai === 'them_gio') {
+                loadOvertimeAttendance(departmentId, month, year);
+            }
+        }
+
+        // ==================== CHẤM CÔNG THƯỜNG ====================
+        function loadRegularAttendance(departmentId, month, year) {
+            const url = `/DailyAttendance/GetData?departmentId=${departmentId}&month=${month}&year=${year}`;
+
+            fetch(url)
+                .then(response => response.json())
+                .then(result => {
+                    if (result.success && result.employees) {
+                        renderRegularAttendanceTable(result.employees, month, year);
+                    } else {
+                        container.innerHTML = '<div class="alert alert-info">Không có dữ liệu chấm công.</div>';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading regular attendance:', error);
+                    container.innerHTML = '<div class="alert alert-danger">Lỗi tải dữ liệu.</div>';
+                });
+        }
+
+        function renderRegularAttendanceTable(employees, month, year) {
+            // Tạo nested headers cho chấm công thường
+            const nestedHeaders = createNestedHeaders(month, year);
+            
+            // Tạo columns
+            const dayColumns = [];
+            for (let i = 1; i <= daysInMonth; i++) {
+                const date = new Date(year, month - 1, i);
+                const dayOfWeek = date.getDay();
+
+                dayColumns.push({
+                    data: `d${i}`,
+                    type: 'text',
+                    width: 40,
+                    className: i <= daysInMonth ? 'htCenter' : 'htDisabled htCenter',
+                    readOnly: i > daysInMonth,
+                    renderer: function(instance, td, row, col, prop, value) {
+                        td.innerHTML = value || '';
+                        td.style.textAlign = 'center';
+
+                        // Tô màu cuối tuần
+                        if (dayOfWeek === 6 || dayOfWeek === 0) {
+                            td.style.background = '#f8f9fa';
+                            td.style.color = '#6c757d';
+                        }
+                        return td;
+                    }
+                });
+            }
+
+            const columns = [
+                { data: 'stt', type: 'numeric', className: 'htCenter', readOnly: true },
+                { data: 'name', type: 'text', className: 'htLeft', readOnly: true },
+                { data: 'salaryGrade', type: 'text', className: 'htCenter' },
+                ...dayColumns,
+                {
+                    data: 'workProduct',
+                    type: 'text',
+                    className: 'htCenter',
+                    width: 80,
+                    readOnly: true,
+                    renderer: function(instance, td, row, col, prop, value) {
+                        td.textContent = value || '0';
+                        td.style.textAlign = 'center';
+                        if (parseInt(value) > 0) {
+                            td.style.backgroundColor = '#e8f5e9';
+                            td.style.color = '#2e7d32';
+                            td.style.fontWeight = 'bold';
+                        }
+                        return td;
+                    }
+                },
+                { data: 'workTime', type: 'numeric', className: 'htCenter', width: 80 },
+                { data: 'off100', type: 'text', className: 'htCenter', width: 80 },
+                { data: 'offLess100_0', type: 'text', className: 'htCenter', width: 40 },
+                { data: 'offLess100_40', type: 'text', className: 'htCenter', width: 40 },
+                { data: 'offLess100_80', type: 'text', className: 'htCenter', width: 40 },
+                { data: 'bhxh', type: 'numeric', className: 'htCenter', width: 80 }
+            ];
+
+            // Chuẩn bị dữ liệu
+            const data = employees.map((emp, index) => {
+                const row = {
+                    stt: index + 1,
+                    userId: emp.userId || emp.UserId || 0,
+                    name: emp.userName || emp.Name || '',
+                    salaryGrade: emp.salaryGrade || '',
+                    workProduct: emp.workProduct || '0',
+                    workTime: emp.workTime || 0,
+                    off100: emp.off100 || '',
+                    offLess100_0: emp.offLess100_0 || '',
+                    offLess100_40: emp.offLess100_40 || '',
+                    offLess100_80: emp.offLess100_80 || '',
+                    bhxh: emp.bhxh || 0
+                };
+
+                // Map D1-D31
+                for (let d = 1; d <= 31; d++) {
+                    const dayKey = `d${d}`;
+                    const apiDayKey = `D${d}`;
+                    row[dayKey] = emp[dayKey] || emp[apiDayKey] || '';
+                }
+
+                return row;
+            });
+
+            // Hủy instance cũ nếu có
+            if (window.hotInstance) {
+                window.hotInstance.destroy();
+            }
+
+            // Tạo Handsontable instance mới
+            window.hotInstance = new Handsontable(container, {
+                data: data,
+                columns: columns,
+                nestedHeaders: nestedHeaders,
+                rowHeaders: false,
+                colHeaders: false,
+                width: '100%',
+                height: 'auto',
+                stretchH: 'none',
+                autoColumnSize: true,
+                fixedColumnsLeft: 3,
+                manualColumnMove: true,
+                manualColumnFreeze: true,
+                contextMenu: true,
+                dropdownMenu: false,
+                filters: false,
+                licenseKey: 'non-commercial-and-evaluation',
+
+                afterChange: function(changes, source) {
+                    if (changes && source !== 'loadData' && source !== 'updateData' && !isCalculating) {
+                        let hasDayChange = false;
+                        let changedRows = new Set();
+
+                        changes.forEach(([row, prop, oldVal, newVal]) => {
+                            if (oldVal !== newVal) {
+                                if (prop && prop.startsWith('d') && prop.length <= 3) {
+                                    hasDayChange = true;
+                                    changedRows.add(row);
+                                }
+
+                                const rowData = this.getSourceDataAtRow(row);
+                                if (rowData && rowData.userId) {
+                                    updateQueue.add(rowData.userId);
+                                }
+                            }
+                        });
+
+                        // Nếu có thay đổi ngày, tính lại SP
+                        if (hasDayChange) {
+                            isCalculating = true;
+                            try {
+                                changedRows.forEach(row => {
+                                    const rowData = this.getSourceDataAtRow(row);
+                                    const { spCount, plusCount } = calculateSPForRow(rowData);
+                                    this.setDataAtCell(row, daysInMonth + 3, spCount, 'calculation');
+                                    this.setDataAtCell(row, daysInMonth + 4, plusCount, 'calculation');
+                                });
+                                this.render();
+                            } finally {
+                                setTimeout(() => { isCalculating = false; }, 50);
+                            }
+                        }
+
+                        // Auto-save
+                        if (updateTimer) clearTimeout(updateTimer);
+                        updateTimer = setTimeout(() => {
+                            if (updateQueue.size > 0) {
+                                const userIds = Array.from(updateQueue);
+                                updateQueue.clear();
+                                autoSaveRegularData(userIds);
+                            }
+                        }, 1000);
+                    }
+                },
+
+                afterLoadData: function() {
+                    setTimeout(() => {
+                        initializeCalculatedColumns();
+                    }, 100);
+                }
+            });
+        }
+
+        // Hàm tạo nested headers
+        function createNestedHeaders(month, year) {
+            const row1 = [
+                'Số TT',
+                'Họ và tên',
+                'Ngạch bậc lương<br/>hoặc cấp bậc<br/>chức vụ',
+                { label: 'Ngày làm việc trong tháng ', colspan: daysInMonth },
+                { label: 'Quy ra công', colspan: 7 }
+            ];
+
+            const row2 = ['', '', ''];
+            for (let i = 1; i <= daysInMonth; i++) {
+                const date = new Date(year, month - 1, i);
+                const dayOfWeek = date.getDay();
+                let dayElement = i.toString();
+
+                if (dayOfWeek === 6 || dayOfWeek === 0) {
+                    row2.push(`<span style="color: red; font-weight: bold;">${dayElement}</span>`);
+                } else {
+                    row2.push(dayElement);
+                }
+            }
+
+            row2.push('Số công<br/>hưởng<br/>lương sản<br/>phẩm');
+            row2.push('Số công<br/>hưởng<br/>lương<br/>thời gian');
+            row2.push('Số công nghỉ<br/>việc, ngừng việc<br/>hưởng 100%');
+            row2.push({ label: 'Số công nghỉ<br/> việc, ngừng việc<br/> hưởng <100% lương', colspan: 3 });
+            row2.push('Số công<br/>hưởng<br/>BHXH');
+
+            const row3 = ['', '', ''];
+            for (let i = 1; i <= 31; i++) row3.push('');
+            row3.push('', '', '', '0%', '40%', '80%', '');
+
+            return [row1, row2, row3];
+        }
+
+        // Hàm tính SP từ D1-D31
+        function calculateSPForRow(rowData) {
+            if (!rowData) return {spCount: 0, plusCount: 0};
+            let spCount = 0;
+            let plusCount = 0;
+            for (let d = 1; d <= 31; d++) {
+                const dayValue = rowData[`d${d}`]?.toString().trim().toUpperCase();
+                if (dayValue === 'SP') spCount++;
+                if (dayValue === '+' || dayValue === 'C3'|| dayValue === 'C1' || dayValue === 'C2') plusCount++;
+            }
+            return { spCount, plusCount };
+        }
+
+        function initializeCalculatedColumns() {
+            isCalculating = true;
+            try {
+                if (!window.hotInstance) return;
+
+                const rowCount = window.hotInstance.countRows();
+                const updates = []; // Batch all updates
+                
+                for (let r = 0; r < rowCount; r++) {
+                    const rowData = window.hotInstance.getSourceDataAtRow(r);
+                    const { spCount, plusCount } = calculateSPForRow(rowData);
+                    
+                    // Add to batch instead of immediate update
+                    updates.push([r, daysInMonth + 3, spCount]);
+                    updates.push([r, daysInMonth + 4, plusCount]);
+                }
+                
+                // Single batch update - MUCH faster!
+                window.hotInstance.setDataAtCell(updates, 'calculation');
+            } catch (error) {
+                console.error('Error in initializeCalculatedColumns:', error);
+            } finally {
+                setTimeout(() => { isCalculating = false; }, 100);
+            }
+        }
+
+        // Hàm auto-save cho chấm công thường
+        function autoSaveRegularData(userIds = null) {
+            const departmentId = departmentSelect.value ? parseInt(departmentSelect.value) : null;
+            const month = parseInt(monthSelect.value);
+            const year = parseInt(yearSelect.value);
+
+            const sourceData = window.hotInstance.getSourceData();
+            if (!sourceData || sourceData.length === 0) return;
+
+            let dataToSave = sourceData;
+            if (userIds && userIds.length > 0) {
+                dataToSave = sourceData.filter(row => userIds.includes(row.userId));
+            }
+
+            const rows = dataToSave.map(row => {
+                const days = {};
+                let spCount = 0;
+                let plusCount = 0;
+                for (let d = 1; d <= 31; d++) {
+                    const dayKey = `D${d}`;
+                    const dayValue = row[`d${d}`] || '';
+                    days[dayKey] = dayValue;
+
+                    if (dayValue.toString().trim().toUpperCase() === 'SP') {
+                        spCount++;
+                    }
+                    if(dayValue.toString().trim().toUpperCase() === '+' || dayValue.toString().trim().toUpperCase() === 'C3' || dayValue.toString().trim().toUpperCase() === 'C1' || dayValue.toString().trim().toUpperCase() === 'C2'){
+                        plusCount++;
+                    }
+                }
+
+                return {
+                    userId: row.userId,
+                    salaryGrade: row.salaryGrade || '',
+                    days: days,
+                    workProduct: spCount.toString(),
+                    workTime: plusCount.toString(),
+                    off100: row.off100 || '',
+                    offLess100_0: row.offLess100_0 || '',
+                    offLess100_40: row.offLess100_40 || '',
+                    offLess100_80: row.offLess100_80 || '',
+                    bhxh: row.bhxh || 0
+                };
+            });
+
+            const requestData = {
+                departmentId: departmentId,
+                month: month,
+                year: year,
+                rows: rows
+            };
+
+            fetch('/DailyAttendance/Save', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(requestData)
+            })
+            .then(response => response.json())
+            .then(result => {
+                console.log('Save result:', result);
+            })
+            .catch(error => {
+                console.error('Save error:', error);
+            });
+        }
+
+        // ==================== CHẤM CÔNG CA ĐÊM ====================
+        function loadNightShiftAttendance(departmentId, month, year) {
+            const url = `/DailyAttendance/GetNightShiftData?departmentId=${departmentId}&month=${month}&year=${year}`;
+
+            fetch(url)
+                .then(response => response.json())
+                .then(result => {
+                    if (result.success && result.employees) {
+                        renderNightShiftTable(result.employees, month, year);
+                    } else {
+                        container.innerHTML = '<div class="alert alert-info">Không có dữ liệu ca đêm.</div>';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading night shift:', error);
+                    container.innerHTML = '<div class="alert alert-danger">Lỗi tải dữ liệu ca đêm.</div>';
+                });
+        }
+
+        function renderNightShiftTable(employees, month, year) {
+            const nestedHeaders = [
+                ['Số TT', 'Họ và tên', 'Mã NV', ` Ca đêm tháng ${month}/${year} `, 'Ghi chú']
+            ];
+
+            const columns = [
+                { data: 'stt', type: 'numeric', width: 50, readOnly: true, className: 'htCenter' },
+                { data: 'name', type: 'text', width: 250, readOnly: true },
+                { data: 'userCode', type: 'text', width: 100, readOnly: true, className: 'htCenter', readOnly: true },
+                { data: 'nightShiftValue', type: 'numeric', width: 150, className: 'htCenter', readOnly: true },
+                { data: 'notes', type: 'text', width: 200 }
+            ];
+
+            const data = employees.map((emp, index) => ({
+                stt: index + 1,
+                userId: emp.userId,
+                name: emp.userName,
+                userCode: emp.userCode || '',
+                nightShiftValue: emp.nightShiftValue || 0,
+                notes: emp.notes || ''
+            }));
+
+            if (window.hotInstance) {
+                window.hotInstance.destroy();
+            }
+
+            window.hotInstance = new Handsontable(container, {
+                data: data,
+                columns: columns,
+                nestedHeaders: nestedHeaders,
+                rowHeaders: false,
+                colHeaders: false,
+                width: '100%',
+                height: 'auto',
+                stretchH: 'none',
+                autoColumnSize: true,
+                fixedColumnsLeft: 2,
+                contextMenu: true,
+                licenseKey: 'non-commercial-and-evaluation',
+
+                afterChange: function(changes, source) {
+                    if (!changes || source === 'loadData') return;
+
+                    changes.forEach(([row, prop, oldVal, newVal]) => { 
+                        if (oldVal === newVal) return;
+
+                        if (prop === 'nightShiftValue') {
+                            const rowData = this.getSourceDataAtRow(row);
+                            if (rowData && rowData.userId) {
+                                saveNightShiftData(rowData.userId, parseInt(monthSelect.value), parseInt(yearSelect.value), newVal);
+                            }
+                        }
+                    });
+                }
+            });
+        }
+
+        function saveNightShiftData(userId, month, year, value) {
+            fetch('/DailyAttendance/SaveNightShift', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ userId, month, year, value: parseFloat(value) || 0 })
+            })
+            .then(response => response.json())
+            .then(result => {
+                if (result.success) {
+                    showNotification('success', 'Đã lưu ca đêm!');
+                }
+            })
+            .catch(error => {
+                console.error('Save night shift error:', error);
+                showNotification('error', 'Lỗi lưu ca đêm!');
+            });
+        }
+
+        // ==================== CHẤM CÔNG THÊM GIỜ ====================
+        let overtimeUpdateQueue   = new Set();
+        let overtimeUpdateTimer   = null;
+        let isOvertimeCalculating = false;
+        let _overtimeHolidayDays  = new Set();  // ngày lễ trong tháng (server trả về)
+
+        function loadOvertimeAttendance(departmentId, month, year) {
+            const url = `/DailyAttendance/GetOvertimeData?departmentId=${departmentId}&month=${month}&year=${year}`;
+            container.innerHTML = '<div class="text-center p-3"><i class="fa fa-spinner fa-spin"></i> Đang tải...</div>';
+
+            fetch(url)
+                .then(r => r.json())
+                .then(result => {
+                    if (result.success && result.employees) {
+                        _overtimeHolidayDays = new Set(result.holidayDays || []);
+                        const days = result.daysInMonth || getDaysInMonth(month, year);
+                        renderOvertimeTable(result.employees, month, year, days);
+                    } else {
+                        container.innerHTML = '<div class="alert alert-info">Không có dữ liệu thêm giờ.</div>';
+                    }
+                })
+                .catch(() => {
+                    container.innerHTML = '<div class="alert alert-danger">Lỗi tải dữ liệu thêm giờ.</div>';
+                });
+        }
+
+        // Phân loại ngày: 'holiday' | 'weekend' | 'regular'
+        function classifyDay(day, month, year) {
+            if (_overtimeHolidayDays.has(day)) return 'holiday';
+            const dow = new Date(year, month - 1, day).getDay();
+            return (dow === 6 || dow === 0) ? 'weekend' : 'regular';
+        }
+
+        function renderOvertimeTable(employees, month, year, effectiveDays) {
+            effectiveDays = effectiveDays || getDaysInMonth(month, year);
+
+            // ── Header row 1 ────────────────────────────────────────────────
+            const headerRow1 = [
+                'Số TT', 'Họ và tên', 'Mã NV',
+                { label: `Giờ thêm từng ngày – Tháng ${month}/${year}`, colspan: effectiveDays },
+                { label: 'Tổng hợp theo loại ngày', colspan: 3 }
+            ];
+
+            // ── Header row 2: đánh màu ngày lễ/cuối tuần ────────────────────
+            const headerRow2 = ['', '', ''];
+            for (let i = 1; i <= effectiveDays; i++) {
+                const type  = classifyDay(i, month, year);
+                const color = type === 'holiday' ? '#c0392b' : type === 'weekend' ? '#e67e22' : '#2c3e50';
+                const title = type === 'holiday' ? 'Lễ/Tết' : type === 'weekend' ? 'Cuối tuần' : 'Ngày thường';
+                headerRow2.push(`<span style="color:${color};font-weight:bold" title="${title}">${i}</span>`);
+            }
+            headerRow2.push(
+                '<span style="color:#27ae60;font-size:11px">Ngày thường<br/>×1.5</span>',
+                '<span style="color:#e67e22;font-size:11px">Cuối tuần<br/>×2.0</span>',
+                '<span style="color:#c0392b;font-size:11px">Lễ / Tết<br/>×3.0</span>'
+            );
+
+            // ── Columns ngày D1-D{effectiveDays} ────────────────────────────
+            const dayColumns = [];
+            for (let i = 1; i <= effectiveDays; i++) {
+                const type = classifyDay(i, month, year);
+                dayColumns.push({
+                    data: `d${i}`, type: 'text', width: 36, className: 'htCenter',
+                    renderer(_inst, td, _r, _c, _p, value) {
+                        td.textContent = value || '';
+                        td.style.textAlign = 'center';
+                        td.style.fontSize  = '12px';
+                        // Màu nền theo loại ngày
+                        if      (type === 'holiday') { td.style.background = '#fde8e8'; td.style.color = '#c0392b'; }
+                        else if (type === 'weekend') { td.style.background = '#fef3e2'; td.style.color = '#e67e22'; }
+                        // Override nếu có giờ → xanh đậm
+                        const h = parseFloat(value);
+                        if (!isNaN(h) && h > 0) {
+                            td.style.background = '#d5f5e3';
+                            td.style.color      = '#1a7a4a';
+                            td.style.fontWeight = 'bold';
+                        }
+                        return td;
+                    }
+                });
+            }
+
+            // ── 3 cột summary (readonly) ─────────────────────────────────────
+            const makeSumCol = (prop, color) => ({
+                data: prop, type: 'numeric', width: 80, readOnly: true, className: 'htCenter',
+                renderer(_i, td, _r, _c, _p, value) {
+                    td.textContent = parseFloat(value || 0).toFixed(1);
+                    td.style.cssText = `background:#f8f9fa;font-weight:bold;text-align:center;color:${color};font-size:13px;`;
+                    return td;
+                }
+            });
+
+            const columns = [
+                { data: 'stt',      type: 'numeric', width: 45,  readOnly: true, className: 'htCenter' },
+                { data: 'name',     type: 'text',    width: 200, readOnly: true },
+                { data: 'userCode', type: 'text',    width: 130, readOnly: true, className: 'htCenter' },
+                ...dayColumns,
+                makeSumCol('regularHours', '#27ae60'),  // Ngày thường × 1.5
+                makeSumCol('weekendHours', '#e67e22'),  // Cuối tuần   × 2.0
+                makeSumCol('holidayHours', '#c0392b')   // Lễ/Tết      × 3.0
+            ];
+
+            // ── Map data ─────────────────────────────────────────────────────
+            const data = employees.map((emp, idx) => {
+                const row = {
+                    stt:          idx + 1,
+                    userId:       emp.userId       || emp.UserId       || 0,
+                    name:         emp.userName     || emp.UserName     || '',
+                    userCode:     emp.userCode     || emp.UserCode     || '',
+                    regularHours: emp.regularHours || emp.RegularHours || 0,
+                    weekendHours: emp.weekendHours || emp.WeekendHours || 0,
+                    holidayHours: emp.holidayHours || emp.HolidayHours || 0
+                };
+                for (let d = 1; d <= 31; d++) row[`d${d}`] = emp[`d${d}`] || emp[`D${d}`] || '';
+                return row;
+            });
+
+            if (window.hotInstance) window.hotInstance.destroy();
+
+            // Offset cột tổng: BASE(3) + dayColumns
+            const BASE    = 3;
+            const REG_COL = BASE + effectiveDays;      // regularHours
+            const WKD_COL = REG_COL + 1;              // weekendHours
+            const HOL_COL = WKD_COL + 1;              // holidayHours
+
+            window.hotInstance = new Handsontable(container, {
+                data, columns,
+                nestedHeaders: [headerRow1, headerRow2],
+                rowHeaders: false, colHeaders: false,
+                width: '100%', height: 'auto',
+                stretchH: 'none', autoColumnSize: false,
+                fixedColumnsLeft: 3,
+                contextMenu: true, licenseKey: 'non-commercial-and-evaluation',
+
+                afterChange(changes, source) {
+                    if (!changes || source === 'loadData' || source === 'calculation' || isOvertimeCalculating) return;
+                    const instance = this;
+                    const changedRows = new Set();
+
+                    changes.forEach(([row, prop, oldVal, newVal]) => {
+                        if (oldVal === newVal) return;
+                        if (prop && /^d\d{1,2}$/.test(prop)) changedRows.add(row);
+                        const rd = instance.getSourceDataAtRow(row);
+                        if (rd && rd.userId) overtimeUpdateQueue.add(rd.userId);
+                    });
+
+                    if (changedRows.size > 0) {
+                        isOvertimeCalculating = true;
+                        try {
+                            const updates = [];
+                            changedRows.forEach(r => {
+                                const rd = instance.getSourceDataAtRow(r);
+                                const { regular, weekend, holiday } = calcOvertimeTotals(rd, effectiveDays, month, year);
+                                updates.push([r, REG_COL, regular], [r, WKD_COL, weekend], [r, HOL_COL, holiday]);
+                            });
+                            instance.setDataAtCell(updates, 'calculation');
+                        } finally { setTimeout(() => { isOvertimeCalculating = false; }, 60); }
+                    }
+
+                    if (overtimeUpdateTimer) clearTimeout(overtimeUpdateTimer);
+                    overtimeUpdateTimer = setTimeout(() => {
+                        if (overtimeUpdateQueue.size > 0) {
+                            const uid = Array.from(overtimeUpdateQueue);
+                            overtimeUpdateQueue.clear();
+                            autoSaveOvertimeData(uid, effectiveDays);
+                        }
+                    }, 1200);
+                }
+            });
+        }
+
+        // Tính 3 loại giờ từ D1-D{days}
+        function calcOvertimeTotals(rowData, days, month, year) {
+            let regular = 0, weekend = 0, holiday = 0;
+            if (!rowData) return { regular: 0, weekend: 0, holiday: 0 };
+            for (let d = 1; d <= days; d++) {
+                const h = parseFloat(rowData[`d${d}`]);
+                if (isNaN(h) || h <= 0) continue;
+                const type = classifyDay(d, month, year);
+                if      (type === 'holiday') holiday += h;
+                else if (type === 'weekend') weekend += h;
+                else                         regular += h;
+            }
+            const fmt = v => parseFloat(v.toFixed(1));
+            return { regular: fmt(regular), weekend: fmt(weekend), holiday: fmt(holiday) };
+        }
+
+        // Lưu batch
+        function autoSaveOvertimeData(userIds, effectiveDays) {
+            const month = parseInt(monthSelect.value);
+            const year  = parseInt(yearSelect.value);
+            if (!window.hotInstance) return;
+            const sourceData = window.hotInstance.getSourceData();
+            if (!sourceData || !sourceData.length) return;
+
+            const rows = sourceData
+                .filter(r => userIds.includes(r.userId))
+                .map(row => {
+                    const days = {};
+                    for (let d = 1; d <= 31; d++) days[`D${d}`] = row[`d${d}`] || '';
+                    const { regular, weekend, holiday } = calcOvertimeTotals(row, effectiveDays, month, year);
+                    return {
+                        userId:       row.userId,
+                        days,
+                        regularHours: regular,
+                        weekendHours: weekend,
+                        holidayHours: holiday
+                    };
+                });
+
+            fetch('/DailyAttendance/SaveOvertime', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ month, year, rows })
+            })
+            .then(r => r.json())
+            .then(res => showNotification(
+                res.success ? 'success' : 'error',
+                res.success ? 'Đã lưu dữ liệu thêm giờ!' : (res.message || 'Lỗi lưu thêm giờ!')
+            ))
+            .catch(() => showNotification('error', 'Lỗi lưu thêm giờ!'));
+        }
+
+        // ==================== NOTIFICATION ====================
+
+        function showNotification(type, message) {
+            let alertClass = type === 'success' ? 'alert-success' : 'alert-danger';
+            let icon = type === 'success' ? 'fa-check-circle' : 'fa-exclamation-triangle';
+            
+            const notification = document.createElement('div');
+            notification.className = `alert ${alertClass} alert-dismissible fade show`;
+            notification.style = 'position: fixed; top: 20px; right: 20px; z-index: 99999; min-width: 250px;';
+            notification.innerHTML = `<i class="fa ${icon}"></i> ${message} <button type="button" class="close" data-dismiss="alert"><span>&times;</span></button>`;
+            
+            document.body.appendChild(notification);
+            setTimeout(() => notification.remove(), 3000);
+        }
+
+        // ==================== EVENT LISTENERS ====================
+        departmentSelect.addEventListener('change', function () {
+            loadBangChamCong();
+        });
+
+        monthSelect.addEventListener('change', function () {
+            loadBangChamCong();
+        });
+
+        yearSelect.addEventListener('change', function () {
+            loadBangChamCong();
+        });
+
+        document.querySelectorAll('input[name="loaiCong"]').forEach(radio => {
+            radio.addEventListener('change', function () {
+                loadBangChamCong();
+            });
+        });
+
+        // Export Excel
+        document.getElementById('btnExportExcel').addEventListener('click', function () {
+            const departmentId = departmentSelect.value || '';
+            const month = parseInt(monthSelect.value);
+            const year = parseInt(yearSelect.value);
+            const loai = document.querySelector('input[name="loaiCong"]:checked').value;
+            
+            let url = `/DailyAttendance/ExportDailyAttendance?departmentId=${departmentId}&month=${month}&year=${year}&loai=${loai}`;
+            window.location.href = url;
+        });
+    });
+</script>

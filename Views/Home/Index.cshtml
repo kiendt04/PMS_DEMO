@@ -1,0 +1,557 @@
+﻿@model HomeViewModel
+@using Microsoft.AspNetCore.Http
+@using PMS.Common
+
+@{
+    ViewData["Title"] = "Trang chủ - PMS Dashboard";
+}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+
+<style>
+    .dashboard-container {
+        font-family: 'Be Vietnam Pro', sans-serif;
+    }
+    
+    /* Stats Cards */
+    .stats-card {
+        border-radius: 12px;
+        border: none;
+        transition: all 0.3s ease;
+        overflow: hidden;
+    }
+    .stats-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.15) !important;
+    }
+    .stats-card .card-body {
+        padding: 1.25rem;
+    }
+    .stats-card .icon-box {
+        width: 50px;
+        height: 50px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .stats-card .stats-value {
+        font-size: 1.5rem;
+        font-weight: 700;
+    }
+    .stats-card .stats-label {
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: #6c757d;
+        font-weight: 600;
+    }
+    
+    /* Color variations */
+    .bg-gradient-primary { background: linear-gradient(135deg, #4e73df 0%, #224abe 100%); }
+    .bg-gradient-success { background: linear-gradient(135deg, #1cc88a 0%, #13855c 100%); }
+    .bg-gradient-info { background: linear-gradient(135deg, #36b9cc 0%, #258391 100%); }
+    .bg-gradient-warning { background: linear-gradient(135deg, #f6c23e 0%, #dda20a 100%); }
+    .bg-gradient-danger { background: linear-gradient(135deg, #e74a3b 0%, #be2617 100%); }
+    .bg-gradient-orange { background: linear-gradient(135deg, #fd7e14 0%, #c35a02 100%); }
+    
+    /* Chart Cards */
+    .chart-card {
+        border-radius: 12px;
+        border: none;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    }
+    .chart-card .card-header {
+        background: transparent;
+        border-bottom: 1px solid #e3e6f0;
+        padding: 1rem 1.25rem;
+    }
+    .chart-card .card-title {
+        margin: 0;
+        font-weight: 600;
+        font-size: 1rem;
+        color: #2d3748;
+    }
+    
+    /* Info Tables */
+    .info-card {
+        border-radius: 12px;
+        border: none;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    }
+    .info-card .card-header {
+        background: transparent;
+        border-bottom: 1px solid #e3e6f0;
+        padding: 1rem 1.25rem;
+    }
+    .info-card .list-group-item {
+        border: none;
+        border-bottom: 1px solid #f1f3f4;
+        padding: 0.75rem 1.25rem;
+    }
+    .info-card .list-group-item:last-child {
+        border-bottom: none;
+    }
+    .avatar-circle {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: 600;
+        font-size: 0.875rem;
+    }
+    
+    /* Shortcut Buttons */
+    .shortcut-btn {
+        border-radius: 12px;
+        padding: 1rem 1.5rem;
+        border: 2px solid transparent;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    .shortcut-btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+    .shortcut-btn i {
+        font-size: 1.5rem;
+    }
+    .shortcut-btn span {
+        font-size: 0.8rem;
+        font-weight: 500;
+    }
+    
+    /* Empty state */
+    .empty-state {
+        text-align: center;
+        padding: 2rem;
+        color: #6c757d;
+    }
+    .empty-state i {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        opacity: 0.5;
+    }
+</style>
+
+<div class="container-fluid dashboard-container">
+    <!-- Header Row -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h4 class="text-gray-800 mb-1">
+                <i class="fas fa-tachometer-alt me-2 text-primary"></i>Dashboard
+            </h4>
+            <p class="text-muted mb-0">
+                <i class="far fa-calendar-alt me-1"></i>@DateTime.Now.ToString("dddd, dd MMMM yyyy", new System.Globalization.CultureInfo("vi-VN"))
+            </p>
+        </div>
+        <div class="text-end">
+            <span class="badge bg-success px-3 py-2">
+                <i class="fas fa-user me-1"></i>@Context.Session.GetString(CommonConstants.UserName)
+            </span>
+        </div>
+    </div>
+
+    <!-- Stats Cards Row -->
+    <div class="row g-3 mb-4">
+        <!-- Card 1: Total Employees -->
+        <div class="col-xl-2 col-md-4 col-sm-6">
+            <div class="card stats-card shadow h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="icon-box bg-gradient-primary text-white me-3" style="margin-right: 20px;">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div>
+                            <div class="stats-value text-primary">@(Model.DashboardStats?.TotalEmployees ?? 0)</div>
+                            <div class="stats-label">Nhân viên</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Card 2: Total Departments -->
+        <div class="col-xl-2 col-md-4 col-sm-6">
+            <div class="card stats-card shadow h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="icon-box bg-gradient-success text-white me-3" style="margin-right: 20px;">
+                            <i class="fas fa-building"></i>
+                        </div>
+                        <div>
+                            <div class="stats-value text-success">@(Model.DashboardStats?.TotalDepartments ?? 0)</div>
+                            <div class="stats-label">Phòng ban</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        @* <!-- Card 3: Yearly Budget - COMMENTED OUT -->
+        <div class="col-xl-2 col-md-4 col-sm-6">
+            <div class="card stats-card shadow h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="icon-box bg-gradient-warning text-white me-3">
+                            <i class="fas fa-wallet"></i>
+                        </div>
+                        <div>
+                            <div class="stats-value text-warning" style="font-size: 1rem;">
+                                @((Model.DashboardStats?.YearlyBudget ?? 0).ToString("N0"))
+                            </div>
+                            <div class="stats-label">Ngân sách năm</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Card 4: Monthly Expenses - COMMENTED OUT -->
+        <div class="col-xl-2 col-md-4 col-sm-6">
+            <div class="card stats-card shadow h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="icon-box bg-gradient-danger text-white me-3">
+                            <i class="fas fa-money-bill-wave"></i>
+                        </div>
+                        <div>
+                            <div class="stats-value text-danger" style="font-size: 1rem;">
+                                @((Model.DashboardStats?.MonthlyExpenses ?? 0).ToString("N0"))
+                            </div>
+                            <div class="stats-label">Chi tháng này</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div> *@
+        
+        <!-- Card: Budget for Current Quarter -->
+        @{
+            var currentMonth = DateTime.Now.Month;
+            var currentQuarter = (currentMonth - 1) / 3; // 0, 1, 2, 3 for Q1, Q2, Q3, Q4
+            var quarterColors = new[] { "#4e73df", "#1cc88a", "#f6c23e", "#e74a3b" };
+            var quarterLabels = new[] { "Quý 1", "Quý 2", "Quý 3", "Quý 4" };
+            var quarterData = Model.BudgetByQuarter?.FirstOrDefault(x => x.Label == $"Quý {currentQuarter + 1}");
+            var quarterValue = quarterData?.Value ?? 0;
+        }
+        @* <div class="col-xl-2 col-md-3 col-sm-6">
+            <div class="card stats-card shadow h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="icon-box text-white me-3" style="background: @quarterColors[currentQuarter];">
+                            <i class="fas fa-calendar-alt"></i>
+                        </div>
+                        <div>
+                            <div class="stats-value" style="font-size: 0.95rem; color: @quarterColors[currentQuarter];">
+                                @quarterValue.ToString("N0")
+                            </div>
+                            <div class="stats-label">@quarterLabels[currentQuarter]</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div> *@
+        
+        <!-- Card 5: Work Days -->
+        <div class="col-xl-2 col-md-4 col-sm-6">
+            <div class="card stats-card shadow h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="icon-box bg-gradient-info text-white me-3" style="margin-right: 20px;">
+                            <i class="fas fa-calendar-check"></i>
+                        </div>
+                        <div>
+                            <div class="stats-value text-info">@(Model.DashboardStats?.WorkDaysInMonth ?? 22)</div>
+                            <div class="stats-label">Ngày công</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Card 6: Pending Leaves -->
+        @* <div class="col-xl-2 col-md-4 col-sm-6">
+            <div class="card stats-card shadow h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="icon-box bg-gradient-orange text-white me-3">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div>
+                            <div class="stats-value" style="color: #fd7e14;">@(Model.DashboardStats?.PendingLeaveRequests ?? 0)</div>
+                            <div class="stats-label">Chờ duyệt</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div> *@
+    </div>
+
+    <!-- Charts Row -->
+    <div class="row g-3 mb-4">
+        <!-- Department Stats Chart -->
+        <div class="col-lg-6">
+            <div class="card chart-card h-100">
+                <div class="card-header">
+                    <h5 class="card-title">
+                        <i class="fas fa-chart-bar me-2 text-primary"></i>Nhân sự theo phòng ban
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div id="departmentChart" style="width: 100%; height: 300px;"></div>
+                </div>
+            </div>
+        </div>
+        
+        @* <!-- Budget by Quarter Chart - COMMENTED OUT -->
+        <div class="col-lg-6">
+            <div class="card chart-card h-100">
+                <div class="card-header">
+                    <h5 class="card-title">
+                        <i class="fas fa-chart-pie me-2 text-success"></i>Ngân sách theo quý (@DateTime.Now.Year)
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div id="budgetChart" style="width: 100%; height: 300px;"></div>
+                </div>
+            </div>
+        </div> *@
+    </div>
+
+    <!-- Info Tables Row -->
+    <div class="row g-3 mb-4">
+        <!-- Birthdays This Month - Full Width -->
+        @* <div class="col-lg-12">
+            <div class="card info-card h-100">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-birthday-cake me-2 text-danger"></i>Sinh nhật tháng @DateTime.Now.Month
+                    </h5>
+                    <span class="badge bg-danger">@(Model.BirthdaysThisMonth?.Count ?? 0)</span>
+                </div>
+                <div class="card-body p-0">
+                    @if (Model.BirthdaysThisMonth != null && Model.BirthdaysThisMonth.Any())
+                    {
+                        <ul class="list-group list-group-flush">
+                            @foreach (var birthday in Model.BirthdaysThisMonth)
+                            {
+                                <li class="list-group-item d-flex align-items-center">
+                                    <div class="avatar-circle me-3" style="background-color: @birthday.AvatarColor;">
+                                        @birthday.Name.Substring(0, 1).ToUpper()
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <div class="fw-semibold">@birthday.Name</div>
+                                        <small class="text-muted">@birthday.Department</small>
+                                    </div>
+                                    <span class="badge bg-light text-dark">
+                                        <i class="far fa-calendar me-1"></i>@birthday.Day/@DateTime.Now.Month
+                                    </span>
+                                </li>
+                            }
+                        </ul>
+                    }
+                    else
+                    {
+                        <div class="empty-state">
+                            <i class="fas fa-birthday-cake"></i>
+                            <p class="mb-0">Không có sinh nhật trong tháng này</p>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div> *@
+        
+        @* <!-- Today Leaves - COMMENTED OUT -->
+        <div class="col-lg-6">
+            <div class="card info-card h-100">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-user-clock me-2 text-warning"></i>Nghỉ phép hôm nay
+                    </h5>
+                    <span class="badge bg-warning text-dark">@(Model.TodayLeaves?.Count ?? 0)</span>
+                </div>
+                <div class="card-body p-0">
+                    @if (Model.TodayLeaves != null && Model.TodayLeaves.Any())
+                    {
+                        <ul class="list-group list-group-flush">
+                            @foreach (var leave in Model.TodayLeaves)
+                            {
+                                <li class="list-group-item d-flex align-items-center">
+                                    <div class="avatar-circle me-3 bg-warning text-dark">
+                                        @leave.Name.Substring(0, 1).ToUpper()
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <div class="fw-semibold">@leave.Name</div>
+                                        <small class="text-muted">@leave.Department</small>
+                                    </div>
+                                    <span class="badge bg-light text-dark">@leave.LeaveType</span>
+                                </li>
+                            }
+                        </ul>
+                    }
+                    else
+                    {
+                        <div class="empty-state">
+                            <i class="fas fa-calendar-check"></i>
+                            <p class="mb-0">Không có ai nghỉ phép hôm nay</p>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div> *@
+    </div>
+
+    @{ 
+        // Single boolean check (uses ViewBag if set by controller, otherwise checks Model.UserInfo roles)
+        var showQuick = (ViewBag.ShowQuickAccess as bool?) ?? (Model?.UserInfo?.TblUserRoles?.Any(ur => ur.RoleId == 1) ?? false);
+    }
+    @if (showQuick)
+    {
+        <div class="row g-3 mb-4">
+            <div class="col-12">
+                <div class="card chart-card">
+                    <div class="card-header">
+                        <h5 class="card-title">
+                            <i class="fas fa-bolt me-2 text-warning"></i>Truy cập nhanh
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3 justify-content-center">
+                                <div class="col-auto">
+                                    <a href="@Url.Action("Index", "TimeKeeping")" class="shortcut-btn btn btn-outline-primary">
+                                        <i class="fas fa-clock text-primary"></i>
+                                        <span>Chấm công</span>
+                                    </a>
+                                </div>
+                                <div class="col-auto">
+                                    <a href="@Url.Action("Index", "SourceAllocation")" class="shortcut-btn btn btn-outline-success">
+                                        <i class="fas fa-wallet text-success"></i>
+                                        <span>Phân nguồn</span>
+                                    </a>
+                                </div>
+                                <div class="col-auto">
+                                    <a href="@Url.Action("Index", "LeaveManagement")" class="shortcut-btn btn btn-outline-info">
+                                        <i class="fas fa-calendar-minus text-info"></i>
+                                        <span>Nghỉ phép</span>
+                                    </a>
+                                </div>
+                                <div class="col-auto">
+                                    <a href="@Url.Action("Index", "TblUsers")" class="shortcut-btn btn btn-outline-warning">
+                                        <i class="fas fa-users text-warning"></i>
+                                        <span>Nhân viên</span>
+                                    </a>
+                                </div>
+                                <div class="col-auto">
+                                    <a href="@Url.Action("Index", "TblDepartments")" class="shortcut-btn btn btn-outline-secondary">
+                                        <i class="fas fa-building text-secondary"></i>
+                                        <span>Phòng ban</span>
+                                    </a>
+                                </div>
+                                <div class="col-auto">
+                                    <a href="@Url.Action("Index", "SalarySettlement")" class="shortcut-btn btn btn-outline-danger">
+                                        <i class="fas fa-file-invoice-dollar text-danger"></i>
+                                        <span>Quyết toán</span>
+                                    </a>
+                                </div>
+                                <div class="col-auto">
+                                    <a href="@Url.Action("Index", "WorkPerformance")" class="shortcut-btn btn btn-outline-dark">
+                                        <i class="fas fa-chart-line text-dark"></i>
+                                        <span>Hiệu suất</span>
+                                    </a>
+                                </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+<script type="text/javascript">
+    google.charts.load('current', { 'packages': ['corechart', 'bar'] });
+    google.charts.setOnLoadCallback(drawCharts);
+
+    function drawCharts() {
+        drawDepartmentChart();
+        drawBudgetChart();
+    }
+
+    function drawDepartmentChart() {
+        var data = google.visualization.arrayToDataTable([
+            ['Phòng ban', 'Số nhân viên', { role: 'style' }]
+            @if (Model.DepartmentStats != null)
+            {
+                @foreach (var dept in Model.DepartmentStats)
+                {
+                    <text>, ['@Html.Raw(dept.DepartmentName)', @dept.EmployeeCount, '@dept.Color']</text>
+                }
+            }
+        ]);
+
+        var options = {
+            title: '',
+            legend: { position: 'none' },
+            hAxis: {
+                textStyle: { fontSize: 11, fontName: 'Be Vietnam Pro' }
+            },
+            vAxis: {
+                minValue: 0,
+                textStyle: { fontSize: 11, fontName: 'Be Vietnam Pro' }
+            },
+            chartArea: { left: 50, top: 20, width: '85%', height: '75%' },
+            bar: { groupWidth: '60%' },
+            animation: { startup: true, duration: 1000, easing: 'out' }
+        };
+
+        var chart = new google.visualization.ColumnChart(document.getElementById('departmentChart'));
+        chart.draw(data, options);
+    }
+
+    function drawBudgetChart() {
+        var data = google.visualization.arrayToDataTable([
+            ['Quý', 'Ngân sách']
+            @if (Model.BudgetByQuarter != null && Model.BudgetByQuarter.Any())
+            {
+                @foreach (var item in Model.BudgetByQuarter)
+                {
+                    <text>, ['@Html.Raw(item.Label)', @item.Value]</text>
+                }
+            }
+            else
+            {
+                <text>, ['Quý 1', 0], ['Quý 2', 0], ['Quý 3', 0], ['Quý 4', 0]</text>
+            }
+        ]);
+
+        var options = {
+            title: '',
+            pieHole: 0.4,
+            colors: ['#4e73df', '#1cc88a', '#36b9cc', '#f6c23e'],
+            legend: {
+                position: 'right',
+                textStyle: { fontSize: 12, fontName: 'Be Vietnam Pro' }
+            },
+            chartArea: { left: 20, top: 20, width: '90%', height: '90%' },
+            pieSliceText: 'value',
+            pieSliceTextStyle: { fontSize: 11 },
+            animation: { startup: true, duration: 1000, easing: 'out' }
+        };
+
+        var chart = new google.visualization.PieChart(document.getElementById('budgetChart'));
+        chart.draw(data, options);
+    }
+
+    // Responsive charts
+    $(window).resize(function() {
+        drawCharts();
+    });
+</script>

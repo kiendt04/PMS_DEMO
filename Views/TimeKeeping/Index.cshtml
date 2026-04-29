@@ -1,0 +1,167 @@
+﻿@{
+    ViewData["Title"] = "QUẢN LÝ CHẤM CÔNG";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    /* Rút ngắn chiều ngang combobox quý, năm */
+    #selectQuarter { width: 120px; }
+    #selectYear { width: 100px; }
+    @@media (max-width: 576px) {
+        #selectQuarter { width: 100px; }
+        #selectYear { width: 90px; }
+    }
+</style>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+
+                <!-- Bộ lọc -->
+                <div class="row align-items-center mt-2 mb-2">
+                    <div class="col-auto d-flex align-items-center mr-3 mb-2">
+                        <label class="fw-bold me-3 mb-0" style="min-width: 50px;">Chọn quý:</label>
+                        <select class="form-control form-select-sm" id="selectQuarter" style="width: auto; min-width: 80px;">
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                            <option value="0" selected>Cả năm</option>
+                        </select>
+                    </div>
+                    <div class="col-auto d-flex align-items-center mr-3 mb-2">
+                        <label class="fw-bold me-3 mb-0" style="min-width: 100px;">Chọn năm:</label>
+                        <select class="form-control form-select-sm" id="selectYear">
+                            @{
+                                var availableYears = ViewBag.AvailableYears as List<int> ?? new List<int>();
+                                var defaultYear = ViewBag.DefaultYear as int? ?? DateTime.Now.Year;
+                            }
+                            @foreach (var year in availableYears)
+                            {
+                                if (year == defaultYear)
+                                {
+                                    <option value="@year" selected="selected">@year</option>
+                                }
+                                else
+                                {
+                                    <option value="@year">@year</option>
+                                }
+                            }
+                        </select>
+                    </div>
+                    <div class="col-auto d-flex align-items-center mr-3 mb-2">
+                        <label class="fw-bold me-3 mb-0" style="min-width: 120px;">Loại công:</label>
+                        <div class="d-flex" style="gap: 1rem;">
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="loaiCong" value="thoi_gian" checked>
+                                <label class="form-check-label">Thời gian</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="loaiCong" value="ca_dem">
+                                <label class="form-check-label">Ca đêm</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="loaiCong" value="them_gio">
+                                <label class="form-check-label">Thêm giờ</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-auto d-flex align-items-center mb-2 ms-auto">
+                        <button id="btnExportExcel" class="btn btn-primary btn-sm mr-2">
+                            <i class="fa fa-file-excel-o"></i> Xuất Excel
+                        </button>
+                        <button id="btnTimKiem" class="btn btn-info" style="display: none;">Tìm kiếm</button>
+                    </div>
+                </div>
+
+                <!-- Kết quả load AJAX -->
+                <div class="table-responsive mt-3" id="bangKetQua">
+                    @Html.Partial("_TimeTable") <!-- mặc định là thời gian -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <script src="~/js/export-utils.js"></script>
+    <script src="~/js/handsontable-formula.js?v=2.1"></script>
+    <script>
+        $(document).ready(function () {
+            function loadBangChamCong() {
+                var loai = $('input[name="loaiCong"]:checked').val();
+                var nam = $('#selectYear').val();
+                var quy = $('#selectQuarter').val();
+                
+                // Xóa bất kỳ hiệu ứng loading nào trước đó
+                $('#bangKetQua').removeClass('loading');
+
+                $.ajax({
+                    url: '/TimeKeeping/RenderLoaiCong',
+                    type: 'GET',
+                    data: { loai: loai, nam: nam, quy: quy, _: new Date().getTime() }, // Thêm timestamp để tránh cache
+                    success: function (data) {
+                        $('#bangKetQua').html(data);
+                        $(window).trigger('resize');
+                        // done
+                    },
+                    error: function (xhr, status, error) {
+                        alert("Lỗi khi tải dữ liệu: " + error);
+
+                    }
+                });
+            }
+
+            // Khi ấn nút "Tìm kiếm"
+            $('#btnTimKiem').click(function () {
+                loadBangChamCong();
+            });
+            // Khi chọn radio "loaiCong" → tự động gọi
+
+            $('input[name="loaiCong"]').change(function () {
+                loadBangChamCong();
+            });
+
+            // Khi thay đổi năm cũng tự động gọi
+            $('#selectYear').change(function () {
+                loadBangChamCong();
+            });
+
+            // Khi thay đổi quý cũng tự động gọi
+            $('#selectQuarter').change(function () {
+                loadBangChamCong();
+            });
+
+            // Chọn quý hiện tại khi load trang lần đầu
+            (function setDefaultQuarter() {
+                var now = new Date();
+                var currentQuarter = Math.floor(now.getMonth() / 3) + 1; // 1..4
+                $('#selectQuarter').val(String(currentQuarter));
+            })();
+
+            // Tự động load dữ liệu khi trang được tải (với quý/năm mặc định)
+            loadBangChamCong();
+
+            // Xuất Excel server-side
+            $('#btnExportExcel').on('click', function (e) {
+                e.preventDefault();
+                var nam = $('#selectYear').val();
+                var quy = $('#selectQuarter').val();
+                var loai = $('input[name="loaiCong"]:checked').val();
+                
+                var url = '/TimeKeeping/ExportTimeKeeping?loai=' + loai + '&nam=' + nam + '&quy=' + quy;
+                window.location.href = url;
+            });
+
+        });
+
+        
+    </script>
+}
+
+<style>
+</style>
+

@@ -1,0 +1,744 @@
+﻿@{
+    ViewData["Title"] = "QUẢN LÝ AN TOÀN ĐIỆN";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/handsontable@14.3.0/dist/handsontable.full.min.css" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+    /* Rút ngắn chiều ngang combobox quý, năm */
+    #selectQuarter { width: 120px; }
+    #selectYear { width: 100px; }
+    @@media (max-width: 576px) {
+        #selectQuarter { width: 100px; }
+        #selectYear { width: 90px; }
+    }
+    
+    /* Style cho cells */
+    .handsontable .htCore td {
+        white-space: nowrap;
+        line-height: 1.2;
+        padding: 4px 2px;
+    }
+    .handsontable td {
+        color: #333333 !important;
+        font-size: 14px !important;
+    }
+    .handsontable span.colHeader {
+        color: #333333 !important;
+        font-weight: 700 !important;
+    }
+    
+    /* Đặc biệt cho cột "Số ngày công được thưởng ATĐ" */
+    .handsontable .htCore td[data-column="3"],
+    .handsontable .htCore td[data-column="7"],
+    .handsontable .htCore td[data-column="11"] {
+        font-size: 13px;
+        text-align: center;
+        vertical-align: middle;
+    }
+    
+    /* Ẩn scrollbar dọc của Handsontable, giữ scrollbar ngang ở dưới */
+    #electricalSafetyHot .wtHolder {
+        overflow-x: auto !important;
+        overflow-y: visible !important;
+        height: auto !important;
+    }
+    #electricalSafetyHot .ht_master .wtHolder {
+        overflow-x: auto !important;
+        overflow-y: visible !important;
+    }
+    /* Ẩn scrollbar của header clone - chỉ giữ 1 scroll ở dưới */
+    #electricalSafetyHot .ht_clone_top .wtHolder {
+        overflow: hidden !important;
+    }
+    
+</style>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <!-- Bộ lọc -->
+
+                <div class="row align-items-center mt-2 mb-2">
+                    <div class="col-auto d-flex align-items-center mr-3 mb-2">
+                        <label class="fw-bold me-3 mb-0" style="min-width: 90px;">Chọn quý:</label>
+                        <select class="form-control form-select-sm" id="selectQuarter">
+                            <option value="0">Cả năm</option>
+                            <option value="1">Quý 1</option>
+                            <option value="2">Quý 2</option>
+                            <option value="3">Quý 3</option>
+                            <option value="4">Quý 4</option>
+                        </select>
+                    </div>
+                    <div class="col-auto d-flex align-items-center mr-3 mb-2">
+                        <label class="fw-bold me-3 mb-0" style="min-width: 90px;">Chọn năm:</label>
+                        <select class="form-control form-select-sm" id="selectYear">
+                            @if (ViewBag.AvailableYears != null)
+                            {
+                                foreach (int year in ViewBag.AvailableYears)
+                                {
+                                    if (year == ViewBag.DefaultYear)
+                                    {
+                                        <option value="@year" selected>@year</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="@year">@year</option>
+                                    }
+                                }
+                            }
+                        </select>
+                    </div>
+                    <div class="col-auto d-flex align-items-center mb-2">
+                        <label class="fw-bold me-3 mb-0" style="min-width: 120px;">Chọn phòng ban:</label>
+                        <select class="form-control form-select-sm" id="selectPhongBan">
+                            <option value="0">-- Tất cả --</option>
+                            @if (ViewBag.Departments != null)
+                            {
+                                foreach (var dept in ViewBag.Departments)
+                                {
+                                    <option value="@dept.Id">@dept.Name</option>
+                                }
+                            }
+                        </select>
+                    </div>
+
+                    <div class="col-auto mb-2">
+                        
+                        <label for="excelFile" class="btn btn-success btn-sm mb-0 ms-2" style="cursor: pointer;">
+                            <i class="fa fa-upload"></i> Import Excel
+                        </label>
+                        <input type="file" id="excelFile" class="d-none" accept=".xlsx, .xls">
+                        @* <button id="btnTimKiem" class="btn btn-info" style="display: none;">Tìm kiếm</button> *@
+                    </div>
+
+                    <div class="col-auto mb-2">
+                        <button id="btnUpdateData_E" class="btn btn-success btn-sm">
+                            <i class="fa fa-save"></i> Cập nhật dữ liệu vào hệ thống
+                        </button>
+                    </div>
+                    <div class="col-auto mb-2">
+                        <button id="btnExportExcel" class="btn btn-primary btn-sm" title="Xuất dữ liệu">
+                            <i class="fa fa-download"></i> Xuất Excel
+                        </button>
+                    </div>
+                </div>
+
+
+                <!-- Bảng Handsontable -->
+                <div class="table-responsive mt-3" id="electricalSafetyHotWrapper" style="overflow:visible;">
+                    <div id="electricalSafetyHot"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/handsontable@14.3.0/dist/handsontable.full.min.js"></script>
+<script src="~/js/handsontable-formula.js?v=2.1"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        let hot = null;
+        let currentData = [];
+        
+        // Queue để xử lý batch updates khi paste nhiều cells
+        let updateQueue = [];
+        let updateTimer = null;
+
+        // Load data when filters change
+        function loadElectricalSafetyData() {
+            const year = parseInt($('#selectYear').val()) || @ViewBag.DefaultYear;
+            const quarter = parseInt($('#selectQuarter').val()) || 0;
+            const department = parseInt($('#selectPhongBan').val()) || 0;
+
+            console.log('Loading data for:', { year, quarter, department });
+
+            $.ajax({
+                url: '/ElectricalSafety/LoadElectricalSafetyData',
+                type: 'GET',
+                data: { nam: year, quy: quarter, phongBan: department },
+                success: function(response) {
+                    if (response.success) {
+                        currentData = response.data;
+                        renderElectricalSafetyTable(quarter, year);
+                    } else {
+                        showUpdateNotification('error', response.message || 'Lỗi khi tải dữ liệu');
+                    }
+                },
+                error: function(xhr, status, error) {
+                    showUpdateNotification('error', 'Lỗi kết nối: ' + error);
+                }
+            });
+        }
+
+        function renderElectricalSafetyTable(selectedQuarter, selectedYear) {
+            const container = document.getElementById('electricalSafetyHot');
+
+            // Xác định các tháng cần hiển thị
+            let monthNumbers = [];
+            let monthLabels = [];
+            
+            if (selectedQuarter > 0) {
+                const startMonth = (selectedQuarter - 1) * 3 + 1;
+                const endMonth = selectedQuarter * 3;
+                monthNumbers = Array.from({ length: endMonth - startMonth + 1 }, (_, i) => startMonth + i);
+                monthLabels = monthNumbers.map(function(m){ return 'Tháng ' + m; });
+            } else {
+                monthNumbers = Array.from({ length: 12 }, (_, i) => i + 1);
+                monthLabels = monthNumbers.map(function(m){ return 'Tháng ' + m; });
+            }
+
+            const subColumns = ['ATĐ', 'Kcvi', 'Knqi', 'Ki'];
+
+            // Nested headers - 3 levels
+            const nestedHeaders = [
+                ['STT' ,'Họ và tên', 'Số TK',  ...monthLabels.map(m => ({ label: m, colspan: 4 }))],
+                ['', '', '', ...monthLabels.flatMap(() => ['Số ngày công<br/>được thưởng ATĐ', { label: 'Hệ số đánh giá', colspan: 3 }])],
+                ['', '', '', ...monthLabels.flatMap(() => ['', 'Kcvi', 'Knqi', 'Ki'])]
+            ];
+
+            const baseColumnCount = 3;
+            const totalMonthCols = monthNumbers.length * subColumns.length;
+            const totalColCount = baseColumnCount + totalMonthCols;
+
+            const columns = [];
+
+            // Base columns with dark color styling
+            columns.push({ 
+                data: 0, 
+                type: 'numeric', 
+                width: 60, 
+                readOnly: true,
+                renderer: function (instance, td, row, col, prop, value, cellProperties) {
+                    td.style.color = '#333';
+                    td.style.textAlign = 'center';
+                    td.innerHTML = value || '';
+                }
+            });
+            columns.push({ 
+                data: 1, 
+                type: 'text', 
+                readOnly: true,
+                renderer: function (instance, td, row, col, prop, value, cellProperties) {
+                    const dataAtRow = instance.getDataAtRow(row);
+                    // Kiểm tra nếu là group row thì đã có styling trong cells function
+                    if (!(dataAtRow && dataAtRow[1] && dataAtRow[0] === '' && dataAtRow[2] === '')) {
+                        td.style.color = '#333';
+                    }
+                    td.innerHTML = value || '';
+                }
+            });
+            columns.push({ 
+                data: 2, 
+                type: 'text', 
+                readOnly: true,
+                renderer: function (instance, td, row, col, prop, value, cellProperties) {
+                    td.style.color = '#333';
+                    td.style.textAlign = 'center';
+                    td.innerHTML = value || '';
+                }
+            });
+
+            // Monthly columns
+            for (let i = 0; i < totalMonthCols; i++) {
+                const columnIndex = i % subColumns.length;
+                let columnWidth = 55; // Default width
+                
+                // Thu nhỏ cột "Số ngày công được thưởng ATĐ" (cột đầu tiên của mỗi tháng)
+                if (columnIndex === 0) {
+                    columnWidth = 40; // Thu nhỏ từ 55 xuống 40
+                }
+                
+                columns.push({
+                    data: baseColumnCount + i,
+                    type: 'numeric',
+                    numericFormat: { pattern: '0.00' },
+                    allowInvalid: false,
+                    width: columnWidth,
+                    renderer: function (instance, td, row, col, prop, value, cellProperties) {
+                        // Cho phép xuống dòng cho cột "Số ngày công được thưởng ATĐ"
+                        if (columnIndex === 0) {
+                            td.style.wordWrap = 'break-word';
+                            td.style.whiteSpace = 'normal';
+                            td.style.lineHeight = '1.2';
+                            td.style.fontSize = '13px';
+                            td.style.textAlign = 'center';
+                            td.style.verticalAlign = 'middle';
+                        }
+                        
+                        // Hiển thị trống nếu không có giá trị hoặc giá trị = 0
+                        if (value === null || value === undefined || value === '' || value === 0) {
+                            td.innerHTML = '';
+                        } else {
+                            Handsontable.renderers.NumericRenderer.apply(this, arguments);
+                        }
+                    }
+                });
+            }
+
+
+
+            // Convert data to table format
+            const tableData = [];
+            let stt = 1;
+
+            if (currentData && currentData.length > 0) {
+                let globalIndex = 1;
+                currentData.forEach(dept => {
+                    // Thêm dòng nhóm phòng ban
+                    tableData.push(makeGroupRow(dept.departmentName, totalColCount));
+                    
+                    // Thêm dòng nhân viên
+                    if (dept.employees && dept.employees.length > 0) {
+                        dept.employees.forEach(emp => {
+                            const row = makeEmployeeRow(globalIndex++, emp, monthNumbers, totalColCount);
+                            tableData.push(row);
+                        });
+                    }
+                });
+            }
+
+            // Hàm tạo dòng nhóm (in nghiêng, màu xanh)
+            function makeGroupRow(label, totalColCount) {
+                const row = new Array(totalColCount).fill('');
+                row[1] = label;
+                return row;
+            }
+
+            function makeEmployeeRow(index, employee, monthNumbers, totalColCount) {
+                const row = new Array(totalColCount).fill('');
+                row[0] = index;
+                row[1] = employee.fullName || '';
+                row[2] = employee.userCode || '';
+                // console.log('Creating row for employee:', employee.fullName, employee.userCode, employee.userId);
+                
+            
+
+                // Điền dữ liệu cho từng tháng được chọn
+                monthNumbers.forEach((month, monthIndex) => {
+                    const monthData = employee.monthlyData ? employee.monthlyData[month] : null;
+                    const offset = baseColumnCount + monthIndex * subColumns.length;
+                    
+                    row[offset + 0] = monthData ? (monthData.lv || '') : ''; // ATĐ (mapping to LV)
+                    row[offset + 1] = monthData ? (monthData.h || '') : '';  // Kcvi (mapping to H)
+                    row[offset + 2] = monthData ? (monthData.p || '') : '';  // Knqi (mapping to P)
+                    row[offset + 3] = monthData ? (monthData.l || '') : '';  // Ki (mapping to L)
+                });
+
+
+                return row;
+            }
+
+            // Destroy existing table if exists
+            if (hot) {
+                hot.destroy();
+            }
+
+            hot = new Handsontable(container, {
+                data: tableData,
+                columns: columns,
+                nestedHeaders: nestedHeaders,
+                colHeaders: false,
+                rowHeaders: false,
+                height: 'auto',  // Sử dụng scroll dọc của web
+                width: '100%',
+                stretchH: 'all',  // Hiển thị full width, không có khoảng trống bên phải
+                autoColumnSize: true,
+                manualColumnFreeze: true,
+                manualColumnMove: true,
+                // fix theo 3 cot dau tien
+                fixedColumnsLeft: 0,
+                
+                // Bật Copy/Paste từ Excel
+                copyPaste: {
+                    enabled: true,
+                    pasteMode: 'overwrite', // Ghi đè dữ liệu cũ
+                    rowsLimit: 1000,        // Giới hạn số dòng paste
+                    columnsLimit: 50        // Giới hạn số cột paste
+                },
+
+                // Bật fill handle để kéo copy nhanh
+                fillHandle: {
+                    direction: 'vertical',
+                    autoInsertRow: false
+                },
+                
+                contextMenu: {
+                    items: {
+                        copy: { name: 'Copy' },
+                        cut: { name: 'Cut' },
+                        paste: { name: 'Paste' },
+                        hsep1: '---------',
+                        row_above: {},
+                        row_below: {},
+                        hsep2: '---------',
+                        freeze_column: { name: 'Cố định cột' },
+                        unfreeze_column: { name: 'Bỏ cố định cột' },
+                        hsep3: '---------',
+                        undo: {},
+                        redo: {},
+                        clear_custom: {
+                            name: 'Xóa nội dung các ô đã chọn',
+                            callback() {
+                                hot.emptySelectedCells();
+                            }
+                        }
+                    }
+                },
+                filters: false,
+                dropdownMenu: false,
+                licenseKey: 'non-commercial-and-evaluation',
+
+                // Tô style cho dòng nhóm
+                cells: function (row, col) {
+                    const cellProperties = {};
+                    const dataAtRow = this.instance.getDataAtRow(row);
+                    // Nếu dòng là dòng nhóm (chỉ có cột 1 có chữ, cột 0 và 2 trống)
+                    if (dataAtRow && dataAtRow[1] && dataAtRow[0] === '' && dataAtRow[2] === '') {
+                        cellProperties.readOnly = true;
+                        cellProperties.renderer = function (instance, td, row, col, prop, value, cellProperties) {
+                            td.style.fontStyle = 'italic';
+                            td.style.color = 'blue';
+                            td.style.fontWeight = 'bold';
+                            td.style.background = '#f0f8ff';
+                            td.innerHTML = value || '';
+                        };
+                    } else {
+                        // Căn giữa tất cả cột trừ cột "Họ và tên" (col = 1)
+                        if (col !== 1) {
+                            cellProperties.className = 'htCenter';
+                        }
+                    }
+                    return cellProperties;
+                },
+                afterChange: function(changes, source) {
+                    if (!changes || source === 'loadData' || source === 'calculation') return;
+                    
+                    const instance = this;
+                    
+                    // Xử lý từng thay đổi
+                    changes.forEach(function([row, prop, oldVal, newVal]) {
+                        // Chỉ process nếu oldVal !== newVal để tránh infinite loop
+                        if (oldVal === newVal) return;
+                        
+                        if (typeof prop === 'number' && prop >= baseColumnCount && prop < totalColCount) {
+                            const rowData = instance.getDataAtRow(row);
+                            
+                            // Kiểm tra nếu đây là dòng nhân viên (không phải dòng group)
+                            if (rowData[0] !== '' && rowData[1] && rowData[2] !== '') {
+                                // Tìm userId từ data gốc
+                                const employeeName = rowData[1];
+                                const userCode = rowData[2];
+
+                                
+                                // Tìm userId từ currentData theo Họ tên + Mã NV
+                                let userId = null;
+                                const currentUserCode = rowData[2] || '';
+                                currentData.forEach(dept => {
+                                    (dept.employees || []).forEach(emp => {
+                                        const nameMatch = (emp.fullName || emp.FullName) === employeeName;
+                                        const codeMatch = (emp.userCode || emp.UserCode || '') === currentUserCode;
+                                        if (nameMatch && codeMatch) {
+                                            userId = emp.userId || emp.UserId || '';
+                                        }
+                                    });
+                                });
+                                
+                                if (userId) {
+                                    // Tính tháng và field type từ column index
+                                    const columnIndex = prop - baseColumnCount;
+                                    const monthIndex = Math.floor(columnIndex / subColumns.length);
+                                    const fieldIndex = columnIndex % subColumns.length;
+                                    const actualMonth = monthNumbers[monthIndex];
+                                    
+                                    const fieldTypes = ['TotalDay', 'Kcvi', 'Knqi', 'Ki'];
+                                    const fieldType = fieldTypes[fieldIndex];
+                                    
+                                    // Xử lý giá trị giống TimeKeeping
+                                    const processedValue = newVal === '' || newVal === null || newVal === undefined ? null : (parseFloat(newVal) || 0);
+                                    
+                                    // Thêm vào queue để batch update
+                                    updateQueue.push({
+                                        userId: userId,
+                                        month: actualMonth,
+                                        year: selectedYear,
+                                        fieldType: fieldType,
+                                        value: processedValue
+                                    });
+                                    
+                                    console.log('Added to queue:', {
+                                        userId, month: actualMonth, year: selectedYear, 
+                                        fieldType, value: processedValue, originalValue: newVal, employeeName, userCode
+                                    });
+                                } else {
+                                    console.log('User not found:', { employeeName, userCode, currentData });
+                                }
+                            }
+                        }
+                    });
+                    
+                    // Debounce batch update - chờ 500ms sau lần thay đổi cuối
+                    if (updateTimer) clearTimeout(updateTimer);
+                    updateTimer = setTimeout(() => {
+                        processBatchUpdates();
+                    }, 500);
+                }
+            });
+
+            // ===== KHỞI TẠO TOOLTIP CÔNG THỨC =====
+            HandsontableFormula.init(hot, null, {
+                getFormula: function(row, col, value, hotInstance) {
+                    const baseColumnCount = 3;
+                    const subColumns = ['ATĐ', 'Kcvi', 'Knqi', 'Ki'];
+                    
+                    // Kiểm tra nếu là cột cơ bản (STT, Họ tên, Số TK)
+                    // if (col < baseColumnCount) {
+                    //     return null;
+                    // }
+                    
+                    // Tính toán tháng và loại cột
+                    const columnIndex = col - baseColumnCount;
+                    const monthIndex = Math.floor(columnIndex / subColumns.length);
+                    const fieldIndex = columnIndex % subColumns.length;
+                    const monthLabel = monthLabels[monthIndex];
+                    const fieldName = subColumns[fieldIndex];
+                    
+                    // Công thức cho từng loại cột
+                    // if (fieldIndex === 0) { // ATĐ
+                    //     return `= Số ngày công được thưởng an toàn điện (${monthLabel})`;
+                    // } else if (fieldIndex === 1) { // Kcvi
+                    //     return `= Hệ số đánh giá Kcvi (${monthLabel})`;
+                    // } else if (fieldIndex === 2) { // Knqi
+                    //     return `= Hệ số đánh giá Knqi (${monthLabel})`;
+                    // } else if (fieldIndex === 3) { // Ki
+                    //     return `= Hệ số đánh giá Ki (${monthLabel})`;
+                    // }
+                    
+                    return `${value}`;
+                },
+                shouldShow: function(row, col, value, hotInstance) {
+                    // Không hiển thị cho cột STT, Họ tên, Số TK
+                    // if (col < 3) return false;
+                    
+                    // Hiển thị cho các cột còn lại
+                    return true;
+                }
+            });
+        }
+
+        // Hàm xử lý batch updates
+        function processBatchUpdates() {
+            if (updateQueue.length === 0) return;
+            
+            const totalUpdates = updateQueue.length;
+            showUpdateNotification('info', `Đang xử lý ${totalUpdates} thay đổi...`);
+            
+            // Process tất cả updates trong queue
+            const promises = updateQueue.map(update => 
+                updateElectricalSafetyData(update.userId, update.month, update.year, update.fieldType, update.value, true)
+            );
+            
+            Promise.all(promises).then(() => {
+                showUpdateNotification('success', `Đã cập nhật ${totalUpdates} thay đổi thành công!`);
+                updateQueue = []; // Clear queue
+            }).catch(error => {
+                showUpdateNotification('error', 'Có lỗi khi cập nhật một số dữ liệu');
+                updateQueue = []; // Clear queue
+            });
+        }
+
+        // Hàm cập nhật dữ liệu
+        function updateElectricalSafetyData(userId, month, year, fieldType, value, isBatch = false) {
+            const requestData = {
+                userId: userId,
+                month: month,
+                year: year,
+                fieldType: fieldType,
+                value: value === '' || value === null || value === undefined ? null : (parseFloat(value) || 0)
+            };
+
+            return $.ajax({
+                url: '/ElectricalSafety/UpdateElectricalSafety',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(requestData),
+                success: function(response) {
+                    if (!isBatch) {
+                        if (response.success) {
+                            showUpdateNotification('success', 'Đã cập nhật an toàn điện!');
+                        } else {
+                            showUpdateNotification('error', response.message);
+                        }
+                    }
+                },
+                error: function(xhr, status, error) {
+                    if (!isBatch) {
+                        showUpdateNotification('error', 'Lỗi kết nối: ' + error);
+                    }
+                }
+            });
+        }
+
+        // Hàm hiển thị thông báo cập nhật
+        function showUpdateNotification(type, message) {
+            let alertClass, icon;
+            if (type === 'success') {
+                alertClass = 'alert-success';
+                icon = 'fa-check-circle';
+            } else if (type === 'info') {
+                alertClass = 'alert-info';
+                icon = 'fa-info-circle';
+            } else {
+                alertClass = 'alert-danger';
+                icon = 'fa-exclamation-triangle';
+            }
+
+            var html = '<div class="alert ' + alertClass + ' alert-dismissible fade show update-notification" role="alert" style="position: fixed; top: 20px; right: 20px; z-index: 99999; min-width: 300px;">'
+                + '<i class="fa ' + icon + '"></i> ' + message
+                + '<button type="button" class="close" data-dismiss="alert">'
+                + '<span>&times;</span>'
+                + '</button>'
+                + '</div>';
+            const notification = $(html);
+
+            $('body').append(notification);
+
+            // Tự động ẩn sau 3 giây
+            setTimeout(() => {
+                notification.alert('close');
+            }, 3000);
+        }
+
+        // Hàm tính chiều cao phù hợp
+        function calculateHotHeight() {
+            const windowHeight = window.innerHeight;
+            const offset = 290; // Trừ phần header, filter, padding, navbar, ...
+            const calculated = windowHeight - offset;
+            return Math.max(calculated, 320); // Tối thiểu 320px
+        }
+
+        // Event listeners cho filter changes
+        $('#selectQuarter, #selectYear, #selectPhongBan').on('change', function() {
+            loadElectricalSafetyData();
+        });
+        // Set default quarter to current quarter on first load
+        (function setDefaultQuarter() {
+            const now = new Date();
+            const currentQuarter = Math.floor(now.getMonth() / 3) + 1; // 1..4
+            const $q = $('#selectQuarter');
+            if ($q.length) {
+                $q.val(String(currentQuarter));
+            }
+        })();
+
+        // Load data khi page ready
+        loadElectricalSafetyData();
+
+        // Export Excel click handler
+        document.getElementById('btnExportExcel').addEventListener('click', function() {
+            const year = parseInt($('#selectYear').val()) || @ViewBag.DefaultYear;
+            const quarter = parseInt($('#selectQuarter').val()) || 0;
+            const department = parseInt($('#selectPhongBan').val()) || 0;
+            
+            const url = `/ElectricalSafety/ExportElectricalSafety?nam=${year}&quy=${quarter}&phongBan=${department}`;
+            window.location.href = url;
+        });
+
+
+        // xu li excel
+       
+    });
+    // xu li doc file excel
+        // Code đơn giản
+    let get_data = [];
+        let currentExcelFile = null;
+
+    document.getElementById('btnImportExcel').addEventListener('click', function() {
+        // Tạo input file
+        const fileInput = document.createElement('input');
+        fileInput.type = 'file';
+        fileInput.accept = '.xlsx, .xls';
+
+        fileInput.onchange = function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                // Kiểm tra định dạng file
+                if (!file.name.match(/\.(xlsx|xls)$/i)) {
+                    alert('Vui lòng chọn file Excel (.xlsx hoặc .xls)');
+                    return;
+                }
+
+                currentExcelFile = file;
+                alert('Đã chọn file: ' + file.name + '\nBấm "Cập nhật dữ liệu" để import vào hệ thống.');
+            }
+        };
+
+        fileInput.click();
+    });
+
+    document.getElementById('btnUpdateData_E').addEventListener('click', function() {
+        if (!currentExcelFile) {
+            alert('Chưa có file Excel nào được chọn. Vui lòng chọn file trước.');
+            return;
+        }
+
+        // Lấy thông tin năm và quý
+        const year = parseInt($('#selectYear').val());
+        const quarter = parseInt($('#selectQuarter').val()) || 0;
+
+        if (!year) {
+            alert('Vui lòng chọn năm cần import dữ liệu.');
+            return;
+        }
+
+        const confirmMsg = `Bạn có chắc chắn muốn import dữ liệu cho Năm ${year} ${quarter > 0 ? ', Quý ' + quarter : ' (Cả năm)'} không?`;
+        if (!confirm(confirmMsg)) {
+            return;
+        }
+
+        console.log('Đang cập nhật dữ liệu từ file:', currentExcelFile.name, 'Year:', year, 'Quarter:', quarter);
+
+        // Tạo FormData để gửi file
+        const formData = new FormData();
+        formData.append('excelFile', currentExcelFile);
+        formData.append('year', year);
+        formData.append('quarter', quarter);
+
+        // Gửi file trực tiếp lên server
+        fetch('/ElectricalSafety/ImportExcelData', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => {
+            console.log('Response status:', response.status);
+            if (!response.ok) {
+                // Try to parse error message if possible
+                return response.json().then(err => {
+                   throw new Error(err.message || 'Lỗi từ server');
+                }).catch(() => {
+                   throw new Error('Network response was not ok');
+                });
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('Server response:', data);
+
+            if (data.success) {
+                alert('Đã cập nhật dữ liệu vào hệ thống thành công! ' + (data.count || '') + ' nhân viên đã được cập nhật.');
+                // Reload trang để hiển thị dữ liệu mới
+                setTimeout(() => {
+                    location.reload();
+                }, 1000);
+            } else {
+                alert('Lỗi: ' + (data.message || 'Không thể cập nhật dữ liệu'));
+            }
+        })
+        .catch((error) => {
+            console.error('Error:', error);
+            alert('Lỗi khi cập nhật dữ liệu vào hệ thống: ' + error.message);
+        });
+    });
+</script>

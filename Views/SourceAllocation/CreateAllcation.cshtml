@@ -1,0 +1,245 @@
+﻿@model PMS.Models.TblBudgetPlan
+
+@{
+    ViewData["Title"] = "Thêm mới mã nguồn tổng";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var currentYear = DateTime.Now.Year;
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/tbl-position-forms.css">
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <form asp-action="CreateAllcation" method="post" id="createForm">
+
+                        <!-- Row 1: Năm và Tổng ngân sách -->
+                        <div class="row">
+                            <div class="col-lg-6 col-md-6 col-sm-12">
+                                <div class="form-group mb-3">
+                                    <div class="boldText">Năm:<code>*</code></div>
+                                    <input asp-for="Year" class="form-control" type="number" min="@currentYear" max="2100" placeholder="Nhập năm (ví dụ: @currentYear)" value="@currentYear" required />
+                                    <span asp-validation-for="Year" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-lg-6 col-md-6 col-sm-12">
+                                <div class="form-group mb-3">
+                                    <div class="boldText">Tổng ngân sách:<code>*</code></div>
+                                    <input asp-for="TotalBudget" class="form-control" type="text" placeholder="Nhập tổng ngân sách" required />
+                                    <span asp-validation-for="TotalBudget" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Row 2: Ngân sách nhân viên và Ngân sách quản lý -->
+                        <div class="row">
+                            <div class="col-lg-6 col-md-6 col-sm-12">
+                                <div class="form-group mb-3">
+                                    <div class="boldText">Ngân sách nhân viên:<code>*</code></div>
+                                    <input asp-for="EmployeeBudget" class="form-control" type="text" placeholder="Nhập ngân sách cho nhân viên" required />
+                                    <span asp-validation-for="EmployeeBudget" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-lg-6 col-md-6 col-sm-12">
+                                <div class="form-group mb-3">
+                                    <div class="boldText">Ngân sách quản lý:<code>*</code></div>
+                                    <input asp-for="ManagerBudget" class="form-control" type="text" placeholder="Nhập ngân sách cho quản lý" required />
+                                    <span asp-validation-for="ManagerBudget" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Buttons -->
+                        <div class="row">
+                            <div class="col-12">
+                                <button type="submit" class="btn btn-success waves-effect waves-light m-r-10">Ghi dữ liệu</button>
+                                <a asp-action="Index" class="btn btn-secondary">Quay lại</a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script>
+        // Biến cờ để kiểm tra đang submit
+        let isSubmitting = false;
+
+        // Hàm định dạng số theo chuẩn: 500,000.2
+        function formatNumber(number) {
+            if (number === null || number === undefined || number === '' || isNaN(number)) {
+                return '';
+            }
+
+            // Chuyển thành số
+            const numValue = parseFloat(number);
+
+            // Tách phần nguyên và phần thập phân
+            const parts = numValue.toString().split('.');
+            let integerPart = parts[0];
+            const decimalPart = parts.length > 1 ? '.' + parts[1] : '';
+
+            // Thêm dấu phẩy phân cách hàng nghìn
+            integerPart = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+
+            return integerPart + decimalPart;
+        }
+
+        // Hàm parse số từ chuỗi đã định dạng: "500,000.2" -> 500000.2
+        function parseFormattedNumber(formattedString) {
+            if (!formattedString || formattedString.trim() === '') {
+                return 0;
+            }
+
+            // Xóa tất cả dấu phẩy (phân cách hàng nghìn)
+            const cleanString = formattedString.replace(/,/g, '');
+
+            // Chuyển đổi sang số
+            const number = parseFloat(cleanString);
+
+            // Trả về số, nếu NaN thì trả về 0
+            return isNaN(number) ? 0 : number;
+        }
+
+        // Hàm định dạng input khi blur
+        function formatInputOnBlur(inputElement) {
+            const rawValue = inputElement.value.trim();
+            if (rawValue !== '') {
+                const parsedValue = parseFormattedNumber(rawValue);
+                if (!isNaN(parsedValue) && parsedValue >= 0) {
+                    inputElement.value = formatNumber(parsedValue);
+                }
+            }
+        }
+
+        // Hàm xóa định dạng khi focus (chỉ hiển thị số thuần)
+        function removeFormatOnFocus(inputElement) {
+            const rawValue = inputElement.value.trim();
+            if (rawValue !== '') {
+                const parsedValue = parseFormattedNumber(rawValue);
+                if (!isNaN(parsedValue)) {
+                    // Hiển thị số mà không có định dạng, giữ lại số thập phân
+                    inputElement.value = parsedValue.toString();
+                }
+            }
+        }
+
+        // Hàm kiểm tra và xử lý input chỉ được nhập số
+        function validateNumberInput(inputElement) {
+            // Lấy giá trị hiện tại
+            let value = inputElement.value;
+
+            // Chỉ cho phép số, dấu chấm (thập phân)
+            value = value.replace(/[^0-9.]/g, '');
+
+            // Chỉ cho phép một dấu chấm thập phân
+            const dotCount = (value.match(/\./g) || []).length;
+            if (dotCount > 1) {
+                // Giữ lại dấu chấm đầu tiên, xóa các dấu chấm sau
+                const parts = value.split('.');
+                value = parts[0] + '.' + parts.slice(1).join('');
+            }
+
+            // Xóa dấu phẩy (sẽ thêm lại sau khi định dạng)
+            value = value.replace(/,/g, '');
+
+            inputElement.value = value;
+        }
+
+        $(document).ready(function () {
+            // Thêm sự kiện cho các input ngân sách
+            $('#TotalBudget, #EmployeeBudget, #ManagerBudget').each(function() {
+                const input = this;
+
+                // Khi focus - xóa định dạng
+                $(input).on('focus', function() {
+                    removeFormatOnFocus(this);
+                });
+
+                // Khi blur - định dạng lại
+                $(input).on('blur', function() {
+                    formatInputOnBlur(this);
+                });
+
+                // Khi nhập - validate
+                $(input).on('input', function() {
+                    validateNumberInput(this);
+                });
+
+                // Khi keypress - chỉ cho phép số và dấu chấm
+                $(input).on('keypress', function(e) {
+                    const charCode = e.which ? e.which : e.keyCode;
+                    const charStr = String.fromCharCode(charCode);
+
+                    // Cho phép: số (0-9), dấu chấm (.)
+                    if (!/[0-9.]/.test(charStr)) {
+                        e.preventDefault();
+                        return false;
+                    }
+
+                    // Kiểm tra nếu đã có dấu chấm mà lại nhập thêm dấu chấm
+                    if (charStr === '.' && this.value.includes('.')) {
+                        e.preventDefault();
+                        return false;
+                    }
+
+                    return true;
+                });
+
+                // Paste event - xử lý khi người dùng paste
+                $(input).on('paste', function(e) {
+                    setTimeout(() => {
+                        validateNumberInput(this);
+                    }, 0);
+                });
+
+                // Định dạng giá trị ban đầu nếu có
+                if (input.value) {
+                    const parsedValue = parseFormattedNumber(input.value);
+                    if (!isNaN(parsedValue)) {
+                        input.value = formatNumber(parsedValue);
+                    }
+                }
+            });
+
+            // Validation for budgets khi submit
+            $('#createForm').on('submit', function(e) {
+                e.preventDefault();
+
+                if (isSubmitting) {
+                    return false;
+                }
+
+                // Lấy giá trị đã parse
+                var totalBudget = parseFormattedNumber($('#TotalBudget').val());
+                var employeeBudget = parseFormattedNumber($('#EmployeeBudget').val());
+                var managerBudget = parseFormattedNumber($('#ManagerBudget').val());
+
+                // Kiểm tra dữ liệu
+                if (employeeBudget + managerBudget > totalBudget) {
+                    alert('Tổng ngân sách nhân viên và quản lý không được vượt quá tổng ngân sách!');
+                    return false;
+                }
+
+                // Chuyển giá trị về số thuần để submit
+                $('#TotalBudget').val(totalBudget);
+                $('#EmployeeBudget').val(employeeBudget);
+                $('#ManagerBudget').val(managerBudget);
+
+                // Submit form
+                isSubmitting = true;
+                this.submit();
+            });
+        });
+    </script>
+}

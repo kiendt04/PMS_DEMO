@@ -1,0 +1,116 @@
+@model PMS.Models.TblTypeWorkDays
+
+@{
+    ViewData["Title"] = "Thêm mới loại ngày công";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@using (Html.BeginForm("Create", "TypeWorkDays", FormMethod.Post))
+{
+    @Html.AntiForgeryToken()
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title">Thông tin chi tiết loại ngày công</h4>
+                    <h6 class="card-subtitle text-muted mb-3">
+                        Lưu ý: <span class="text-danger">*</span> là các trường bắt buộc
+                    </h6>
+
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <div class="form-group">
+                                <div class="boldText">Tên loại ngày công:<code>*</code></div>
+                                @Html.EditorFor(model => model.Name, new { htmlAttributes = new { @class = "form-control", placeholder = "Nhập tên loại ngày công" } })
+                                @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+
+                        <div class="col-lg-3">
+                            <div class="form-group">
+                                <div class="boldText">Ký hiệu công:</div>
+                                @Html.EditorFor(model => model.PerformanceSign, new { htmlAttributes = new { @class = "form-control", placeholder = "Nhập ký hiệu công" } })
+                                @Html.ValidationMessageFor(model => model.PerformanceSign, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                         <div class="col-lg-3">
+                            <div class="form-group">
+                                <div class="boldText">Ký hiệu ngày:</div>
+                                @Html.EditorFor(model => model.DaysSign, new { htmlAttributes = new { @class = "form-control", placeholder = "Nhập ký hiệu ngày" } })
+                                @Html.ValidationMessageFor(model => model.DaysSign, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <div class="form-group">
+                                <div class="boldText">Ngày bắt đầu:<code>*</code></div>
+                                @Html.TextBoxFor(model => model.StartDate, new { @class = "form-control", type = "date" })
+                                @Html.ValidationMessageFor(model => model.StartDate, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+
+                        <div class="col-lg-6">
+                            <div class="form-group">
+                                <div class="boldText">Ngày kết thúc:</div>
+                                @Html.TextBoxFor(model => model.EndDate, new { @class = "form-control", type = "date" })
+                                @Html.ValidationMessageFor(model => model.EndDate, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <div class="boldText">Giá trị:</div>
+                                @Html.TextBoxFor(model => model.Value, new { @class = "form-control", type = "number", step = "0.01", placeholder = "Nhập giá trị" })
+                                @Html.ValidationMessageFor(model => model.Value, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <div class="boldText">Thứ tự:</div>
+                                @Html.TextBoxFor(model => model.Order, new { @class = "form-control", type = "number", placeholder = "Nhập thứ tự" })
+                                @Html.ValidationMessageFor(model => model.Order, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                        
+                         <div class="col-lg-4">
+                            <div class="form-group">
+                                <div class="boldText">Trạng thái:<code>*</code></div>
+                                @Html.DropDownListFor(model => model.Status,
+                                    new List<SelectListItem> {
+                                        new SelectListItem { Text = "Hoạt động", Value = "1", Selected = true },
+                                        new SelectListItem { Text = "Ngưng hoạt động", Value = "0" }
+                                    },
+                                    new { @class = "form-control" })
+                                @Html.ValidationMessageFor(model => model.Status, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="form-group">
+                                <div class="boldText">Ghi chú:</div>
+                                @Html.TextAreaFor(model => model.Note, new { @class = "form-control", rows = "4", placeholder = "Nhập ghi chú" })
+                                @Html.ValidationMessageFor(model => model.Note, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-success waves-effect waves-light m-r-10">
+                        <i class="fa fa-save"></i> Ghi dữ liệu
+                    </button>
+                    @Html.ActionLink("Quay lại", "Index", null, new { @class = "btn btn-secondary" })
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

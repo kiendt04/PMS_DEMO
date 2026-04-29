@@ -1,0 +1,328 @@
+﻿@model SalaryDistributionViewModel
+
+@{
+    ViewData["Title"] = $"Phân bổ lương cho NLĐ - Tháng {Model.Month}/{Model.Year}";
+    Layout = "_Layout";
+}
+
+<div class="card">
+
+    <div class="card-body">
+        <!-- <div class="search-box mb-4">
+            <span class="icon search-icon">🔍</span>
+            <span class="icon fx-icon">𝑓ₓ</span>
+            <input type="text" class="search-input" placeholder="">
+        </div> -->
+        <!-- Thông tin tổng quan -->
+        <div class="row mb-4">
+            <div class="col-md-2">
+                <strong>Ngân sách cho NLD:(V1)</strong>
+                <div class="h5">@(( Model.TotalAdvanceSalary + Model.TotalFinalization).ToString("N0"))</div>
+            </div>
+            <div class="col-md-2">
+                <strong>Ngân sách cho NLD:(V2)</strong>
+                <div class="h5">@((Model.TotalEmployeeBudget - Model.TotalAdvanceSalary - Model.TotalFinalization).ToString("N0"))</div>
+            </div>
+            <div class="col-md-2">
+                <strong>Ngân sách cho NQL:</strong>
+                <div class="h5">@((Model.TotalManagerBudget).ToString("N0"))</div>
+            </div>
+            <div class="col-md-2">
+                <strong>Tổng ngân sách:</strong>
+                <div class="h5">@((Model.TotalEmployeeBudget + Model.TotalManagerBudget).ToString("N0"))</div>
+            </div>
+            <div class="col-md-2">
+                <strong>Tổng hệ số:</strong>
+                <div class="h5">@Model.TotalCoefficient.ToString("N2")</div>
+            </div>
+            <div class="col-md-2">
+                <strong>Giá trị 1 hệ số:</strong>
+                <div class="h5">@Model.MoneyPerExchangePoint.ToString("N2")</div>
+            </div>
+        </div>
+
+        <form asp-action="Distribution" method="post" id="distributionForm">
+            <input type="hidden" asp-for="SourceAllocationId" />
+            <input type="hidden" asp-for="Month" />
+            <input type="hidden" asp-for="Year" />
+            <input type="hidden" asp-for="TotalEmployeeBudget" />
+            <input type="hidden" asp-for="TotalManagerBudget" />
+            <input type="hidden" asp-for="MoneyPerExchangePoint" />
+            <input type="hidden" asp-for="TotalCoefficient" />
+
+            <div class="table-responsive">
+                <table id="mytable" class="table table-bordered table-striped">
+                    <thead>
+                        <tr>
+                            <th  class="text-center">STT</th>
+                            <th  class="text-center">Đơn vị</th>
+                            @* <th width="10%">Loại phòng</th> *@
+                            <th  class="text-center">Hệ số lương</th>
+                            <th  class="text-center">Giá trị <br> 1 hệ số </br> </th>
+                            <th  class="text-center">Quý lương <br> kế hoạch</br></th>
+                            <th  class="text-center">Quý lương <br> thực tế </br> </th>
+                            <th class="text-center">Tiền thưởng <br> chế độ </br> </th>
+                            <th  class="text-center">Tiền thu quỹ</th>
+                            <th  class="text-center">Ghi chú</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @for (int i = 0; i < Model.Departments.Count; i++)
+                        {
+                            var department = Model.Departments[i];
+                            <tr>
+                                <td class="text-center">@(i + 1)</td>
+                                <td>
+                                    <input type="hidden" asp-for="Departments[i].DepartmentId" />
+                                    <input type="hidden" asp-for="Departments[i].DepartmentName" />
+                                    <input type="hidden" asp-for="Departments[i].DepartmentType" />
+                                    <input type="hidden" asp-for="Departments[i].Coefficient" />
+                                    <input type="hidden" asp-for="Departments[i].PlannedSalary" />
+                                    <input type="hidden" asp-for="Departments[i].ActualSalary" />
+                                    <input type="hidden" asp-for="Departments[i].Different" />
+                                    @department.DepartmentName
+                                </td>
+                                @* <td>@department.DepartmentType</td> *@
+                                <td class="text-center">@department.Coefficient.ToString("N2")</td>
+                                <td class="text-right">@Model.MoneyPerExchangePoint.ToString("N0")</td>
+                                <td class="text-right">@department.PlannedSalary.ToString("N0")</td>
+                                <td class="text-right" data-planned-salary="@department.PlannedSalary">
+                                    @department.ActualSalary?.ToString("N0")
+                                </td>
+                                <td class="text-start">
+                                    @* visible formatted input *@
+                                    <input type="text" class="form-control form-control-sm bonus-display"
+                                           data-department-id="@department.DepartmentId"
+                                           value="@((department.Bonus ?? 0).ToString("N0"))"
+                                           onchange="updateBonusValue(this)" 
+                                           style="text-align: right; width: 120px;" />
+                                    @* hidden input bound to model (will hold numeric value for model binding) *@
+                                    <input type="hidden" asp-for="Departments[i].Bonus" class="bonus-input"
+                                           data-department-id="@department.DepartmentId" />
+                                </td>
+                                <td class="text-start">
+                                    <input type="text" class="form-control form-control-sm surcharge-display"
+                                           data-department-id="@department.DepartmentId"
+                                           value="@((department.Surcharge ?? 0).ToString("N0"))"
+                                           onchange="updateSurchargeValue(this)"
+                                           style="text-align: right; width: 120px;" />
+                                    <input type="hidden" asp-for="Departments[i].Surcharge" class="surcharge-input"
+                                           data-department-id="@department.DepartmentId" />
+                                </td>
+                                <td class="text-center">
+                                    @* <input asp-for="Departments[i].Note" class="form-control form-control-sm note-input"
+                                           data-department-id="@department.DepartmentId" /> *@
+                                           @department.Note
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                    <tfoot class="font-weight-bold">
+                        <tr>
+                            <td colspan="2" class="text-right">TỔNG CỘNG:</td>
+                            <td class="text-center">@Model.TotalCoefficient.ToString("N2")</td>
+                            <td class="text-right"></td>
+                            <td class="text-right">@Model.Departments.Sum(d => d.PlannedSalary).ToString("N0")</td>
+                            <td class="text-right" id="actual-salary">@Model.Departments.Sum(d => d.ActualSalary ?? 0).ToString("N0")</td>
+                            <td class="text-right" id="total-bonus">@Model.Departments.Sum(d => d.Bonus ?? 0).ToString("N0")</td>
+                            <td class="text-right" id="total-surcharge">@Model.Departments.Sum(d => d.Surcharge ?? 0).ToString("N0")</td>
+                            <td></td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+
+            <div class="form-group mt-3">
+                <button type="submit" class="btn btn-success">
+                    <i></i> Lưu phân bổ
+                </button>
+                </button>
+                <a href="@Url.Action("Index")" class="btn btn-secondary">
+                    <i></i> Hủy bỏ
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $('#mytable').DataTable({
+            "pageLength": 10,
+            "ordering": true,
+            "searching": false,
+            "lengthChange": false,
+            "info": false,
+            "infoPostFix": false 
+        });
+            // Khởi tạo giá trị từ display input sang hidden input
+            initializeInputValues();
+
+            // Xử lý khi người dùng nhập vào input hiển thị
+            $('.bonus-display, .surcharge-display').on('input', function () {
+                updateHiddenInput(this);
+                updateActualSalary($(this));
+                updateTotals();
+            });
+
+            // Khởi tạo giá trị từ display sang hidden
+            function initializeInputValues() {
+                $('.bonus-display').each(function() {
+                    updateHiddenInput(this);
+                });
+                $('.surcharge-display').each(function() {
+                    updateHiddenInput(this);
+                });
+                updateAllActualSalaries();
+                updateTotals();
+            }
+
+            // Cập nhật hidden input từ display input
+            function updateHiddenInput(displayInput) {
+                var value = $(displayInput).val().replace(/[^0-9]/g, '');
+                var numericValue = value ? parseInt(value) : 0;
+
+                var row = $(displayInput).closest('tr');
+                if ($(displayInput).hasClass('bonus-display')) {
+                    row.find('.bonus-input').val(numericValue);
+                } else {
+                    row.find('.surcharge-input').val(numericValue);
+                }
+            }
+
+            // Cập nhật tất cả lương thực tế
+            function updateAllActualSalaries() {
+                $('.bonus-input').each(function() {
+                    updateActualSalary($(this));
+                });
+            }
+
+            function updateActualSalary(inputElement) {
+                var row = inputElement.closest('tr');
+                var plannedSalary = parseFloat(row.find('.actual-salary').data('planned-salary')) || 0;
+                var bonus = parseFloat(row.find('.bonus-input').val()) || 0;
+                var surcharge = parseFloat(row.find('.surcharge-input').val()) || 0;
+
+                // Tính quý lương thực tế theo công thức
+                var actualSalary = plannedSalary + bonus - surcharge;
+
+                // Hiển thị kết quả
+                row.find('.actual-salary').text(actualSalary.toLocaleString('vi-VN'));
+
+                // Cập nhật vào hidden field để submit form
+                var actualSalaryInput = row.find('input[name$=".ActualSalary"]');
+                actualSalaryInput.val(actualSalary);
+
+                // Cập nhật chênh lệch
+                var different = actualSalary - plannedSalary;
+                var differentInput = row.find('input[name$=".Different"]');
+                differentInput.val(different);
+            }
+
+            function updateTotals() {
+                var totalBonus = 0;
+                var totalSurcharge = 0;
+                var totalActualSalary = 0;
+                var totalPlannedSalary = 0;
+
+                $('.bonus-input').each(function() {
+                    totalBonus += parseFloat($(this).val()) || 0;
+                });
+
+                $('.surcharge-input').each(function() {
+                    totalSurcharge += parseFloat($(this).val()) || 0;
+                });
+
+                $('input[name$=".ActualSalary"]').each(function() {
+                    totalActualSalary += parseFloat($(this).val()) || 0;
+                });
+
+                $('input[name$=".PlannedSalary"]').each(function() {
+                    totalPlannedSalary += parseFloat($(this).val()) || 0;
+                });
+                
+                $('#total-bonus').text(formatNumber(totalBonus));
+                $('#total-surcharge').text(formatNumber(totalSurcharge));
+                $('#total-actual-salary').text(formatNumber(totalActualSalary));
+                $('#total-planned-salary').text(formatNumber(totalPlannedSalary));
+            }
+
+            function formatNumber(num) {
+                return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+            }
+
+            // Format số khi người dùng nhập
+                   // Format số khi blur - chuyển từ 100000 thành 100,000
+        $('.bonus-display, .surcharge-display').on('blur', function() {
+            var value = $(this).val().replace(/[^0-9]/g, '');
+            if (value) {
+                // Format số với dấu phẩy phân cách hàng nghìn
+                var num = parseInt(value);
+                $(this).val(num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","));
+            } else {
+                $(this).val('0');
+            }
+        });
+
+        // Bỏ format khi focus - chuyển từ 100,000 thành 100000
+        $('.bonus-display, .surcharge-display').on('focus', function() {
+            var value = $(this).val().replace(/,/g, ''); // Bỏ dấu phẩy
+            $(this).val(value || '0');
+        });
+
+            // Xử lý submit form
+            $('#distributionForm').on('submit', function(e) {
+                // Đảm bảo tất cả hidden input đã được cập nhật
+                $('.bonus-display, .surcharge-display').each(function() {
+                    updateHiddenInput(this);
+                });
+
+                // Validate dữ liệu
+                var isValid = true;
+                $('.bonus-display, .surcharge-display').each(function() {
+                    var value = $(this).val().replace(/[^0-9]/g, '');
+                    if (isNaN(parseInt(value))) {
+                        isValid = false;
+                        $(this).addClass('is-invalid');
+                    } else {
+                        $(this).removeClass('is-invalid');
+                    }
+                });
+
+                if (!isValid) {
+                    e.preventDefault();
+                    alert('Vui lòng nhập số hợp lệ cho Bonus và Surcharge');
+                }
+            });
+        });
+    </script>
+}
+<style>
+    .search-box {
+        display: flex;
+        align-items: center;
+        width: 100%;
+        max-width: 100%;
+        background: #ffffff;
+        border: 1px solid #dcdcdc;
+        border-radius: 8px;
+        padding: 8px 12px;
+        padding-bottom: 10px;
+        box-shadow: 0 0 3px rgba(0,0,0,0.1);
+    }
+
+        .search-box .icon {
+            font-size: 10px;
+            margin-right: 10px;
+            color: #555;
+        }
+
+    .search-input {
+        border: none;
+        outline: none;
+        width: 100%;
+        font-size: 12px;
+    }
+
+</style>

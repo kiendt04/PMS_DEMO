@@ -1,0 +1,942 @@
+@{
+    ViewData["Title"] = "QUYẾT TOÁN LƯƠNG";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/handsontable@14.3.0/dist/handsontable.full.min.css" />
+<style>
+    /* Rút ngắn chiều ngang combobox */
+    #selectMonth { width: 50px; }
+    #selectYear { width: 100px; }
+    #selectDepartment { width: auto; min-width: 150px; }
+    #selectObjectType { width: 120px; }
+    
+    @@media (max-width: 576px) {
+        #selectMonth { width: 50px; }
+        #selectYear { width: 90px; }
+        #selectDepartment { width: auto; min-width: 130px; }
+        #selectObjectType { width: 100px; }
+    }
+    
+    /* Tăng font-size và màu chữ */
+    .handsontable td {
+        color: #333333 !important;
+        font-size: 14px !important;
+        white-space: nowrap !important;
+    }
+    .handsontable span.colHeader {
+        color: #333333 !important;
+        font-weight: 700 !important;
+    }
+    
+    /* Ẩn scrollbar dọc của Handsontable, giữ scrollbar ngang ở dưới */
+    #salarySettlementHot .wtHolder {
+        overflow-x: auto !important;
+        overflow-y: visible !important;
+        height: auto !important;
+    }
+    #salarySettlementHot .ht_master .wtHolder {
+        overflow-x: auto !important;
+        overflow-y: visible !important;
+    }
+    /* Ẩn scrollbar của header clone - chỉ giữ 1 scroll ở dưới */
+    #salarySettlementHot .ht_clone_top .wtHolder {
+        overflow: hidden !important;
+    }
+    
+    /* Style cho cột số tiền */
+    .handsontable .htCore td[data-column="7"],
+    .handsontable .htCore td[data-column="8"],
+    .handsontable .htCore td[data-column="9"],
+    .handsontable .htCore td[data-column="10"],
+    .handsontable .htCore td[data-column="11"],
+    .handsontable .htCore td[data-column="12"],
+    .handsontable .htCore td[data-column="13"],
+    .handsontable .htCore td[data-column="14"] {
+        text-align: right;
+    }
+</style>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+
+                <!-- Bộ lọc -->
+                <div class="row align-items-center mt-2 mb-2 flex-nowrap" style="overflow-x: auto; gap: 1rem;">
+                    <div class="col-auto d-flex align-items-center mb-2" style="gap: 0.5rem;">
+                        <label class="fw-bold mb-0">Tháng:</label>
+                        <select class="form-control form-select-sm" id="selectMonth" style="width: 80px" onchange="loadSalarySettlementData()">
+                            @for (int i = 1; i <= 12; i++)
+                            {
+                                if (i == DateTime.Now.Month)
+                                {
+                                    <option value="@i" selected>@i</option>
+                                }
+                                else
+                                {
+                                    <option value="@i">@i</option>
+                                }
+                            }
+                        </select>
+                    </div>
+                    <div class="col-auto d-flex align-items-center mb-2" style="gap: 0.5rem;">
+                        <label class="fw-bold mb-0">Năm:</label>
+                        <select class="form-control form-select-sm" id="selectYear" onchange="loadSalarySettlementData()">
+                            @if (ViewBag.AvailableYears != null)
+                            {
+                                foreach (int year in ViewBag.AvailableYears)
+                                {
+                                    if (year == ViewBag.DefaultYear)
+                                    {
+                                        <option value="@year" selected>@year</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="@year">@year</option>
+                                    }
+                                }
+                            }
+                        </select>
+                    </div>
+                    <div class="col-auto d-flex align-items-center mb-2" style="gap: 0.5rem;">
+                        <label class="fw-bold mb-0">Phòng ban:</label>
+                        <select class="form-control form-select-sm" id="selectDepartment" onchange="loadSalarySettlementData()" style="width: auto; min-width: 150px;">
+                            <option value="0">-- Tất cả --</option>
+                            @if (ViewBag.Departments != null)
+                            {
+                                foreach (var dept in ViewBag.Departments)
+                                {
+                                    <option value="@dept.Id">@dept.Name</option>
+                                }
+                            }
+                        </select>
+                    </div>
+                    <div class="col-auto d-flex align-items-center mb-2" style="gap: 0.5rem;">
+                        <label class="fw-bold mb-0">Đối tượng:</label>
+                        <select class="form-control form-select-sm" id="selectObjectType" onchange="loadSalarySettlementData()">
+                            <option value="0">-- Tất cả --</option>
+                            <option value="1">Người Quản lý</option>
+                            <option value="2">Người Lao động</option>
+                        </select>
+                    </div>
+                    
+                    <div class="col-auto d-flex align-items-center mb-2">
+                        <button id="btnUpdateAllData" class="btn btn-success btn-sm me-2" onclick="updateAllSalarySettlementData()">
+                            <i class="fa fa-save"></i> Cập nhật dữ liệu vào hệ thống
+                        </button>
+                    </div>
+                    <div class="col-auto d-flex align-items-center mb-2">
+                         <button id="btnExportExcel" class="btn btn-primary btn-sm" title="Xuất dữ liệu">
+                            <i class="fa fa-download"></i> Xuất Excel
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Bảng Handsontable -->
+                <div class="table-responsive mt-3" id="salarySettlementHotWrapper" style="overflow:visible;">
+                    <div id="salarySettlementHot"></div>
+                    <div class="text-muted mt-2">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/handsontable@14.3.0/dist/handsontable.full.min.js"></script>
+<script src="~/js/handsontable-formula.js?v=2.1"></script>    
+<script>
+        document.addEventListener("DOMContentLoaded", function () {
+        let hot = null;
+        let currentData = [];
+        let tableData = []; // Thêm biến để lưu tableData
+
+        // Load data when filters change
+        function loadSalarySettlementData() {
+            const year = parseInt($('#selectYear').val()) || @ViewBag.DefaultYear;
+            const month = parseInt($('#selectMonth').val()) || @DateTime.Now.Month;
+            const department = parseInt($('#selectDepartment').val()) || 0;
+            const objectType = parseInt($('#selectObjectType').val()) || 0;
+
+            console.log('Loading data for:', { year, month, department, objectType });
+
+            $.ajax({
+                url: '/SalarySettlement/LoadSalarySettlementData',
+                type: 'GET',
+                data: { nam: year, thang: month, phongBan: department, doiTuong: objectType },
+                success: function(response) {
+                    console.log('AJAX Success Response:', response);
+                    if (response.success) {
+                        currentData = response.data;
+                        console.log('Current data set:', currentData);
+                        renderSalarySettlementTable();
+                    } else {
+                        console.log('Server returned error:', response.message);
+                        showUpdateNotification('error', response.message || 'Lỗi khi tải dữ liệu');
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.log('AJAX Error:', {xhr: xhr, status: status, error: error});
+                    console.log('Response text:', xhr.responseText);
+                    showUpdateNotification('error', 'Lỗi kết nối: ' + error);
+                }
+            });
+        }
+        // Expose to global scope for inline onchange handlers
+        window.loadSalarySettlementData = loadSalarySettlementData;
+
+        function renderSalarySettlementTable() {
+            const container = document.getElementById('salarySettlementHot');
+
+            // Định nghĩa cột
+            const columns = [
+                { data: 0, type: 'numeric', width: 50, readOnly: true, renderer: function(instance, td, row, col, prop, value) {
+                    td.innerHTML = value || '';
+                    td.style.textAlign = 'center';
+                    td.style.cursor = 'not-allowed';
+                }}, // TT
+                { data: 1, type: 'text', width: 160, readOnly: true, renderer: function(instance, td, row, col, prop, value) {
+                    td.innerHTML = value || '';
+                    td.style.cursor = 'not-allowed';
+                }}, // Họ và tên
+                { data: 2, type: 'text', width: 100, readOnly: true, renderer: function(instance, td, row, col, prop, value) {
+                    td.innerHTML = value || '';
+                    td.style.textAlign = 'center';
+                    td.style.cursor = 'not-allowed';
+                }}, // Mã cán bộ
+                { data: 3, type: 'text', width: 100, readOnly: true, renderer: function(instance, td, row, col, prop, value) {
+                    td.innerHTML = value || '';
+                    td.style.textAlign = 'center';
+                    td.style.cursor = 'not-allowed';
+                }}, // Số TK
+                { data: 4, type: 'numeric', width: 60, readOnly: true, renderer: function(instance, td, row, col, prop, value) {
+                    if (value !== null && value !== undefined && value !== '') {
+                        td.innerHTML = value;
+                        td.style.textAlign = 'right';
+                        td.style.cursor = 'not-allowed';
+                    } else {
+                        td.innerHTML = '';
+                        td.style.cursor = 'not-allowed';
+                    }
+                }}, // Hệ số lương
+                { data: 5, type: 'numeric', width: 60, readOnly: true, renderer: function(instance, td, row, col, prop, value) {
+                    if (value !== null && value !== undefined && value !== '') {
+                        td.innerHTML = value;
+                        td.style.textAlign = 'right';
+                        td.style.cursor = 'not-allowed';
+                    } else {
+                        td.innerHTML = '';
+                        td.style.cursor = 'not-allowed';
+                    }
+                }}, // HS phụ cấp
+                { data: 6, type: 'numeric', width: 60, readOnly: true, renderer: function(instance, td, row, col, prop, value) {
+                    if (value !== null && value !== undefined && value !== '') {
+                        td.innerHTML = value;
+                        td.style.textAlign = 'right';
+                        td.style.cursor = 'not-allowed';
+                    } else {
+                        td.innerHTML = '';
+                        td.style.cursor = 'not-allowed';
+                    }
+                }}, // Tổng HSL
+                { data: 7, type: 'numeric', width: 120, readOnly: true, renderer: function(instance, td, row, col, prop, value) {
+                    if (value !== null && value !== undefined && value !== '') {
+                        const numValue = parseFloat(value);
+                        if (!isNaN(numValue)) {
+                            td.innerHTML = numValue.toLocaleString('vi-VN');
+                            td.style.textAlign = 'right';
+                            td.style.cursor = 'not-allowed';
+                        } else {
+                            td.innerHTML = value;
+                            td.style.cursor = 'not-allowed';
+                        }
+                    } else {
+                        td.innerHTML = '';
+                        td.style.cursor = 'not-allowed';
+                    }
+                }}, // Lương chế độ 1 tháng
+                { data: 8, type: 'numeric', width: 100,
+                    allowInvalid: false,
+                    numericFormat: { pattern: '0,0' },
+                    validator: function(value, callback) {
+                        if (value === null || value === undefined || value === '') {
+                            callback(true); // Cho phép rỗng
+                            return;
+                        }
+                        const numValue = parseFloat(value);
+                        if (!isNaN(numValue) && isFinite(numValue) && numValue >= 0) {
+                            callback(true); // Hợp lệ
+                        } else {
+                            callback(false); // Không hợp lệ
+                        }
+                    },
+                    renderer: function(instance, td, row, col, prop, value) {
+                        if (value !== null && value !== undefined && value !== '') {
+                            const numValue = parseFloat(value);
+                            if (!isNaN(numValue)) {
+                                td.innerHTML = numValue.toLocaleString('vi-VN');
+                                td.style.textAlign = 'right';
+                            } else {
+                                td.innerHTML = value;
+                            }
+                        } else {
+                            td.innerHTML = '';
+                        }
+                    }
+                }, // Đã tạm ứng (có thể edit)
+                { data: 9, type: 'numeric', width: 100,
+                    allowInvalid: false,
+                    numericFormat: { pattern: '0,0' },
+                    validator: function(value, callback) {
+                        if (value === null || value === undefined || value === '') {
+                            callback(true); // Cho phép rỗng
+                            return;
+                        }
+                        const numValue = parseFloat(value);
+                        if (!isNaN(numValue) && isFinite(numValue) && numValue >= 0) {
+                            callback(true); // Hợp lệ
+                        } else {
+                            callback(false); // Không hợp lệ
+                        }
+                    },
+                    renderer: function(instance, td, row, col, prop, value) {
+                        if (value !== null && value !== undefined && value !== '') {
+                            const numValue = parseFloat(value);
+                            if (!isNaN(numValue)) {
+                                td.innerHTML = numValue.toLocaleString('vi-VN');
+                                td.style.textAlign = 'right';
+                            } else {
+                                td.innerHTML = value;
+                            }
+                        } else {
+                            td.innerHTML = '';
+                        }
+                    }
+                }, // Quyết toán lương chế độ (có thể edit)
+                { data: 10, type: 'numeric', width: 80,
+                    allowInvalid: false,
+                    numericFormat: { pattern: '0,0' },
+                    validator: function(value, callback) {
+                        if (value === null || value === undefined || value === '') {
+                            callback(true); // Cho phép rỗng
+                            return;
+                        }
+                        const numValue = parseFloat(value);
+                        if (!isNaN(numValue) && isFinite(numValue) && numValue >= 0) {
+                            callback(true); // Hợp lệ
+                        } else {
+                            callback(false); // Không hợp lệ
+                        }
+                    },
+                    renderer: function(instance, td, row, col, prop, value) {
+                        if (value !== null && value !== undefined && value !== '') {
+                            const numValue = parseFloat(value);
+                            if (!isNaN(numValue)) {
+                                td.innerHTML = numValue.toLocaleString('vi-VN');
+                                td.style.textAlign = 'right';
+                            } else {
+                                td.innerHTML = value;
+                            }
+                        } else {
+                            td.innerHTML = '';
+                        }
+                    }
+                }, // Ăn ca (có thể edit)
+                { data: 11, type: 'numeric', width: 100,
+                    allowInvalid: false,
+                    numericFormat: { pattern: '0,0' },
+                    validator: function(value, callback) {
+                        if (value === null || value === undefined || value === '') {
+                            callback(true); // Cho phép rỗng
+                            return;
+                        }
+                        const numValue = parseFloat(value);
+                        if (!isNaN(numValue) && isFinite(numValue) && numValue >= 0) {
+                            callback(true); // Hợp lệ
+                        } else {
+                            callback(false); // Không hợp lệ
+                        }
+                    },
+                    renderer: function(instance, td, row, col, prop, value) {
+                        if (value !== null && value !== undefined && value !== '') {
+                            const numValue = parseFloat(value);
+                            if (!isNaN(numValue)) {
+                                td.innerHTML = numValue.toLocaleString('vi-VN');
+                                td.style.textAlign = 'right';
+                            } else {
+                                td.innerHTML = value;
+                            }
+                        } else {
+                            td.innerHTML = '';
+                        }
+                    }
+                }, // Ca đêm, thêm giờ (có thể edit)
+                { data: 12, type: 'numeric', width: 100,
+                    allowInvalid: false,
+                    numericFormat: { pattern: '0,0' },
+                    validator: function(value, callback) {
+                        if (value === null || value === undefined || value === '') {
+                            callback(true); // Cho phép rỗng
+                            return;
+                        }
+                        const numValue = parseFloat(value);
+                        if (!isNaN(numValue) && isFinite(numValue) && numValue >= 0) {
+                            callback(true); // Hợp lệ
+                        } else {
+                            callback(false); // Không hợp lệ
+                        }
+                    },
+                    renderer: function(instance, td, row, col, prop, value) {
+                        if (value !== null && value !== undefined && value !== '') {
+                            const numValue = parseFloat(value);
+                            if (!isNaN(numValue)) {
+                                td.innerHTML = numValue.toLocaleString('vi-VN');
+                                td.style.textAlign = 'right';
+                            } else {
+                                td.innerHTML = value;
+                            }
+                        } else {
+                            td.innerHTML = '';
+                        }
+                    }
+                }, // Truy lĩnh
+                { data: 13, type: 'numeric', width: 100,
+                    allowInvalid: false,
+                    numericFormat: { pattern: '0,0' },
+                    validator: function(value, callback) {
+                        if (value === null || value === undefined || value === '') {
+                            callback(true); // Cho phép rỗng
+                            return;
+                        }
+                        const numValue = parseFloat(value);
+                        if (!isNaN(numValue) && isFinite(numValue) && numValue >= 0) {
+                            callback(true); // Hợp lệ
+                        } else {
+                            callback(false); // Không hợp lệ
+                        }
+                    },
+                    renderer: function(instance, td, row, col, prop, value) {
+                        if (value !== null && value !== undefined && value !== '') {
+                            const numValue = parseFloat(value);
+                            if (!isNaN(numValue)) {
+                                td.innerHTML = numValue.toLocaleString('vi-VN');
+                                td.style.textAlign = 'right';
+                            } else {
+                                td.innerHTML = value;
+                            }
+                        } else {
+                            td.innerHTML = '';
+                        }
+                    }
+                }, // Truy thu
+                { data: 14, type: 'numeric', width: 120, readOnly: true, renderer: function(instance, td, row, col, prop, value) {
+                    if (value !== null && value !== undefined && value !== '') {
+                        const numValue = parseFloat(value);
+                        if (!isNaN(numValue)) {
+                            td.innerHTML = numValue.toLocaleString('vi-VN');
+                            td.style.textAlign = 'right';
+                            td.style.cursor = 'not-allowed';
+                        } else {
+                            td.innerHTML = value;
+                            td.style.cursor = 'not-allowed';
+                        }
+                    } else {
+                        td.innerHTML = '';
+                        td.style.cursor = 'not-allowed';
+                    }
+                }}, // TỔNG LĨNH (tự động tính)
+                { data: 15, type: 'text', width: 150 } // Ghi chú
+            ];
+
+            // Nested headers
+            const nestedHeaders = [
+                [
+                    'TT', 'Họ và tên', 'Mã cán bộ', 'Số TK', 'Hệ số <br/> lương', 'Hệ số <br/> phụ cấp', 'Tổng <br/> HS lương', 'Lương chế độ <br/> 1 tháng',
+                    'Đã tạm ứng', { label: 'Lĩnh tiền', colspan: 3 }, 'Truy lĩnh', 'Truy thu', 'TỔNG LĨNH', 'Ghi chú'
+                ],
+                [
+                    '', '', '', '', '', '', '', '', '', 'Quyết toán <br/> lương chế độ', 'Ăn ca', 'Ca đêm, <br/> thêm giờ', '', '', '', ''
+                ]
+            ];
+
+            // Convert data to table format
+            tableData = []; // Reset tableData
+            let stt = 1;
+
+            if (currentData && currentData.departmentGroups && currentData.departmentGroups.length > 0) {
+                currentData.departmentGroups.forEach(dept => {
+                    // Thêm dòng nhóm phòng ban
+                    tableData.push(makeGroupRow(dept.departmentName, 16));
+
+                    // Thêm dòng nhân viên
+                    if (dept.employees && dept.employees.length > 0) {
+                        dept.employees.forEach(emp => {
+                            const row = makeEmployeeRow(stt++, emp);
+                            tableData.push(row);
+                        });
+                    }
+                });
+            }
+
+            // Hàm tạo dòng nhóm (in nghiêng, màu xanh)
+            function makeGroupRow(label, totalColCount) {
+                const row = new Array(totalColCount).fill('');
+                row[1] = label;
+                return row;
+            }
+
+            function makeEmployeeRow(index, employee) {
+                const row = new Array(16).fill('');
+                row[0] = index;
+                row[1] = employee.fullName || '';
+                row[2] = employee.employeeCode || '';
+                row[3] = employee.bankNo || '';
+                row[4] = employee.salaryCoefficient || 0;
+                row[5] = employee.allowanceCoefficient || 0;
+                row[6] = employee.totalSalaryCoefficient || 0;
+                row[7] = employee.monthlyRegimeSalary || 0;
+                row[8] = employee.advancePayment || 0;
+                row[9] = employee.regimeSalarySettlement || 0;
+                row[10] = employee.mealAllowance || 0;
+                row[11] = employee.nightShiftOvertime || 0;
+                row[12] = employee.retroactivePayment || 0;
+                row[13] = employee.retroactiveCollection || 0;
+                row[14] = calculateTotalReceived(row); // TỔNG LĨNH
+                row[15] = employee.notes || '';
+                return row;
+            }
+
+            // Hàm tính tổng lĩnh (không cộng Đã tạm ứng)
+            function calculateTotalReceived(row) {
+                const regimeSalarySettlement = parseFloat(row[9]) || 0; // Quyết toán lương chế độ
+                const mealAllowance = parseFloat(row[10]) || 0;
+                const nightShiftOvertime = parseFloat(row[11]) || 0;
+                const retroactivePayment = parseFloat(row[12]) || 0;
+                const retroactiveCollection = parseFloat(row[13]) || 0;
+
+                return regimeSalarySettlement + mealAllowance + nightShiftOvertime + retroactivePayment - retroactiveCollection;
+            }
+
+            // Destroy existing table if exists
+            if (hot) {
+                hot.destroy();
+            }
+
+            hot = new Handsontable(container, {
+                data: tableData,
+                columns: columns,
+                nestedHeaders: nestedHeaders,
+                colHeaders: false,
+                rowHeaders: false,
+                height: 'auto',  // Sử dụng scroll dọc của web
+                width: '100%',
+                stretchH: 'none',
+                autoColumnSize: true,
+                manualColumnFreeze: true,
+                manualColumnMove: true,
+                fixedColumnsLeft: 4, // Cố định 4 cột đầu
+                contextMenu: {
+                    items: {
+                        row_above: {},
+                        row_below: {},
+                        hsep1: '---------',
+                        freeze_column: { name: 'Cố định cột' },
+                        unfreeze_column: { name: 'Bỏ cố định cột' },
+                        hsep2: '---------',
+                        undo: {},
+                        redo: {},
+                        clear_custom: {
+                            name: 'Xóa nội dung các ô đã chọn',
+                            callback() {
+                                hot.emptySelectedCells();
+                            }
+                        }
+                    }
+                },
+                filters: false,
+                dropdownMenu: false,
+                licenseKey: 'non-commercial-and-evaluation',
+
+                // Tô style cho dòng nhóm
+                cells: function (row, col) {
+                    const cellProperties = {};
+                    const dataAtRow = this.instance.getDataAtRow(row);
+
+                    // Nếu dòng là dòng nhóm (chỉ có cột 1 có chữ, cột 0 trống)
+                    if (dataAtRow && dataAtRow[1] && dataAtRow[0] === '') {
+                        cellProperties.readOnly = true;
+                        cellProperties.renderer = function (instance, td, row, col, prop, value, cellProperties) {
+                            td.style.fontStyle = 'italic';
+                            td.style.color = 'blue';
+                            td.style.fontWeight = 'bold';
+                            td.style.background = '#f0f8ff';
+                            td.innerHTML = value || '';
+                        };
+                    }
+
+                    return cellProperties;
+                },
+
+                afterChange: function(changes, source) {
+                    if (source === 'edit' && changes) {
+                        changes.forEach(function([row, prop, oldVal, newVal]) {
+                            // Bỏ qua dòng nhóm (group rows)
+                            const currentRow = hot.getDataAtRow(row);
+                            if (currentRow && currentRow[1] && currentRow[0] === '') {
+                                return; // Đây là dòng nhóm, bỏ qua
+                            }
+
+                            if (oldVal !== newVal) {
+                                // Cập nhật TỔNG LĨNH khi có thay đổi cột 8-13
+                                if (prop >= 8 && prop <= 13) {
+                                    const employee = hot.getDataAtRow(row);
+                                    const newTotal = calculateTotalReceived(employee);
+                                    hot.setDataAtCell(row, 14, newTotal, 'calculation');
+                                }
+
+                                // Tìm userId từ currentData bằng tên
+                                const employeeName = hot.getDataAtRow(row)[1];
+                                const userId = findUserIdByName(employeeName);
+
+                                if (userId) {
+                                    // Cập nhật currentData để đồng bộ
+                                    updateCurrentData(userId, prop, newVal);
+                                }
+                            }
+                        });
+                    }
+                }
+            });
+
+            // ===== HIỂN THỊ CÔNG THỨC TRONG SEARCH-BOX =====
+            // Khởi tạo HandsontableFormula sau khi hot instance đã được tạo
+            if (typeof HandsontableFormula !== 'undefined') {
+                HandsontableFormula.init(hot, 'formulaInput', {
+                    getFormula: function(row, col, value, hotInstance) {
+                        const colHeader = hotInstance.getColHeader(col);
+                        if (col == 6) {
+                            return `= Hệ số lương + Hệ số phụ cấp`;
+                        }
+                        else if (col == 7) {
+                            return `= Tổng hệ số lương × Lương cơ sở`;
+                        }
+                        else if (col == 9) {
+                            return `= Lương chế độ - Lương tạm ứng (ROUND((Lương chế độ - MOD(Lương chế độ,100000))/2 + MOD(Lương chế độ,100000), 0))`;
+                        }
+                        else if (col == 14) {
+                            return `= Quyết toán lương chế độ + Ăn ca + Ca đêm, thêm giờ + Truy lĩnh - Truy thu`;
+                        }
+                        return `= ${value}`;
+                    },
+                    shouldShow: function(row, col, value) {
+                        // Chỉ hiển thị tooltip cho các cột từ cột 6 trở đi (Tổng HS lương và các cột sau)
+                        // Không hiển thị cho các cột: TT, Họ tên, Mã CB, Số TK, Hệ số lương, Hệ số phụ cấp
+                        return col >= 6 && value != null && value !== '';
+                    }
+                });
+            }
+        }
+
+        
+
+        // Hàm tìm userId bằng tên nhân viên
+        function findUserIdByName(employeeName) {
+            for (const dept of currentData.departmentGroups) {
+                if (dept.employees) {
+                    const employee = dept.employees.find(e => e.fullName === employeeName);
+                    if (employee) {
+                        return employee.userId;
+                    }
+                }
+            }
+            return null;
+        }
+
+        // Hàm cập nhật currentData khi có thay đổi
+        function updateCurrentData(userId, columnIndex, newValue) {
+            for (const dept of currentData.departmentGroups) {
+                if (dept.employees) {
+                    const employee = dept.employees.find(e => e.userId === userId);
+                    if (employee) {
+                        // Map column index to field name
+                        const fieldMap = {
+                            8: 'advancePayment',
+                            9: 'regimeSalarySettlement',
+                            10: 'mealAllowance',
+                            11: 'nightShiftOvertime',
+                            12: 'retroactivePayment',
+                            13: 'retroactiveCollection',
+                            15: 'notes'
+                        };
+
+                        const fieldName = fieldMap[columnIndex];
+                        if (fieldName) {
+                            // Xử lý giá trị số
+                            if (fieldName !== 'notes') {
+                                if (newValue === null || newValue === undefined || newValue === '') {
+                                    employee[fieldName] = null;
+                                } else {
+                                    const cleanValue = newValue.toString().replace(/[^\d.-]/g, '');
+                                    const numValue = parseFloat(cleanValue);
+                                    employee[fieldName] = isNaN(numValue) ? null : numValue;
+                                }
+                            } else {
+                                employee[fieldName] = newValue || '';
+                            }
+                            console.log(`Updated currentData: userId=${userId}, ${fieldName}=${employee[fieldName]}`);
+
+                            // Cập nhật totalReceived trong currentData
+                            employee.totalReceived = calculateEmployeeTotalReceived(employee);
+                        }
+                        break;
+                    }
+                }
+            }
+        }
+
+        // Hàm tính tổng lĩnh cho một employee
+        function calculateEmployeeTotalReceived(employee) {
+            const regimeSalarySettlement = parseFloat(employee.regimeSalarySettlement) || 0;
+            const mealAllowance = parseFloat(employee.mealAllowance) || 0;
+            const nightShiftOvertime = parseFloat(employee.nightShiftOvertime) || 0;
+            const retroactivePayment = parseFloat(employee.retroactivePayment) || 0;
+            const retroactiveCollection = parseFloat(employee.retroactiveCollection) || 0;
+
+            return regimeSalarySettlement + mealAllowance + nightShiftOvertime + retroactivePayment - retroactiveCollection;
+        }
+
+        // Hàm cập nhật dữ liệu
+        function updateSalarySettlementData(userId, month, year, fieldType, value) {
+            const requestData = {
+                userId: userId,
+                month: month,
+                year: year,
+                fieldType: fieldType,
+                value: parseFloat(value) || 0
+            };
+
+            $.ajax({
+                url: '/SalarySettlement/UpdateSalarySettlement',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(requestData),
+                success: function(response) {
+                    if (response.success) {
+                        showUpdateNotification('success', 'Đã cập nhật quyết toán lương!');
+                    } else {
+                        showUpdateNotification('error', response.message);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    showUpdateNotification('error', 'Lỗi kết nối: ' + error);
+                }
+            });
+        }
+
+        // Hàm cập nhật tất cả các trường
+        function updateAllSalarySettlementFields(allRowData) {
+            $.ajax({
+                url: '/SalarySettlement/UpdateAllSalarySettlementFields',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(allRowData),
+                success: function(response) {
+                    if (response.success) {
+                        showUpdateNotification('success', 'Đã cập nhật tất cả dữ liệu quyết toán lương!');
+                    } else {
+                        showUpdateNotification('error', response.message);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    showUpdateNotification('error', 'Lỗi kết nối: ' + error);
+                }
+            });
+        }
+
+        // Hàm hiển thị thông báo cập nhật
+        function showUpdateNotification(type, message) {
+            const alertClass = type === 'success' ? 'alert-success' : 'alert-danger';
+            const icon = type === 'success' ? 'fa-check-circle' : 'fa-exclamation-triangle';
+
+            var html = '<div class="alert ' + alertClass + ' alert-dismissible fade show update-notification" role="alert" style="position: fixed; top: 20px; right: 20px; z-index: 99999; min-width: 300px;">'
+                + '<i class="fa ' + icon + '"></i> ' + message
+                + '<button type="button" class="close" data-dismiss="alert">'
+                + '<span>&times;</span>'
+                + '</button>'
+                + '</div>';
+            const notification = $(html);
+
+            $('body').append(notification);
+
+            // Tự động ẩn sau 3 giây
+            setTimeout(() => {
+                notification.alert('close');
+            }, 3000);
+        }
+
+        // Hàm tính chiều cao phù hợp
+        function calculateHotHeight() {
+            const windowHeight = window.innerHeight;
+            const offset = 300; // Trừ phần header, filter, padding, navbar, ...
+            const calculated = windowHeight - offset;
+            return Math.max(calculated, 320); // Tối thiểu 320px
+        }
+
+        // Event listeners cho filter changes (tự động tải khi thay đổi)
+        $('#selectMonth').on('change', function () { loadSalarySettlementData(); });
+        $('#selectYear').on('change', function () { loadSalarySettlementData(); });
+        $('#selectDepartment').on('change', function () { loadSalarySettlementData(); });
+        $('#selectObjectType').on('change', function () { loadSalarySettlementData(); });
+
+
+
+        // Export Excel
+        document.getElementById('btnExportExcel').addEventListener('click', function () {
+            const year = parseInt($('#selectYear').val()) || @ViewBag.DefaultYear;
+            const month = parseInt($('#selectMonth').val()) || 1;
+            const department = parseInt($('#selectDepartment').val()) || 0;
+            const objectType = parseInt($('#selectObjectType').val()) || 0;
+            
+            const url = `/SalarySettlement/ExportSalarySettlement?nam=${year}&thang=${month}&phongBan=${department}&doiTuong=${objectType}`;
+            window.location.href = url;
+        });
+
+        // Hàm cập nhật tất cả dữ liệu vào TblSalarySettlement
+        window.updateAllSalarySettlementData = function() {
+            if (!currentData || !currentData.departmentGroups || currentData.departmentGroups.length === 0) {
+                showUpdateNotification('warning', 'Không có dữ liệu để cập nhật!');
+                return;
+            }
+
+            // Confirm trước khi cập nhật
+            if (!confirm('Bạn có chắc chắn muốn cập nhật tất cả dữ liệu vào hệ thống không?')) {
+                return;
+            }
+
+            const year = parseInt($('#selectYear').val());
+            const month = parseInt($('#selectMonth').val());
+
+            // Disable nút để tránh click nhiều lần
+            $('#btnUpdateAllData').prop('disabled', true).html('<i class="fa fa-spinner fa-spin"></i> Đang xử lý...');
+
+            // 🔴 QUAN TRỌNG: Lấy dữ liệu từ Handsontable, KHÔNG phải từ currentData
+            const allEmployees = [];
+
+            if (!hot) {
+                showUpdateNotification('error', 'Không tìm thấy bảng dữ liệu!');
+                $('#btnUpdateAllData').prop('disabled', false).html('<i class="fa fa-save"></i> Cập nhật dữ liệu vào hệ thống');
+                return;
+            }
+
+            const tableData = hot.getData();
+
+            tableData.forEach((row, rowIndex) => {
+                // Bỏ qua dòng nhóm (group rows) - dòng có cột 0 rỗng
+                if (row[0] === '' && row[1] !== '') {
+                    return; // Đây là dòng nhóm phòng ban, bỏ qua
+                }
+
+                // Bỏ qua dòng trống
+                if (!row[1] || row[1] === '') {
+                    return;
+                }
+
+                // Tìm thông tin employee từ currentData bằng tên
+                const employeeName = row[1];
+                let employeeInfo = null;
+
+                // Tìm trong currentData
+                for (const dept of currentData.departmentGroups) {
+                    if (dept.employees) {
+                        employeeInfo = dept.employees.find(e => e.fullName === employeeName);
+                        if (employeeInfo) break;
+                    }
+                }
+
+                if (!employeeInfo) {
+                    console.warn(`Không tìm thấy thông tin nhân viên: ${employeeName}`);
+                    return;
+                }
+
+                // 🔥 Xử lý giá trị từ Handsontable
+                const parseHandsontableValue = (value) => {
+                    if (value === null || value === undefined || value === '') {
+                        return null;
+                    }
+                    // Handsontable có thể trả về string với dấu phẩy (ví dụ: "1,000")
+                    const cleanValue = value.toString().replace(/[^\d.-]/g, '');
+                    const numValue = parseFloat(cleanValue);
+                    return isNaN(numValue) ? null : numValue;
+                };
+
+                // Cột trong Handsontable:
+                // [0]STT, [1]Họ tên, [2]Mã CB, [3]Số TK, [4]HSL, [5]HSPC, [6]Tổng HSL, [7]Lương chế độ
+                // [8]Đã tạm ứng, [9]Quyết toán lương chế độ, [10]Ăn ca, [11]Ca đêm thêm giờ
+                // [12]Truy lĩnh, [13]Truy thu, [14]TỔNG LĨNH, [15]Ghi chú
+
+                const employeeData = {
+                    UserId: employeeInfo.userId,
+                    Month: month,
+                    Year: year,
+                    AdvancePayment: parseHandsontableValue(row[8]), // Cột 8: Đã tạm ứng
+                    RegimeSalarySettlement: parseHandsontableValue(row[9]), // Cột 9: Quyết toán lương chế độ
+                    MealAllowance: parseHandsontableValue(row[10]), // Cột 10: Ăn ca
+                    NightShiftOvertime: parseHandsontableValue(row[11]), // Cột 11: Ca đêm, thêm giờ
+                    RetroactivePayment: parseHandsontableValue(row[12]), // Cột 12: Truy lĩnh
+                    RetroactiveCollection: parseHandsontableValue(row[13]), // Cột 13: Truy thu
+                    TotalReceived: parseHandsontableValue(row[14]), // Cột 14: TỔNG LĨNH
+                    Notes: row[15] || '' // Cột 15: Ghi chú
+                };
+
+                console.log(`Preparing data for ${employeeName}:`, employeeData);
+                allEmployees.push(employeeData);
+            });
+
+            console.log('Sending data to server:', allEmployees);
+            console.log('Total employees:', allEmployees.length);
+
+            if (allEmployees.length === 0) {
+                showUpdateNotification('warning', 'Không có dữ liệu để cập nhật!');
+                $('#btnUpdateAllData').prop('disabled', false).html('<i class="fa fa-save"></i> Cập nhật dữ liệu vào hệ thống');
+                return;
+            }
+
+            // Gửi dữ liệu lên server
+            $.ajax({
+                url: '/SalarySettlement/SaveAllSalarySettlement',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({ Employees: allEmployees }),
+                success: function(response) {
+                    console.log('Response:', response);
+                    if (response.success) {
+                        showUpdateNotification('success', response.message || 'Cập nhật tất cả dữ liệu thành công!');
+                        // Reload data để hiển thị giá trị đã lưu
+                        setTimeout(() => {
+                            loadSalarySettlementData();
+                        }, 1000);
+                    } else {
+                        showUpdateNotification('error', response.message || 'Có lỗi xảy ra khi cập nhật dữ liệu!');
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error:', xhr.responseText);
+                    console.error('Status:', status);
+                    console.error('Error:', error);
+                    showUpdateNotification('error', 'Lỗi kết nối: ' + error + ' - ' + xhr.responseText);
+                },
+                complete: function() {
+                    console.log('Request completed');
+                    // Enable lại nút sau khi hoàn tất
+                    $('#btnUpdateAllData').prop('disabled', false).html('<i class="fa fa-save"></i> Cập nhật dữ liệu vào hệ thống');
+                }
+            });
+        };
+
+        // Load data khi page ready
+        loadSalarySettlementData();
+
+    });
+</script>
+

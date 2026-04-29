@@ -1,0 +1,102 @@
+﻿@model PMS.Models.TblUser
+
+@{
+    ViewData["Title"] = "Cập nhật thông tin người dùng";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@using (Html.BeginForm("Index", "UpdateAccount", FormMethod.Post))
+{
+    @Html.AntiForgeryToken()
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title">Thông tin chi tiết</h4>
+
+                    <div class="row">
+                        <div class="col-lg-3">
+                            <div class="form-group">
+                                <div class="boldText">Tên người dùng:<code>*</code></div>
+                                @Html.EditorFor(model => model.Name, new { htmlAttributes = new { @class = "form-control", placeholder = "Nhập tên người dùng" } })
+                                @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                        <div class="col-lg-3">
+                            <div class="form-group">
+                                <div class="boldText">Mã nhân viên:<code>*</code></div>
+                                @Html.EditorFor(model => model.UserCode, new { htmlAttributes = new { @class = "form-control", placeholder = "Nhập mã nhân viên" } })
+                                @Html.ValidationMessageFor(model => model.UserCode, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                        <div class="col-lg-3">
+                            <div class="form-group">
+                                <div class="boldText">Ngày sinh:<code>*</code></div>
+                                @Html.TextBoxFor(model => model.Dob, "{0:yyyy-MM-dd}", new { @class = "form-control", type = "date" })
+                                @Html.ValidationMessageFor(model => model.Dob, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="row">
+                        <div class="col-lg-3">
+                            <div class="form-group">
+                                <div class="boldText">Ngày tuyển dụng:<code>*</code></div>
+                                @Html.TextBoxFor(model => model.EmploymentDate, "{0:yyyy-MM-dd}", new { @class = "form-control", type = "date" })
+                                @Html.ValidationMessageFor(model => model.EmploymentDate, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                        <div class="col-lg-3">
+                            <div class="form-group">
+                                <div class="boldText">Hệ số lương:<code>*</code></div>
+                                @Html.EditorFor(model => model.SalaryConfficient, new { htmlAttributes = new { @class = "form-control", placeholder = "Nhập hệ số lương" } })
+                                @Html.ValidationMessageFor(model => model.SalaryConfficient, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                        <div class="col-lg-3">
+                            <div class="form-group">
+                                <div class="boldText">Số tài khoản:<code>*</code></div>
+                                @Html.EditorFor(model => model.BankNo, new { htmlAttributes = new { @class = "form-control", placeholder = "Nhập số tài khoản ngân hàng" } })
+                                @Html.ValidationMessageFor(model => model.BankNo, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-lg-3">
+                            <div class="form-group">
+                                <div class="boldText">Tên tài khoản:<code>*</code></div>
+                                @Html.EditorFor(model => model.AccountName, new { htmlAttributes = new { @class = "form-control", placeholder = "Nhập tên tài khoản" } })
+                                @Html.ValidationMessageFor(model => model.AccountName, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                        <div class="col-lg-3">
+                            <div class="form-group">
+                                <div class="boldText">Mật khẩu:<code>*</code></div>
+                                @Html.TextBoxFor(model => model.Password, new { @class = "form-control", placeholder = "Nhập mật khẩu", type = "password", value = "123" })
+                                @Html.ValidationMessageFor(model => model.Password, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                        <div class="col-lg-3">
+                            <div class="form-group">
+                                <div class="boldText">Địa chỉ email:<code>*</code></div>
+                                @Html.EditorFor(model => model.EmailAddress, new { htmlAttributes = new { @class = "form-control", placeholder = "Nhập địa chỉ email" } })
+                                @Html.ValidationMessageFor(model => model.EmailAddress, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-9">
+                            <div class="form-group">
+                                <div class="boldText">Ghi chú:</div>
+                                @Html.TextAreaFor(model => model.Description, new { @class = "form-control", rows = 3, cols = 50, placeholder = "Nhập ghi chú..." })
+                            </div>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-success waves-effect waves-light m-r-10">Ghi dữ liệu</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}

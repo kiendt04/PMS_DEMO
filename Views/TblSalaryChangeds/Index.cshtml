@@ -1,0 +1,355 @@
+﻿@model List<PMS.ViewModels.UserSalaryInfo>
+
+@{
+    ViewData["Title"] = "Bảng hệ số lương";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@* đổi phiên bản của handsontable *@
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/handsontable@14.3.0/dist/handsontable.full.min.css">
+<script src="https://cdn.jsdelivr.net/npm/handsontable@14.3.0/dist/handsontable.full.min.js"></script>
+<script src="~/js/handsontable-formula.js?v=2.1"></script>
+<style>
+    #hotTable {
+        width: 100%;
+        max-width: 100%;
+        overflow: visible; /* Sử dụng scroll dọc của web */
+    }
+
+    /* Tăng font-size và màu chữ */
+    .handsontable td {
+        color: #333333 !important;
+        font-size: 14px !important;
+        white-space: nowrap !important;
+    }
+    .handsontable span.colHeader {
+        color: #333333 !important;
+        font-weight: 700 !important;
+    }
+    /* Ẩn scrollbar dọc của Handsontable, giữ scrollbar ngang ở dưới */
+    #hotTable .wtHolder {
+        overflow-x: auto !important;
+        overflow-y: visible !important;
+        height: auto !important;
+    }
+    #hotTable .ht_master .wtHolder {
+        overflow-x: auto !important;
+        overflow-y: visible !important;
+    }
+    /* Ẩn scrollbar của header clone - chỉ giữ 1 scroll ở dưới */
+    #hotTable .ht_clone_top .wtHolder {
+        overflow: hidden !important;
+    }
+
+    /* style riêng cho dòng readonly */
+    .readonly-cell {
+        background-color: #f0f0f0 !important;
+        font-weight: bold !important;
+        text-align: center !important;
+    }
+
+    .highlight-row {
+        background-color: #ffe8a1 !important; /* màu vàng nhạt */
+        font-weight: bold;
+    }
+
+</style>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body" style="padding-top : 10px !important">
+                <div class="row mt-3 mb-3 align-items-center">
+                    <div class="col-auto d-flex align-items-center" style="gap: 0.5rem;">
+                        <label class="mb-0">Chọn thời gian:</label>
+                        <select id="cboYear" name="cboYear" class="form-control" onchange="ChangeData()" style="width: 100px;">
+                            @for (int i = DateTime.Now.Year + 1; i >= 2024; i--)
+                            {
+                                <option value="@i" selected="@(ViewBag.SelectedYear == i ? "selected" : null)">@i</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="col-auto ms-auto">
+                        <button id="btnExportExcel" class="btn btn-primary" title="Xuất dữ liệu">
+                            <i class="fa fa-download"></i> Xuất Excel
+                        </button>
+                    </div>
+                </div>
+
+                <div id="hotTable"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const container = document.getElementById('hotTable');
+
+    // Đảm bảo mỗi row có đúng 43 giá trị (fix lỗi lệch dòng)
+    const data = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model))
+        .map(item => [
+            item.Flag,
+            item.Id,
+            item.STT,                     
+            item.Name,                 
+            item.PositionName,       
+            item.UserCode,
+            item.BankNo,
+            item.HS1_1,
+            item.HS2_1,
+            item.HS3_1,
+            item.HS1_2,
+            item.HS2_2,
+            item.HS3_2,
+            item.HS1_3,
+            item.HS2_3,
+            item.HS3_3,
+            item.HS1_4,
+            item.HS2_4,
+            item.HS3_4,
+            item.HS1_5,
+            item.HS2_5,
+            item.HS3_5,
+            item.HS1_6,
+            item.HS2_6,
+            item.HS3_6,
+            item.HS1_7,
+            item.HS2_7,
+            item.HS3_7,
+            item.HS1_8,
+            item.HS2_8,
+            item.HS3_8,
+            item.HS1_9,
+            item.HS2_9,
+            item.HS3_9,
+            item.HS1_10,
+            item.HS2_10,
+            item.HS3_10,
+            item.HS1_11,
+            item.HS2_11,
+            item.HS3_11,
+            item.HS1_12,
+            item.HS2_12,
+            item.HS3_12
+        ]);
+
+    const nullRenderer = function (instance, td, row, col, prop, value, cellProperties) {
+        // Nếu value = 0, null, undefined thì hiển thị trống
+        Handsontable.renderers.TextRenderer.apply(this, arguments);
+        if (value === 0 || value === "0" || value === null || value === undefined) {
+            td.textContent = ""; // xoá nội dung, để trống
+        }
+    };
+
+    const hot = new Handsontable(container, {
+        data: data,
+        nestedHeaders: [
+            ['Flag','Id','Số TT', 'Họ và tên', 'Chức danh', 'Mã nhân viên', 'Số Tài khoản', 
+                { label: 'T1', colspan: 3 },
+                { label: 'T2', colspan: 3 },
+                { label: 'T3', colspan: 3 },
+                { label: 'T4', colspan: 3 },
+                { label: 'T5', colspan: 3 },
+                { label: 'T6', colspan: 3 },
+                { label: 'T7', colspan: 3 },
+                { label: 'T8', colspan: 3 },
+                { label: 'T9', colspan: 3 },
+                { label: 'T10', colspan: 3 },
+                { label: 'T11', colspan: 3 },
+                { label: 'T12', colspan: 3 }
+
+            ],
+            ['', '', '', '', '', '', '',
+                'HS<sub>cbcv</sub>', 'HS<sub>cv+tn</sub>', 'HS<sub>u</sub>',
+                'HS<sub>cbcv</sub>', 'HS<sub>cv+tn</sub>', 'HS<sub>u</sub>',
+                'HS<sub>cbcv</sub>', 'HS<sub>cv+tn</sub>', 'HS<sub>u</sub>',
+                'HS<sub>cbcv</sub>', 'HS<sub>cv+tn</sub>', 'HS<sub>u</sub>',
+                'HS<sub>cbcv</sub>', 'HS<sub>cv+tn</sub>', 'HS<sub>u</sub>',
+                'HS<sub>cbcv</sub>', 'HS<sub>cv+tn</sub>', 'HS<sub>u</sub>',
+                'HS<sub>cbcv</sub>', 'HS<sub>cv+tn</sub>', 'HS<sub>u</sub>',
+                'HS<sub>cbcv</sub>', 'HS<sub>cv+tn</sub>', 'HS<sub>u</sub>',
+                'HS<sub>cbcv</sub>', 'HS<sub>cv+tn</sub>', 'HS<sub>u</sub>',
+                'HS<sub>cbcv</sub>', 'HS<sub>cv+tn</sub>', 'HS<sub>u</sub>',
+                'HS<sub>cbcv</sub>', 'HS<sub>cv+tn</sub>', 'HS<sub>u</sub>',
+                'HS<sub>cbcv</sub>', 'HS<sub>cv+tn</sub>', 'HS<sub>u</sub>'
+            ]
+        ],
+        
+        // Tự động điều chỉnh độ rộng cột theo nội dung
+        autoColumnSize: {
+            samplingRatio: 23,  // Lấy mẫu 23 rows để tính toán (tăng performance)
+            allowSampleDuplicates: false,
+            syncLimit: 300      // Giới hạn số cột được sync
+        },
+        rowHeaders: false,
+        colHeaders: false,
+        // stretchH: 'all', // Tắt để cho phép scroll ngang
+        manualColumnResize: true,  // Cho phép user resize thủ công
+        height: 'auto', // Tự động điều chỉnh theo container CSS
+        //height: window.innerHeight * 0.7, // 70% chiều cao màn hình
+        fixedColumnsLeft: 7,
+
+        // Performance optimization
+        renderAllRows: true, // Bật để tránh lỗi viewport khi dùng height: 'auto'
+
+        hiddenColumns: {
+            columns: [0, 1], // ẩn cột Flag và Id
+            indicators: false
+        },
+
+        cells: function (row, col) {
+            const cellProperties = {};
+            const rowData = this.instance.getSourceDataAtRow(row); // lấy toàn bộ dữ liệu 1 hàng
+            cellProperties.readOnly = true;
+            // Căn giữa các cột 1,2,3,5
+            if (col === 2 || col === 6 || col === 4 || col === 5) {
+                
+                cellProperties.className = 'htCenter';
+            }
+
+            if (col >= 7) { // 7 trở đi là các cột hệ số
+                cellProperties.readOnly = true;
+                cellProperties.renderer = nullRenderer;
+                cellProperties.className = 'htRight';
+            }
+            // Bôi vàng những dòng dữ liệu Người lao động, tên phòng ban
+            if (rowData && rowData[0] === false) {
+                cellProperties.className = (cellProperties.className || '') + ' highlight-row';
+                cellProperties.readOnly = true;
+            }
+
+            return cellProperties;
+        },
+
+        licenseKey: 'non-commercial-and-evaluation',
+        afterChange: function (changes, source) {
+            if (source === 'edit') {
+                changes.forEach(([row, col, oldValue, newValue]) => {
+                    const rowData = this.getSourceDataAtRow(row);
+                    const rowId = rowData[1];
+                    const year = document.getElementById("cboYear").value;
+
+                    // Lấy tháng
+                    const headers = getNestedHeader(col, this.getSettings().nestedHeaders);
+                    const monthStr = headers[0].replace("T", "");
+                    const month = parseInt(monthStr);
+
+                    // Xác định 3 cột HS của tháng
+                    // Xác định offset (cột bắt đầu của tháng 1)
+                    const offset = 7;
+
+                    // Tính index của tháng dựa trên vị trí cột
+                    const monthIndex = Math.floor((col - offset) / 3) + 1;
+
+                    // Tính colBase chuẩn cho tháng đó
+                    const colBase = offset + (monthIndex - 1) * 3;
+
+                    console.log(colBase);
+
+                    // === Old values: dùng oldValue cho đúng cột đang sửa ===
+                    const oldValues = {
+                        HS_cbcv: col === colBase ? oldValue : this.getSourceDataAtRow(row)[colBase],
+                        HS_cvtn: col === colBase + 1 ? oldValue : this.getSourceDataAtRow(row)[colBase + 1],
+                        HS_u: col === colBase + 2 ? oldValue : this.getSourceDataAtRow(row)[colBase + 2]
+                    };
+
+                    // === New values: lấy từ bảng sau khi update ===
+                    const newValues = {
+                        HS_cbcv: this.getDataAtCell(row, colBase),
+                        HS_cvtn: this.getDataAtCell(row, colBase + 1),
+                        HS_u: this.getDataAtCell(row, colBase + 2)
+                    };
+
+                    console.log("RowId:", rowId, "Year:", year, "Month:", month,
+                        "Old:", oldValues, "New:", newValues);
+
+                    $.ajax({
+                        url: '@Url.Action("SaveCell", "TblSalaryChangeds")',
+                        type: "POST",
+                        data: {
+                            RowId: rowId,
+                            Year: year,
+                            Month: month,
+                            OldValues: oldValues,
+                            NewValues: newValues
+                        },
+                        success: function (res) {
+                            if (!res.success) {
+                                alert("Lỗi lưu: " + res.message);
+                            }
+                        },
+                        error: function (err) {
+                            console.error("Ajax error", err);
+                        }
+                    });
+                });
+            }
+        }
+    });
+
+    function getNestedHeader(col, nestedHeaders) {
+        const headers = [];
+        for (let row = 0; row < nestedHeaders.length; row++) {
+            const rowHeaders = nestedHeaders[row];
+            let colIndex = 0;
+            for (let i = 0; i < rowHeaders.length; i++) {
+                const header = rowHeaders[i];
+                if (typeof header === "object") {
+                    const span = header.colspan || 1;
+                    if (col >= colIndex && col < colIndex + span) {
+                        headers.push(header.label);
+                    }
+                    colIndex += span;
+                } else {
+                    if (col === colIndex) {
+                        headers.push(header);
+                    }
+                    colIndex++;
+                }
+            }
+        }
+        return headers;
+    }
+
+    function ChangeData() {
+        var selectedYear = document.getElementById("cboYear").value;
+        // Gọi lại Index với query string ?year=xxx
+        window.location.href = '@Url.Action("Index", "TblSalaryChangeds")' + '?year=' + selectedYear;
+    }
+
+    // ===== HIỂN THỊ CÔNG THỨC TRONG SEARCH-BOX (Sử dụng helper) =====
+    HandsontableFormula.init(hot, 'formulaInput', {
+        getFormula: function(row, col, value, hotInstance) {
+            const rowData = hotInstance.getSourceDataAtRow(row);
+            const offset = 7; // Cột bắt đầu của tháng 1
+            const monthIndex = Math.floor((col - offset) / 3) + 1;
+            const colType = (col - offset) % 3; // 0 = HS_cbcv, 1 = HS_cvtn, 2 = HS_u
+            
+            if (colType === 0) {
+                return `= HS_cbcv (Tháng ${monthIndex})`;
+            } else if (colType === 1) {
+                return `= HS_cv+tn (Tháng ${monthIndex}) = Hệ số chức vụ + Hệ số trách nhiệm`;
+            } else if (colType === 2) {
+                return `= HS_cbcv + HS_cv+tn (Tháng ${monthIndex})`;
+            }
+            return '';
+        },
+        
+        shouldShow: function(row, col, value, hotInstance) {
+            const rowData = hotInstance.getSourceDataAtRow(row);
+            // Không hiển thị cho dòng header (Flag = false)
+            if (rowData && rowData[0] === false) return false;
+            // Chỉ hiển thị cho cột hệ số (>= 7)
+            return col >= 7;
+        }
+    });
+
+    // Export Excel
+    document.getElementById('btnExportExcel').addEventListener('click', function () {
+        const year = document.getElementById("cboYear").value;
+        const url = `/TblSalaryChangeds/ExportSalaryChanged?year=${year}`;
+        window.location.href = url;
+    });
+
+</script>
+<style>
+</style>

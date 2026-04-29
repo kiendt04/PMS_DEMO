@@ -1,0 +1,275 @@
+﻿@{
+    ViewData["Title"] = "QUẢN LÝ TẠM ỨNG LƯƠNG";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+
+                <!-- Bộ lọc -->
+                <div class="row align-items-center mt-2 mb-2">
+                    <div class="col-auto d-flex align-items-center mr-3 mb-2">
+                        <label class="fw-bold me-3 mb-0" style="min-width: 90px;">Chọn tháng:</label>
+                        <select class="form-control form-select-sm" id="selectMonth" style="width:auto; min-width:120px;">
+                            <option value="" class="text-center">Tất cả</option>
+                            @for (int i = 1; i <= 12; i++)
+                            {
+                                if (i == DateTime.Now.Month)
+                                {
+                                    <option value="@i" selected class="text-center">@i</option>
+                                }
+                                else
+                                {
+                                    <option value="@i" class="text-center">@i</option>
+                                }
+                            }
+                        </select>
+                    </div>
+                    <div class="col-auto d-flex align-items-center mr-3 mb-2">
+                        <label class="fw-bold me-3 mb-0" style="min-width: 60px;">Chọn năm:</label>
+                        <select class="form-control form-select-sm" id="selectYear" style="width:100px;">
+                            <option value="" class="text-center">Tất cả</option>
+                            @for (int i = DateTime.Now.Year - 5; i <= DateTime.Now.Year + 1; i++)
+                            {
+                                if (i == DateTime.Now.Year)
+                                {
+                                    <option value="@i" selected class="text-center">@i</option>
+                                }
+                                else
+                                {
+                                    <option value="@i" class="text-center">@i</option>
+                                }
+                            }
+                        </select>
+                    </div>
+                    <div class="col-auto d-flex align-items-center mr-3 mb-2">
+                        <label class="fw-bold me-3 mb-0" style="min-width: 120px;">Chọn đối tượng: </label>
+                        <div class="d-flex" style="gap: 1rem;">
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="loaiDoiTuong" value="NQL" checked id="doiTuongNQL">
+                                <label class="form-check-label" for="doiTuongNQL">NQL</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="loaiDoiTuong" value="NLD" id="doiTuongNLD">
+                                <label class="form-check-label" for="doiTuongNLD">NLĐ</label>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Nút bấm -->
+                    <div class="ms-auto">
+                        <div class="d-flex" style="gap: 0.75rem;">
+                              <button id="btnCreateNewAdvanceSalaryTbl" class="btn btn-info btn-sm px-4">Tạo bảng lương mới</button>
+
+                            <button id="btnRecalcAdvanceSalary" class="btn btn-warning btn-sm px-4 text-white" title="Cập nhật lại lương chế độ, bhxh...">
+                                <i class="fa fa-refresh">Cập nhật dữ liệu</i>
+                            </button>
+                            <button id="btnExportExcel" class="btn btn-primary btn-sm px-4" title="Xuất dữ liệu">
+                                <i class="fa fa-download">Xuất Excel</i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Kết quả load AJAX -->
+                <div class="table-responsive vh-100" id="bangKetQua">
+                    @{
+                        var defaultData = ViewBag.DefaultData as List<object[]> ?? new List<object[]>();
+                    }
+                    @Html.Partial("_ManagerTable", defaultData) <!-- Load partial view với dữ liệu mặc định -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function () {
+
+            $('#btnCreateNewAdvanceSalaryTbl').click(function () {
+                TaoBangChoThangMoi();
+            });
+
+            $('#btnRecalcAdvanceSalary').click(function () {
+                CapNhatLaiDuLieu();
+            });
+
+            function TaoBangChoThangMoi()
+            {
+                var thang = parseInt($('#selectMonth').val());
+                var nam = parseInt($('#selectYear').val());
+
+                $.ajax({
+                    url: '/AdvanceSalary/CreateNewMonthAdvanceSalaryData',
+                    type: 'POST',
+                    contentType: 'application/json; charset=utf-8',
+                    data: JSON.stringify({
+                        Month: thang,
+                        Year: nam
+                    }),
+                    success: function (data) {
+                        // Kiểm tra response từ server
+                        if (data && (data.Success === true || data.success === true)) {
+                            showUpdateNotification('success', data.Message || data.message || 'Tạo mới thành công');
+                            loadBangTamUng();
+                        } else {
+                            // Nếu Success = false, hiển thị thông báo lỗi
+                            var errorMsg = data?.Message || data?.message || 'Tạo mới thất bại';
+                            showUpdateNotification('false', errorMsg);
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        var errorMessage = 'Tạo mới thất bại: ' + error;
+                        // Nếu có response từ server, lấy message từ đó
+                        if (xhr.responseText) {
+                            try {
+                                var response = JSON.parse(xhr.responseText);
+                                errorMessage = response.Message || response.message || errorMessage;
+                            } catch (e) {
+                                // Nếu không parse được, dùng message mặc định
+                            }
+                        }
+                        showUpdateNotification('false', errorMessage);
+                    }
+                });
+            }
+
+            function CapNhatLaiDuLieu() {
+                var thang = parseInt($('#selectMonth').val());
+                var nam = parseInt($('#selectYear').val());
+
+                if (!thang || !nam) {
+                    showUpdateNotification('false', 'Vui lòng chọn tháng và năm.');
+                    return;
+                }
+
+                $.ajax({
+                    url: '/AdvanceSalary/RecalculateAdvanceSalaryMonth',
+                    type: 'POST',
+                    contentType: 'application/json; charset=utf-8',
+                    data: JSON.stringify({
+                        Month: thang,
+                        Year: nam
+                    }),
+                    success: function (data) {
+                        if (data && (data.Success === true || data.success === true)) {
+                            showUpdateNotification('success', data.Message || data.message || 'Cập nhật thành công');
+                            loadBangTamUng();
+                        } else {
+                            var errorMsg = data?.Message || data?.message || 'Cập nhật thất bại';
+                            showUpdateNotification('false', errorMsg);
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        var errorMessage = 'Cập nhật thất bại: ' + error;
+                        if (xhr.responseText) {
+                            try {
+                                var response = JSON.parse(xhr.responseText);
+                                errorMessage = response.Message || response.message || errorMessage;
+                            } catch (e) { }
+                        }
+                        showUpdateNotification('false', errorMessage);
+                    }
+                });
+            }
+
+            function loadBangTamUng() {
+                var loai = $('input[name="loaiDoiTuong"]:checked').val();
+                var thang = $('#selectMonth').val();
+                var nam = $('#selectYear').val();
+                
+                // Xử lý giá trị tháng/năm
+                if (thang === "" || thang === null) {
+                    thang = @DateTime.Now.Month;
+                } else {
+                    thang = parseInt(thang);
+                }
+                
+                if (nam === "" || nam === null) {
+                    nam = @DateTime.Now.Year;
+                } else {
+                    nam = parseInt(nam);
+                }
+                
+                $('#bangKetQua').html('<div class="text-center py-4">Đang tải dữ liệu...</div>');
+
+                $.ajax({
+                    url: '/AdvanceSalary/RenderLoaiDoiTuong',
+                    type: 'GET',
+                    data: {
+                        loai: loai,
+                        thang: thang,
+                        nam: nam
+                    },
+                    success: function (data) {
+                        $('#bangKetQua').html(data);
+                    },
+                    error: function (xhr, status, error) {
+                        console.error('AJAX Error:', error);
+                        showUpdateNotification('false', 'Lỗi khi tải dữ liệu: ' + error);
+                    }
+                });
+            }
+                    
+            $('input[name="loaiDoiTuong"]').change(function () {  
+                loadBangTamUng();
+            });
+
+            $('#selectMonth, #selectYear').change(function () {
+                loadBangTamUng();
+            });
+
+            // Export Excel click handler
+            $('#btnExportExcel').on('click', function() {
+                const loai = $('input[name="loaiDoiTuong"]:checked').val() || 'NQL';
+                const thang = parseInt($('#selectMonth').val()) || @DateTime.Now.Month;
+                const nam = parseInt($('#selectYear').val()) || @DateTime.Now.Year;
+                
+                const url = `/AdvanceSalary/ExportAdvanceSalary?loai=${loai}&thang=${thang}&nam=${nam}`;
+                window.location.href = url;
+            });
+
+            // Hàm hiển thị thông báo cập nhật
+            function showUpdateNotification(type, message) {
+                try {
+                    let alertClass, icon;
+                    if (type === 'success') {   
+                        alertClass = 'alert-success';
+                        icon = 'fa-check-circle';
+                    } else if (type === 'info') {
+                        alertClass = 'alert-info';
+                        icon = 'fa-info-circle';
+                    } else {
+                        alertClass = 'alert-danger';
+                        icon = 'fa-exclamation-triangle';
+                    }
+
+                    const notification = $(`
+                        <div class="alert ${alertClass} alert-dismissible fade show update-notification" role="alert" style="position: fixed; top: 20px; right: 20px; z-index: 99999; min-width: 300px; max-width: 400px;">
+                            <i class="fa ${icon}"></i> ${message}
+                            <button type="button" class="close" data-dismiss="alert">
+                                <span>&times;</span>
+                            </button>
+                        </div>
+                    `);
+
+                    $('body').append(notification);
+
+                    setTimeout(() => {
+                        try {
+                            notification.alert('close');
+                        } catch (e) {
+                            notification.remove();
+                        }
+                    }, 3000);
+                } catch (error) {
+                    alert(message);
+                }
+            }              
+        });
+    </script>
+}
+

@@ -1,0 +1,178 @@
+@model PMS.Models.TblTransfer
+
+@{
+    ViewData["Title"] = "Chỉnh sửa điều chuyển";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="~/css/select2-custom.css" />
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <form asp-action="Edit" method="post">
+                        <input type="hidden" name="id" value="@Model.Id" />
+                        <input type="hidden" name="userId" value="@Model.Id" />
+
+                        <div class="row">
+                            <div class="col-lg-6 col-md-6 col-sm-12">
+                                <div class="form-group mb-3">
+                                    <div class="boldText">Nhân viên:</div>
+                                    <input class="form-control" value="@Model.EmployeeName" readonly />
+                                </div>
+                            </div>
+                            <div class="col-lg-6 col-md-6 col-sm-12">
+                                <div class="form-group mb-3">
+                                    <div class="boldText">Mã nhân viên:</div>
+                                    <input class="form-control" value="@Model.EmployeeCode" readonly />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-lg-6 col-md-6 col-sm-12">
+                                <div class="form-group mb-3">
+                                    <div class="boldText">Chọn phòng ban:<code>*</code></div>
+                                    <select class="form-control" name="departmentId" id="departmentId">
+                                        @foreach (var d in (IEnumerable<PMS.Models.TblDepartment>)ViewBag.Departments)
+                                        {
+                                            if (d.Name == Model.Department)
+                                            {
+                                                <option value="@d.Id" selected>@d.Name</option>
+                                            }
+                                            else
+                                            {
+                                                <option value="@d.Id">@d.Name</option>
+                                            }
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-lg-6 col-md-6 col-sm-12">
+                                <div class="form-group mb-3">
+                                    <div class="boldText">Chọn chức danh:<code>*</code></div>
+                                    <select class="form-control select2-search" name="positionId" id="positionId">
+                                        @foreach (var p in (IEnumerable<PMS.Models.TblPosition>)ViewBag.Positions)
+                                        {
+                                            if (p.Name == Model.Position)
+                                            {
+                                                <option value="@p.Id" selected>@p.Name</option>
+                                            }
+                                            else
+                                            {
+                                                <option value="@p.Id">@p.Name</option>
+                                            }
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- PHẦN LOẠI VAI TRÒ - SỬ DỤNG STATUS -->
+                        @* <div class="row">
+                            <div class="col-12">
+                                <div class="form-group mb-3">
+                                    <div class="boldText">Loại vai trò:<code>*</code></div>
+                                    <div class="d-flex flex-wrap">
+                                        <div class="form-check mr-4 mb-2">
+                                            <input type="radio" id="mainRole" name="status" value="2" class="form-check-input" @(Model.Status == 2 ? "checked" : "") />
+                                            <label class="form-check-label" for="mainRole">
+                                                Làm chính<br>
+                                                
+                                            </label>
+                                        </div>
+                                        <div class="form-check mr-4 mb-2">
+                                            <input type="radio" id="concurrentRole" name="status" value="1" class="form-check-input" @(Model.Status == 1 ? "checked" : "") />
+                                            <label class="form-check-label" for="concurrentRole">
+                                                Kiêm nhiệm<br>
+                                                
+                                            </label>
+                                        </div>
+                                        <div class="form-check mr-4 mb-2">
+                                            <input type="radio" id="inactiveRole" name="status" value="0" class="form-check-input" @(Model.Status == 0 ? "checked" : "") />
+                                            <label class="form-check-label" for="inactiveRole">
+                                                Hết hiệu lực<br>
+                                               
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div> *@
+
+                        <div class="row">
+                            <div class="col-lg-6 col-md-6 col-sm-12">
+                                <div class="form-group mb-3">
+                                    <div class="boldText">Ngày hiệu lực:<code>*</code></div>
+                                    <div class="input-group">
+                                        <input class="form-control" type="text" id="effectiveDate" readonly value="@Model.TransferDate.ToString("dd/MM/yyyy")" />
+                                        <div class="input-group-append">
+                                            <span class="input-group-text"><i class="fa fa-calendar"></i></span>
+                                        </div>
+                                    </div>
+                                    <input type="hidden" name="effectiveDate" id="effectiveDateHidden" value="@Model.TransferDate.ToString("yyyy-MM-dd")" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- SỬA NÚT QUAY LẠI -->
+                        <button type="submit" class="btn btn-success waves-effect waves-light m-r-10">Ghi dữ liệu</button>
+                        <a href="@Url.Action("Create", "TransferUser", new { userId = Model.Id })" class="btn btn-secondary waves-effect waves-light m-r-10">Quay lại form Thêm mới</a>
+                        <a href="@Url.Action("Index", "TransferUser")" class="btn btn-outline-secondary">Quay lại danh sách</a>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/locales/bootstrap-datepicker.vi.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            // Initialize Select2 cho dropdown chức danh
+            $('.select2-search').select2({
+                placeholder: 'Tìm kiếm chức danh...',
+                allowClear: true,
+                width: '100%',
+                theme: 'bootstrap-5',
+                language: {
+                    noResults: function() {
+                        return "Không tìm thấy chức danh";
+                    },
+                    searching: function() {
+                        return "Đang tìm kiếm...";
+                    }
+                }
+            });
+
+            // Initialize date picker
+            $('#effectiveDate').datepicker({
+                format: 'dd/mm/yyyy',
+                autoclose: true,
+                todayHighlight: true,
+                language: 'vi'
+            }).on('changeDate', function(e) {
+                var d = e.date;
+                var y = d.getFullYear();
+                var m = String(d.getMonth() + 1).padStart(2, '0');
+                var day = String(d.getDate()).padStart(2, '0');
+                $('#effectiveDateHidden').val(y + '-' + m + '-' + day);
+            });
+
+            // Calendar icon click event
+            $('.input-group-text').click(function() {
+                $('#effectiveDate').focus();
+            });
+        });
+    </script>
+}

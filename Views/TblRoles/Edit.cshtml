@@ -1,0 +1,53 @@
+﻿@model PMS.Models.TblRole
+
+@{
+    ViewData["Title"] = "Edit";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@using (Html.BeginForm("Edit", "TblRoles", FormMethod.Post))
+{
+    @Html.AntiForgeryToken()
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title">Thông tin chi tiết</h4>
+                    <h6 class="card-subtitle">Lưu ý: <code>*</code> Là các trường bắt buộc phải nhập.</h6>
+                        <div class="row p-t-0">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label>Mã quyền:<code>*</code></label>
+                                    @Html.EditorFor(model => model.Id, new { htmlAttributes = new { @class = "form-control", placeholder = "Mã quyền" } })
+                                    @Html.ValidationMessageFor(model => model.Id, "", new { @class = "text-danger" })
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row p-t-0">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label>Tên quyền:<code>*</code></label>
+                                    @Html.EditorFor(model => model.Name, new { htmlAttributes = new { @class = "form-control", placeholder = "Tên quyền" } })
+                                    @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row p-t-0">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label>Mô tả:</label>
+                                <textarea class="form-control" rows="5" placeholder="Mô tả chi tiết" id="txtDescription" name="txtDescription">@Model.Description</textarea>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-success waves-effect waves-light m-r-10">Ghi dữ liệu</button>
+                        @Html.ActionLink("Quay lại", "Index")
+                </div>
+            </div>
+
+        </div>
+    </div>
+}

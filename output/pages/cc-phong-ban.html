@@ -1,0 +1,44 @@
+<!-- partial: cc-phong-ban.html -->
+<div class="cat-header">
+    <div class="cat-header-left">
+        <div class="cat-icon-wrap cat-icon-blue">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+        </div>
+        <div>
+            <div class="cat-title">BẢNG CHẤM CÔNG PHÒNG BAN</div>
+            <div class="cat-sub">Theo dõi công chi tiết theo từng đơn vị, bộ phận</div>
+        </div>
+    </div>
+    <div class="cat-header-right">
+        <button class="btn-cat-add" style="background: #10B981;">Xuất Excel</button>
+    </div>
+</div>
+
+<div class="cc-filterbar">
+    <div class="cc-filter-group">
+        <label>Phòng ban</label>
+        <select class="cc-select" style="min-width: 220px;">
+            <option>Phòng Kỹ thuật</option>
+            <option>Phòng Kinh doanh</option>
+        </select>
+    </div>
+    <div class="cc-filter-group">
+        <label>Tháng/Năm</label>
+        <div style="display:flex; gap:8px;">
+            <select class="cc-select" style="min-width:100px"><option>04</option></select>
+            <select class="cc-select" style="min-width:100px"><option>2024</option></select>
+        </div>
+    </div>
+    <div class="cc-filter-group">
+        <label>Loại công</label>
+        <div class="cc-radio-group">
+            <label class="cc-radio"><input type="radio" name="ccpbLoai" checked /><span class="cc-radio-dot"></span>Thời gian</label>
+            <label class="cc-radio"><input type="radio" name="ccpbLoai" /><span class="cc-radio-dot"></span>Ca đêm</label>
+            <label class="cc-radio"><input type="radio" name="ccpbLoai" /><span class="cc-radio-dot"></span>Thêm giờ</label>
+        </div>
+    </div>
+</div>
+
+<div class="table-card">
+    <div id="ccpbHotContainer" style="width:100%; height: 500px;"></div>
+</div>

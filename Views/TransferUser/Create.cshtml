@@ -1,0 +1,864 @@
+@{
+    ViewData["Title"] = "Thêm mới thông tin điều chuyển";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css">
+    <link rel="stylesheet" href="~/css/tbl-position-forms.css">
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="~/css/select2-custom.css" />
+    <style>
+        /* CSS cho radio button bị disabled */
+        input[name="transferType"]:disabled + label {
+            color: #6c757d !important;
+            cursor: not-allowed !important;
+        }
+
+        input[type="radio"]:disabled {
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        .text-muted {
+            color: #6c757d !important;
+        }
+
+        /* CSS cho bảng */
+        #historyTable tbody tr:hover {
+            background-color: #f5f5f5;
+        }
+
+        .select-transfer-radio:checked {
+            background-color: #007bff;
+        }
+
+        /* CSS cho ô nhập hệ số lương khi disabled */
+        #newPosCoef:disabled {
+            background-color: #e9ecef !important;
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+
+        #newPosCoef.bg-light {
+            background-color: #f8f9fa !important;
+        }
+    </style>
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <form id="transferForm" method="post" action="@Url.Action("Create", "TransferUser")">
+                        <!-- Chọn nhân viên -->
+                        <div class="row">
+                            <div class="col-lg-6 col-md-6 col-sm-12">
+                                <div class="form-group mb-3">
+                                    <div class="boldText">Chọn nhân viên:<code>*</code></div>
+                                    <select id="userId" name="userId" class="form-control select2-search" required>
+                                        <option value="">Chọn mã nhân viên</option>
+                                        @foreach (var user in ViewBag.Users)
+                                        {
+                                            <option value="@user.Id">@user.UserCode - @user.Name</option>
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-lg-6 col-md-6 col-sm-12">
+                                <div class="form-group mb-3">
+                                    <div class="boldText">Tên nhân viên:</div>
+                                    <input type="text" id="employeeName" class="form-control" readonly />
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Bảng lịch sử phòng ban/chức vụ -->
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="boldText mb-3">Lịch sử phòng ban/chức vụ</div>
+                                <div class="table-responsive">
+                                    <table id="historyTable" class="table table-bordered table-striped">
+                                        <thead>
+                                            <tr>
+                                                <th style="width: 50px;">STT</th>
+                                                <th style="width: 100px;" class="text-center">Chọn</th>
+                                                <th>Phòng ban</th>
+                                                <th>Chức danh</th>
+                                                <th>Ngày hiệu lực</th>
+                                                <th>Vai trò chính</th>
+                                                <th>Hiệu lực</th>
+                                                <th class="text-nowrap">Thao tác</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td colspan="8" class="text-center text-muted">Vui lòng chọn nhân viên để xem lịch sử</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Thông tin thay đổi -->
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="boldText mb-3" style="color: #007bff; font-weight: bold;">THÔNG TIN THAY ĐỔI:</div>
+                            </div>
+                        </div>
+
+                        <!-- Tùy chọn - Đưa lên đầu -->
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="form-group mb-3">
+                                    <div class="boldText">Loại điều chuyển:</div>
+                                    <div class="d-flex flex-wrap">
+                                        <div class="form-check mr-4 mb-2">
+                                            <input type="radio" id="normalTransfer" name="transferType" value="normal" class="form-check-input" checked />
+                                            <label class="form-check-label" for="normalTransfer">
+                                                Thêm phòng ban/chức vụ mới<br>
+                                            </label>
+                                        </div>
+                                        <div class="form-check mr-4 mb-2">
+                                            <input type="radio" id="changeTransfer" name="transferType" value="change" class="form-check-input" disabled />
+                                            <label class="form-check-label text-muted" for="changeTransfer">
+                                                Chuyển từ phòng cũ sang phòng mới
+                                            </label>
+                                        </div>
+                                        <div class="form-check mb-2">
+                                            <input type="radio" id="resignTransfer" name="transferType" value="resign" class="form-check-input" />
+                                            <label class="form-check-label" for="resignTransfer">
+                                                Thôi việc
+                                            </label>
+                                        </div>
+                                    </div>
+
+                                    <!-- Sub-option cho "Thêm phòng ban/chức vụ mới" -->
+                                    <div id="normalTransferOptions" class="ml-4 mt-2" style="display: block;">
+                                        <div class="form-check">
+                                            <input type="checkbox" id="setAsMain" name="setAsMain" value="true" class="form-check-input" />
+                                            <label class="form-check-label" for="setAsMain">
+                                                <strong>Đặt làm chính</strong>
+                                                <br><small class="text-muted">(Nếu không chọn: tự động làm chính nếu chưa có phòng ban, hoặc kiêm nhiệm nếu đã có)</small>
+                                            </label>
+                                        </div>
+                                    </div>
+
+                                    <!-- Sub-option cho "Chuyển từ phòng cũ sang phòng mới" -->
+                                    <div id="changeTransferOptions" class="ml-4 mt-2" style="display: none;">
+                                        <div class="form-check">
+                                            <input type="checkbox" id="setAsMainOnChange" name="setAsMainOnChange" value="true" class="form-check-input" />
+                                            <label class="form-check-label" for="setAsMainOnChange">
+                                                <strong>Đặt phòng ban/chức vụ mới làm chính</strong>
+                                                <br><small class="text-muted">(Chuyển vai trò chính sang phòng ban/chức vụ mới, phòng cũ sẽ chuyển thành kiêm nhiệm hoặc dừng)</small>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-lg-3 col-md-6 col-sm-12">
+                                <div class="form-group mb-3">
+                                    <div class="boldText">Chọn phòng ban:<code>*</code></div>
+                                    <select id="departmentId" name="departmentId" class="form-control" required>
+                                        <option value="">Chọn phòng ban</option>
+                                        @foreach (var dept in ViewBag.Departments)
+                                        {
+                                            <option value="@dept.Id">@dept.Name</option>
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-lg-4 col-md-6 col-sm-12">
+                                <div class="form-group mb-3">
+                                    <div class="boldText">Chọn chức danh:<code>*</code></div>
+                                    <select id="positionId" name="positionId" class="form-control" required>
+                                        <option value="">Chọn chức danh</option>
+                                        @foreach (var pos in ViewBag.Positions)
+                                        {
+                                            <option value="@pos.Id">@pos.Name</option>
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-lg-3 col-md-6 col-sm-12">
+                                    <div class="form-group mb-3">
+                                        <div class="boldText">Nhập hệ số lương:<code>*</code></div>
+                                        <input type="number" id="newPosCoef" name="newPosCoef" class="form-control"
+                                               required step="any" placeholder="Nhập hệ số lương" min="0">
+                                    </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-lg-6 col-md-6 col-sm-12">
+                                <div class="form-group mb-3">
+                                    <div class="boldText">Ngày hiệu lực:<code>*</code></div>
+                                    <div class="input-group">
+                                        <input class="form-control" type="text" id="effectiveDate" readonly />
+                                        <div class="input-group-append">
+                                            <span class="input-group-text">
+                                                <i class="fa fa-calendar"></i>
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <input type="hidden" name="effectiveDate" id="effectiveDateHidden" />
+                                    <input type="hidden" name="oldDepartmentId" id="oldDepartmentId" value="0" />
+                                    <input type="hidden" name="oldPositionId" id="oldPositionId" value="0" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Buttons like position page -->
+                        <button type="submit" class="btn btn-success waves-effect waves-light m-r-10">Ghi dữ liệu</button>
+                        <a href="@Url.Action("Index", "TransferUser")">Quay lại</a>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Biến global để lưu trạng thái người dùng có phòng ban hay không
+    var userHasDepartments = false;
+    var CoefNewPos = 0;
+    // Biến đếm số phòng ban/chức vụ còn hiệu lực của người dùng
+    var userDepartmentCount = 0;
+    /**
+     * Hàm cập nhật trạng thái enable/disable của ô nhập hệ số lương
+     * Enable khi:
+     * 1. Đã chọn position VÀ người dùng chưa có phòng ban nào (lần đầu thêm)
+     * 2. Đã chọn position VÀ checkbox "Đặt làm chính" được chọn (setAsMain)
+     * 3. Đã chọn position VÀ checkbox "Đặt phòng mới làm chính" được chọn (setAsMainOnChange)
+     */
+    function updateNewPosCoefState() {
+        var setAsMainChecked = $('#setAsMain').is(':checked');
+        var setAsMainOnChangeChecked = $('#setAsMainOnChange').is(':checked');
+        var normalTransferSelected = $('#normalTransfer').is(':checked');
+        var changeTransferSelected = $('#changeTransfer').is(':checked');
+        var positionSelected = $('#positionId').val(); // Kiểm tra đã chọn position chưa
+        
+        // Điều kiện enable:
+        // PHẢI chọn position TRƯỚC, sau đó:
+        // 1. Người dùng chưa có phòng ban (lần đầu) => enable
+        // 2. Loại "Thêm phòng ban mới" + checkbox "Đặt làm chính" được chọn
+        // 3. Loại "Chuyển phòng" + checkbox "Đặt phòng mới làm chính" được chọn
+        var conditionsMet = !userHasDepartments || 
+                           (normalTransferSelected && setAsMainChecked) || 
+                           (changeTransferSelected && setAsMainOnChangeChecked);
+        
+        var shouldEnable = positionSelected && conditionsMet;
+        
+        if (shouldEnable) {
+            $('#newPosCoef').prop('disabled', false).removeClass('bg-light');
+            // Chỉ set giá trị nếu có CoefNewPos
+            if (CoefNewPos > 0) {
+                $('#newPosCoef').val(CoefNewPos);
+            }
+            console.log('✅ Enable newPosCoef - Position: ' + positionSelected + ', Lý do:', 
+                !userHasDepartments ? 'Chưa có phòng ban' : 
+                setAsMainChecked ? 'Đặt làm chính' : 
+                'Đặt phòng mới làm chính');
+        } else {
+            $('#newPosCoef').prop('disabled', true).addClass('bg-light').val('');
+            if (!positionSelected) {
+                console.log('❌ Disable newPosCoef - Chưa chọn position');
+            } else {
+                console.log('❌ Disable newPosCoef - Chưa tick checkbox hoặc đã có phòng ban');
+            }
+        }
+    }
+
+    $(document).ready(function () {
+        // Initialize Select2 cho dropdown nhân viên
+        $('#userId').select2({
+            placeholder: 'Tìm kiếm nhân viên...',
+            allowClear: true,
+            width: '100%',
+            theme: 'bootstrap-5',
+            language: {
+                noResults: function() {
+                    return "Không tìm thấy nhân viên";
+                },
+                searching: function() {
+                    return "Đang tìm kiếm...";
+                }
+            }
+        });
+
+        // Xử lý khi chọn nhân viên
+        $('#userId').on('change', function() {
+            var userId = $(this).val();
+            if (userId) {
+                // Lấy tên nhân viên
+                var selectedOption = $(this).find('option:selected').text();
+                var employeeName = selectedOption.split(' - ')[1];
+                $('#employeeName').val(employeeName);
+
+                // Load lịch sử phòng ban/chức vụ
+                loadUserHistory(userId);
+            } else {
+                $('#employeeName').val('');
+                // Hiển thị thông báo mặc định
+                showDefaultMessage();
+                // Khi chưa chọn nhân viên, disable radio "Chuyển từ phòng cũ sang phòng mới"
+                $('#changeTransfer').prop('disabled', true);
+                $('label[for="changeTransfer"]').addClass('text-muted');
+                
+                // Reset trạng thái newPosCoef
+                updateNewPosCoefState();
+            }
+        });
+
+        // Xử lý khi thay đổi checkbox "Đặt làm chính"
+        $('#setAsMain').on('change', function() {
+            var isChecked = $(this).is(':checked');
+            var positionId = $('#positionId').val();
+            
+            console.log('🔄 Checkbox "Đặt làm chính" thay đổi:', isChecked);
+            
+            // Nếu tick checkbox và đã chọn position, load hệ số lương
+            if (isChecked && positionId && CoefNewPos > 0) {
+                $('#newPosCoef').val(CoefNewPos);
+                console.log('✅ Hiển thị hệ số lương:', CoefNewPos);
+            }
+            
+            updateNewPosCoefState();
+        });
+
+        // Xử lý khi thay đổi checkbox "Đặt phòng mới làm chính"
+        $('#setAsMainOnChange').on('change', function() {
+            var isChecked = $(this).is(':checked');
+            var positionId = $('#positionId').val();
+            
+            console.log('🔄 Checkbox "Đặt phòng mới làm chính" thay đổi:', isChecked);
+            
+            // Nếu tick checkbox và đã chọn position, load hệ số lương
+            if (isChecked && positionId && CoefNewPos > 0) {
+                $('#newPosCoef').val(CoefNewPos);
+                console.log('✅ Hiển thị hệ số lương:', CoefNewPos);
+            }
+            
+            updateNewPosCoefState();
+        });
+
+        // Xử lý radio buttons cho loại điều chuyển
+        $('input[name="transferType"]').on('change', function() {
+            var selectedType = $(this).val();
+
+            // Reset tất cả trường về trạng thái bình thường
+            $('#departmentId, #positionId').prop('disabled', false);
+
+            // Ẩn tất cả các sub-options trước
+            $('#normalTransferOptions').hide();
+            $('#changeTransferOptions').hide();
+
+            switch(selectedType) {
+                case 'normal':
+                    // Thêm phòng ban/chức vụ mới - hiện checkbox "Đặt làm chính"
+                    $('#normalTransferOptions').show();
+                    break;
+                case 'change':
+                    // Chuyển từ phòng cũ sang phòng mới - hiện checkbox "Đặt phòng mới làm chính"
+                    $('#changeTransferOptions').show();
+                    break;
+                case 'resign':
+                    // Thôi việc - vô hiệu hóa các trường không cần thiết
+                    $('#departmentId, #positionId').prop('disabled', true).val('');
+                    break;
+                default:
+                    break;
+            }
+            
+            // Cập nhật trạng thái newPosCoef khi thay đổi loại điều chuyển
+            updateNewPosCoefState();
+        });
+
+        // Initialize date picker
+        $('#effectiveDate').datepicker({
+            format: 'dd/mm/yyyy',
+            autoclose: true,
+            todayHighlight: true,
+            language: 'vi'
+        }).on('changeDate', function(e) {
+            // Update hidden field with proper format (avoid timezone issues)
+            var selectedDate = e.date;
+            var year = selectedDate.getFullYear();
+            var month = String(selectedDate.getMonth() + 1).padStart(2, '0');
+            var day = String(selectedDate.getDate()).padStart(2, '0');
+            var dateString = year + '-' + month + '-' + day;
+            $('#effectiveDateHidden').val(dateString);
+        });
+
+        // Set default date to today
+        var today = new Date();
+        var dd = String(today.getDate()).padStart(2, '0');
+        var mm = String(today.getMonth() + 1).padStart(2, '0');
+        var yyyy = today.getFullYear();
+        $('#effectiveDate').val(dd + '/' + mm + '/' + yyyy);
+
+        // Set hidden field with today's date in YYYY-MM-DD format (avoid timezone issues)
+        var year = today.getFullYear();
+        var month = String(today.getMonth() + 1).padStart(2, '0');
+        var day = String(today.getDate()).padStart(2, '0');
+        var dateString = year + '-' + month + '-' + day;
+        $('#effectiveDateHidden').val(dateString);
+
+        // Calendar icon click event
+        $('.input-group-text').click(function() {
+            $('#effectiveDate').focus();
+        });
+
+        // Xử lý checkbox vai trò (chỉ được chọn 1)
+        $(document).on('change', '.role-checkbox', function() {
+            var $checkbox = $(this);
+            var transferId = $checkbox.data('transfer-id');
+            var isChecked = $checkbox.is(':checked');
+
+            if (isChecked) {
+                // Hiển thị confirm trước khi thay đổi vai trò chính
+                showConfirmDialog(
+                    'Bạn có chắc chắn muốn đặt chức vụ này làm vai trò chính không?',
+                    'Xác nhận thay đổi vai trò',
+                    function() {
+                        // Callback khi xác nhận
+                        // Bỏ check tất cả các checkbox khác
+                        $('.role-checkbox').not($checkbox).prop('checked', false);
+                        if (isChecked && positionId && CoefNewPos > 0) {
+                            $('#newPosCoef').val(CoefNewPos);
+                            console.log('✅ Hiển thị hệ số lương:', CoefNewPos);
+                        }
+                        // Gọi hàm cập nhật vị trí làm chính
+                        updateMainPosition(transferId, true);
+                    },
+                    function() {
+                        // Callback khi hủy - revert lại checkbox
+                        $checkbox.prop('checked', false);
+                    }
+                );
+            } else {
+                // Nếu bỏ check, hiển thị confirm
+                showConfirmDialog(
+                    'Bạn có chắc chắn muốn chuyển chức vụ này thành kiêm nhiệm không?',
+                    'Xác nhận thay đổi vai trò',
+                    function() {
+                        // Callback khi xác nhận - cập nhật về kiêm nhiệm
+                        updateMainPosition(transferId, false);
+                    },
+                    function() {
+                        // Callback khi hủy - revert lại checkbox
+                        $checkbox.prop('checked', true);
+                    }
+                );
+            }
+        });
+
+        // Xử lý nút dừng chức vụ
+        $(document).on('click', '.stop-position-btn', function() {
+            var id = $(this).data('id');
+            
+            showConfirmDialog(
+                'Bạn có chắc chắn muốn cho nhân viên thôi làm chức vụ này không?',
+                'Xác nhận dừng chức vụ',
+                function() {
+                    // Callback khi xác nhận
+                    $.ajax({
+                        url: '@Url.Action("StopPosition", "TransferUser")',
+                        type: 'POST',
+                        data: { id: id },
+                        success: function(response) {
+                            if (response.success) {
+                                showUpdateNotification('success', response.message);
+                                var userId = $('#userId').val();
+                                if (userId) {
+                                    loadUserHistory(userId);
+                                }
+                            } else {
+                                message = response.message === '1' ? 'Không thể dừng chức vụ đang làm chính!!</br>Nếu muốn dừng chức vụ này, vui lòng chọn chức vụ khác làm chính' : response.message;
+                                showUpdateNotification('error', message);
+                            }
+                        },
+                        error: function() {
+                            showUpdateNotification('error', 'Có lỗi xảy ra khi dừng chức vụ!');
+                        }
+                    });
+                }
+            );
+        });
+
+        // Xử lý khi chọn chức danh - tự động load hệ số lương
+        $('#positionId').on('change', function() {
+            var positionId = $(this).val();
+            
+            if (positionId) {
+                // Hiển thị loading
+                $('#newPosCoef').val('').attr('placeholder', 'Đang tải...');
+                
+                // Gọi API lấy hệ số lương
+                $.ajax({
+                    url: '@Url.Action("GetNewPositionCoef", "TransferUser")',
+                    type: 'GET',
+                    data: { positionId: positionId },
+                    success: function(response) {
+                        if (response.success) {
+                            // Lưu hệ số vào biến global
+                            CoefNewPos = response.posCoef;
+                            console.log('📥 Đã load hệ số lương: ' + response.posCoef);
+                            
+                            // Cập nhật trạng thái enable/disable và điền giá trị
+                            updateNewPosCoefState();
+                        } else {
+                            CoefNewPos = 0;
+                            $('#newPosCoef').val('').attr('placeholder', 'Nhập hệ số lương');
+                            console.error('Lỗi: ' + response.message);
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        CoefNewPos = 0;
+                        $('#newPosCoef').val('').attr('placeholder', 'Nhập hệ số lương');
+                        console.error('Lỗi khi load hệ số lương:', error);
+                    }
+                });
+            } else {
+                // Nếu bỏ chọn position, reset
+                CoefNewPos = 0;
+                $('#newPosCoef').val('').attr('placeholder', 'Nhập hệ số lương');
+                
+                // Cập nhật trạng thái (sẽ disable vì chưa chọn position)
+                updateNewPosCoefState();
+            }
+        });
+    });
+
+    // Hàm kiểm tra và cập nhật trạng thái của radio button "changeTransfer"
+    function updateChangeTransferState() {
+        var changeTransferRadio = $('#changeTransfer');
+        var isAnyTableRadioSelected = false;
+
+        // Kiểm tra xem có radio nào trong bảng được chọn không
+        $('.select-transfer-radio').each(function() {
+            if ($(this).is(':checked')) {
+                isAnyTableRadioSelected = true;
+                return false; // Thoát vòng lặp ngay khi tìm thấy
+            }
+        });
+
+        // Nếu có radio trong bảng được chọn, ENABLE radio "Chuyển từ phòng cũ sang phòng mới"
+        if (isAnyTableRadioSelected) {
+            changeTransferRadio.prop('disabled', false);
+            $('label[for="changeTransfer"]').removeClass('text-muted');
+        } else {
+            // Nếu không có radio nào trong bảng được chọn, DISABLE lại
+            changeTransferRadio.prop('disabled', true);
+            changeTransferRadio.prop('checked', false);
+
+            // Thêm CSS để làm mờ
+            $('label[for="changeTransfer"]').addClass('text-muted');
+
+            // Nếu đang chọn option này, chuyển về option mặc định
+            if (changeTransferRadio.is(':checked')) {
+                $('#normalTransfer').prop('checked', true).trigger('change');
+            }
+        }
+    }
+
+    // Hàm hiển thị thông báo cập nhật
+            function showUpdateNotification(type, message) {
+                try {
+                    let alertClass, icon;
+                    if (type === 'success') {   
+                        alertClass = 'alert-success';
+                        icon = 'fa-check-circle';
+                    } else if (type === 'info') {
+                        alertClass = 'alert-info';
+                        icon = 'fa-info-circle';
+                    } else {
+                        alertClass = 'alert-danger';
+                        icon = 'fa-exclamation-triangle';
+                    }
+
+                    const notification = $(`
+                        <div class="alert ${alertClass} alert-dismissible fade show update-notification" role="alert" style="position: fixed; top: 20px; right: 20px; z-index: 99999; min-width: 300px; max-width: 400px;">
+                            <i class="fa ${icon}"></i> ${message}
+                            <button type="button" class="close" data-dismiss="alert">
+                                <span>&times;</span>
+                            </button>
+                        </div>
+                    `);
+
+                    $('body').append(notification);
+
+                    setTimeout(() => {
+                        try {
+                            notification.alert('close');
+                        } catch (e) {
+                            notification.remove();
+                        }
+                    },type === 'success' ? 3000 : 9000);
+                } catch (error) {
+                    alert(message);
+                }
+            }
+
+    // Hàm hiển thị hộp thoại xác nhận
+    function showConfirmDialog(message, title = 'Xác nhận', onConfirm, onCancel = null) {
+        // Xóa modal cũ nếu có
+        $('#confirmModal').remove();
+        
+        const modal = $(`
+            <div class="modal fade" id="confirmModal" tabindex="-1" role="dialog">
+                <div class="modal-dialog modal-dialog-centered" role="document">
+                    <div class="modal-content" style="border-radius: 12px; border: none; box-shadow: 0 10px 40px rgba(0,0,0,0.15);">
+                        <div class="modal-header" style="border-bottom: 1px solid #e9ecef; border-radius: 12px 12px 0 0; padding: 20px 24px;">
+                            <h5 class="modal-title" style="font-weight: 600; color: #495057;">
+                                <i class="fa fa-question-circle" style="color: #6c757d; margin-right: 8px;"></i> ${title}
+                            </h5>
+                            <button type="button" class="close" data-dismiss="modal" style="padding: 0; margin: 0; opacity: 0.5;">
+                                <span style="font-size: 28px;">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body" style="padding: 24px; color: #6c757d; font-size: 15px;">
+                            ${message}
+                        </div>
+                        <div class="modal-footer" style="border-top: 1px solid #e9ecef; padding: 16px 24px; border-radius: 0 0 12px 12px;">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal" style="border-radius: 6px; padding: 8px 20px;">
+                                <i class="fa fa-times"></i> Hủy
+                            </button>
+                            <button type="button" class="btn btn-primary" id="confirmBtn" style="border-radius: 6px; padding: 8px 20px;">
+                                <i class="fa fa-check"></i> Xác nhận
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `);
+        
+        $('body').append(modal);
+        
+        // Xử lý nút xác nhận
+        $('#confirmBtn').on('click', function() {
+            $('#confirmModal').modal('hide');
+            if (typeof onConfirm === 'function') {
+                onConfirm();
+            }
+        });
+        
+        // Xử lý khi đóng modal
+        $('#confirmModal').on('hidden.bs.modal', function() {
+            $(this).remove();
+            if (typeof onCancel === 'function') {
+                onCancel();
+            }
+        });
+        
+        $('#confirmModal').modal('show');
+    }
+
+    // Xử lý khi chọn radio trong bảng lịch sử phòng ban
+    // Khi người dùng chọn 1 dòng, hệ thống sẽ tự động:
+    // 1. Chọn loại "Chuyển từ phòng cũ sang phòng mới"
+    // 2. Tick checkbox "Đặt phòng ban/chức vụ mới làm chính"
+    // 3. Phòng cũ được chọn sẽ chuyển từ "còn hiệu lực" → "hết hiệu lực"
+    $(document).on('change', '.select-transfer-radio', function() {
+        var deptId = $(this).data('tbl-dept-id');
+        var posId = $(this).data('tbl-pos-id');
+
+        // Lưu ID của phòng ban/chức vụ cũ đã chọn vào hidden fields
+        $('#oldDepartmentId').val(deptId);
+        $('#oldPositionId').val(posId);
+
+        console.log("Selected old dept: " + deptId + ", old pos: " + posId);
+
+        // === TỰ ĐỘNG CHỌN LOẠI "CHUYỂN TỪ PHÒNG CŨ SANG PHÒNG MỚI" ===
+        // Khi người dùng chọn 1 dòng trong bảng lịch sử, có nghĩa là họ muốn chuyển
+        // từ phòng ban/chức vụ đã chọn sang phòng ban/chức vụ mới
+        $('#changeTransfer').prop('checked', true).trigger('change');
+
+        // === TỰ ĐỘNG TICK CHECKBOX "ĐẶT PHÒNG BAN MỚI LÀM CHÍNH" ===
+        // Mặc định khi chuyển phòng, phòng mới sẽ là phòng chính
+        // Điều này cũng sẽ chuyển phòng cũ từ "còn hiệu lực" sang "hết hiệu lực"
+        $('#setAsMainOnChange').prop('checked', true).trigger('change');
+
+        // === DISABLE CHECKBOX NẾU CHỈ CÓ 1 VAI TRÒ LÀM CHÍNH ===
+        // Nếu nhân viên chỉ có 1 phòng ban/chức vụ (làm chính), không có kiêm nhiệm nào khác
+        // thì bắt buộc phòng mới phải làm chính -> disable checkbox không cho người dùng bỏ tick
+        if (userDepartmentCount === 1) {
+            $('#setAsMainOnChange').prop('disabled', true);
+            console.log('⚠️ Nhân viên chỉ có 1 vai trò làm chính - Checkbox bị disable');
+        } else {
+            // Nếu có nhiều phòng ban, cho phép người dùng chọn
+            $('#setAsMainOnChange').prop('disabled', false);
+            console.log('✅ Nhân viên có ' + userDepartmentCount + ' vai trò - Checkbox được enable');
+        }
+
+        // Gọi hàm cập nhật trạng thái radio "Chuyển từ phòng cũ sang phòng mới"
+        updateChangeTransferState();
+    });
+
+    // Hàm cập nhật vị trí làm chính, kiêm nhiệm
+    function updateMainPosition(transferId, isMain) {
+        var orderNumber = isMain ? 1 : 2; // 1 = Làm chính, 2 = Kiêm nhiệm
+
+        $.ajax({
+            url: '@Url.Action("UpdateMainPosition", "TransferUser")',
+            type: 'POST',
+            data: {
+                transferId: transferId,
+                orderNumber: orderNumber
+            },
+            success: function(response) {
+                if (response.success) {
+                    console.log('Cập nhật vai trò thành công');
+                } else {
+                    console.error('Lỗi cập nhật vai trò:', response.message);
+                    alert('Lỗi: ' + response.message);
+                    // Reload lại bảng để đảm bảo dữ liệu đúng
+                    var userId = $('#userId').val();
+                    if (userId) {
+                        loadUserHistory(userId);
+                    }
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error('AJAX Error:', error);
+                alert('Có lỗi xảy ra khi cập nhật vai trò!');
+                // Reload lại bảng
+                var userId = $('#userId').val();
+                if (userId) {
+                    loadUserHistory(userId);
+                }
+            }
+        });
+    }
+
+    function loadUserHistory(userId) {
+        $.ajax({
+            url: '@Url.Action("GetUserHistory", "TransferUser")',
+            type: 'GET',
+            data: { userId: userId },
+            success: function(data) {
+                var tbody = $('#historyTable tbody');
+                tbody.empty();
+
+                if (data && data.length > 0) {
+                    $.each(data, function(index, item) {
+                        var statusClass = item.isActive ? 'text-success' : 'text-danger';
+                        var roleTypeBadge = '';
+
+                        // Xác định badge cho loại vai trò dựa trên OrderNumber
+                        if (item.status === 0) {
+                            roleTypeBadge = '<span></span>';
+                        }
+                        else {
+                            var isChecked = item.orderNumber === 1 ? 'checked' : '';
+                            roleTypeBadge = '<div class="text-center"><input type="checkbox" class="role-checkbox" data-transfer-id="' + item.id + '" ' + isChecked + ' /></div>';
+                        }
+
+                        // Tạo nút chọn để chuyển (chỉ hiện cho các bản ghi còn hiệu lực)
+                        var selectButton = '';
+                        if (item.status === 1) {
+                            selectButton = '<div class="text-center">' +
+                                '<input type="radio" name="selectForTransfer" class="select-transfer-radio" ' +
+                                'data-dept-id="' + item.departmentId + '" ' +
+                                'data-pos-id="' + item.positionId + '" ' +
+                                'data-dept-name="' + item.department + '" ' +
+                                'data-pos-name="' + item.position + '" ' +
+                                'data-tbl-dept-id="' + item.userDepartmentId + '"' +
+                                'data-tbl-pos-id="' + item.id + '"/>' +
+                                '</div>';
+                        }
+
+                        var row = '<tr data-department-id="' + item.departmentId + '" data-position-id="' + item.positionId + '">' +
+                            '<td>' + item.stt + '</td>' +
+                            '<td>' + selectButton + '</td>' +
+                            '<td>' + item.department + '</td>' +
+                            '<td>' + item.position + '</td>' +
+                            '<td>' + item.effectiveDate + '</td>' +
+                            '<td>' + roleTypeBadge + '</td>' +
+                            '<td><span class="' + statusClass + '">' + item.statusText + '</span></td>' +
+                            '<td class="text-nowrap">' +
+                                '<a href="@Url.Action("Edit", "TransferUser")/' + item.id + '?userId=' + userId + '" data-toggle="tooltip" data-original-title="Sửa">' +
+                                    '<i class="fa fa-pencil text-warning m-r-10"></i>' +
+                                '</a>' +
+                                (item.status === 1 ?
+                                '<a href="javascript:void(0)" class="stop-position-btn" data-id="' + item.id + '" data-toggle="tooltip" data-original-title="Thôi làm">' +
+                                    '<i class="fa fa-stop-circle text-danger m-r-10"></i>' +
+                                '</a>' : '') +
+                            '</td>' +
+                        '</tr>';
+                        tbody.append(row);
+                    });
+
+                    // Kích hoạt tooltip sau khi render
+                    $('[data-toggle="tooltip"]').tooltip();
+
+                    // Cập nhật trạng thái: User có phòng ban
+                    userHasDepartments = true;
+                    // Đếm số phòng ban/chức vụ còn hiệu lực (status = 1)
+                    userDepartmentCount = data.filter(function(item) { return item.status === 1; }).length;
+                    console.log('👤 User có ' + userDepartmentCount + ' phòng ban/chức vụ còn hiệu lực');
+
+                    // Kiểm tra trạng thái ban đầu
+                    updateChangeTransferState();
+                    
+                    // Cập nhật trạng thái newPosCoef
+                    updateNewPosCoefState();
+
+                } else {
+                    showNoDataMessage();
+                    
+                    // Cập nhật trạng thái: User chưa có phòng ban
+                    userHasDepartments = false;
+                    console.log('👤 User chưa có phòng ban nào');
+                    
+                    // Khi không có dữ liệu, disable radio "Chuyển từ phòng cũ sang phòng mới"
+                    $('#changeTransfer').prop('disabled', true);
+                    $('label[for="changeTransfer"]').addClass('text-muted');
+                    
+                    // Cập nhật trạng thái newPosCoef
+                    updateNewPosCoefState();
+                }
+            },
+            error: function() {
+                console.log('Lỗi khi load lịch sử nhân viên');
+                showNoDataMessage();
+                // Khi có lỗi, disable radio "Chuyển từ phòng cũ sang phòng mới"
+                $('#changeTransfer').prop('disabled', true);
+                $('label[for="changeTransfer"]').addClass('text-muted');
+            }
+        });
+    }
+
+    function showDefaultMessage() {
+        var tbody = $('#historyTable tbody');
+        tbody.empty();
+        tbody.append('<tr><td colspan="8" class="text-center text-muted">Vui lòng chọn nhân viên để xem lịch sử</td></tr>');
+
+        // Khi chưa có nhân viên, disable radio "Chuyển từ phòng cũ sang phòng mới"
+        $('#changeTransfer').prop('disabled', true);
+        $('label[for="changeTransfer"]').addClass('text-muted');
+    }
+
+    function showNoDataMessage() {
+        var tbody = $('#historyTable tbody');
+        tbody.empty();
+        tbody.append('<tr><td colspan="8" class="text-center text-muted">Không có dữ liệu lịch sử</td></tr>');
+
+        // Khi không có dữ liệu, disable radio "Chuyển từ phòng cũ sang phòng mới"
+        $('#changeTransfer').prop('disabled', true);
+        $('label[for="changeTransfer"]').addClass('text-muted');
+    }
+</script>
+
+@section Scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/locales/bootstrap-datepicker.vi.min.js"></script>
+    <!-- Thêm Select2 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+}

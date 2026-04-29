@@ -1,0 +1,130 @@
+﻿ @model IEnumerable<PMS.Models.TblPosition>
+
+@{
+    ViewData["Title"] = "DANH MỤC CHỨC VỤ";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                @* <div class="row">
+                    <div class="col-lg-5">
+                        <h4 class="card-title" style="margin-bottom:0px;">Thông tin chi tiết</h4>
+                    </div>
+                    <div class="col-lg-7" style="text-align: right;">
+                        <a class="btn btn-sm btn-primary" href="@Url.Action("Create")">Thêm mới</a>
+                    </div>
+                </div> *@
+
+                <div class="table-responsive mt-2 "  style="margin-top : 0px !important">
+
+                    <table id="myTable" class="table table-bordered table-striped" style="padding-top : 0px !important">
+                        <thead>
+                            <tr>
+                                <th class="text-center" style="width: 20px;">#</th>
+                                <th class="text-center " style="width: 200px !important;">Tên chức vụ</th>
+                                <th class="text-center">Tên viết tắt</th>
+                                <!-- <th class="text-center">Độ ưu tiên</th> -->
+                                <th class="text-center">HS cơ bản chức vụ</th>
+                                <th class="text-center">HS trách nhiệm</th>
+                                <th class="text-center">HS chức vụ</th>
+                                <th class="text-center">Ngày hiệu lực</th>
+                                <th class="text-center" style="width: 200px !important;">Mô tả</th>
+                                <th class="text-center" style="width: 200px !important;">Ghi chú</th>
+                                <th class="text-center" >Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (Model != null || Model.Count() == 0)
+                            {
+                                int i = 1;
+                                foreach (var item in Model.OrderBy(a => a.Order))
+                                {
+                                    <tr>
+                                        <td class="text-center">@(i++)</td>
+                                        <td>@Html.DisplayFor(modelItem => item.Name)</td>
+                                        <td class="text-center">@Html.DisplayFor(modelItem => item.ShortName)</td>
+                                        <!-- <td class="text-center">@Html.DisplayFor(modelItem => item.Order)</td> -->
+                                        <td class="text-center">@Html.DisplayFor(modelItem => item.BasicPosiontConfficient)</td>
+                                        <td class="text-center">@Html.DisplayFor(modelItem => item.ResponsibilityCoefficient)</td>
+                                        <td class="text-center">@Html.DisplayFor(modelItem => item.PosiontConfficient)</td>
+                                        <td class="text-center">@item.DateIssued.ToString("dd/MM/yyyy")</td>
+                                        <td title="@item.Description">
+                                            @(item.Description?.Length > 50 ? item.Description.Substring(0, 50) + "..." : item.Description)
+                                        </td>
+                                        <td title="@item.Note">
+                                            @(item.Note?.Length > 50 ? item.Note.Substring(0, 50) + "..." : item.Note)
+                                        </td>
+                                        <td class="text-nowrap">
+                                            <a href="@Url.Action("Edit", new { id = item.Id })" data-toggle="tooltip" data-original-title="Sửa">
+                                                <i class="fa fa-pencil text-inverse m-r-10"></i>
+                                            </a>
+                                            <form asp-action="Delete" asp-route-id="@item.Id" method="post" class="d-inline"
+                                                  onsubmit="return confirm('Bạn có muốn xóa dữ liệu không?');">
+                                                <button type="submit" class="btn btn-link p-0 m-0" style="border:none; background:none;">
+                                                    <i class="fa fa-close text-danger" data-toggle="tooltip" data-original-title="Xóa"></i>
+                                                </button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="~/assets/node_modules/datatables/jquery.dataTables.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $('#myTable').DataTable({
+            "pageLength": 10,
+            "ordering": true,
+            "searching": true,
+            "lengthChange": true,
+
+            // DOM với 3 phần cùng hàng
+            "dom":
+                '<"d-flex justify-content-between align-items-center mb-3"<"d-flex align-items-center"l><"d-flex align-items-center"f>>' +
+                '<"row"<"col-sm-12"tr>>' +
+                '<"row"<"col-sm-5"i><"col-sm-7"p>>',
+
+            "language": {
+                "lengthMenu": "Hiển thị _MENU_ bản ghi",
+                "search": "Tìm kiếm:"
+            },
+
+            "initComplete": function () {
+                // 1. Lấy container bên trái (chứa "Hiển thị")
+                var leftContainer = $('.dataTables_wrapper .d-flex.align-items-center').first();
+
+                // 2. Thêm nút "Thêm mới" vào container bên trái
+                var addButton = '<a class="btn btn-sm btn-primary ms-5" href="@Url.Action("Create")">Thêm mới</a>';
+                leftContainer.append(addButton);
+
+                // 3. Điều chỉnh khoảng cách
+                leftContainer.css('gap', '20px');
+
+                // 4. Điều chỉnh label
+                $('.dataTables_length label, .dataTables_filter label').css({
+                    'margin-bottom': '0',
+                    'margin-right': '8px'
+                });
+            }
+        });
+    });
+</script>
+
+<style>
+    /* CSS riêng cho trang này */
+    .dataTables_wrapper .d-flex.justify-content-between {
+        flex-wrap: nowrap;
+        justify-content: flex-start !important;
+        gap: 80px;
+    }
+</style>

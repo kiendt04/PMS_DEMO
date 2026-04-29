@@ -1,0 +1,57 @@
+﻿@using Newtonsoft.Json
+@using PMS.Common
+@using Microsoft.AspNetCore.Http;
+
+@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+    var menusJson = Context.Session.GetString(CommonConstants.Menus);
+    var menus = string.IsNullOrEmpty(menusJson)
+        ? new List<TblMenu>()
+        : JsonConvert.DeserializeObject<List<TblMenu>>(menusJson);
+}
+
+
+<nav class="sidebar-nav">
+    <ul id="sidebarnav">
+        <li class="nav-small-cap" style="padding-top:10px;">--- TIỆN ÍCH</li>
+        @foreach (var menu in menus)
+        {
+            if (menu.ParentId == -1)
+            {
+                if (menu.TypeMenu == 0)
+                {
+                    // Menu goc va khong co menu con (VD: Trang chu)
+                    <li class="active">
+                        <a class="waves-effect waves-dark active" href="@Url.Action("Index", menu.Url)"><i class="@menu.IconUrl"></i><span class="hide-menu">@menu.Name</span></a>
+                        <ul aria-expanded="false" class="collapse"></ul>
+                    </li>
+                }
+                else
+                {
+                    // Menu cha va co menu con
+                    <li>
+                        <a class="has-arrow waves-effect waves-dark" href="javascript:void(0)" aria-expanded="false"><i class="@menu.IconUrl"></i><span class="hide-menu">@menu.Name</span></a>
+                        <ul aria-expanded="false" class="collapse">
+                            @foreach(var item in menus)
+                            {
+                                if (item.ParentId == menu.Id)
+                                {
+                                    <li><a href="@Url.Action("Index",item.Url)">@item.Name</a></li>
+                                }
+                            }
+                        </ul>
+                    </li>
+                }
+            }
+            
+        }
+        <li class="nav-small-cap">--- HỖ TRỢ</li>
+        <li><a class="waves-effect waves-dark" href="@Url.Action("Index","UpdateAccount")" aria-expanded="false"><i class="fa fa-circle-o text-warning"></i><span class="hide-menu">Cập nhật tài khoản</span></a></li>
+        <li><a class="waves-effect waves-dark" href="@Url.Action("Index","Guide")" aria-expanded="false"><i class="fa fa-circle-o text-danger"></i><span class="hide-menu">Giới thiệu hệ thống</span></a></li>
+        <li><a class="waves-effect waves-dark" href="@Url.Action("Index","LOGIN")" aria-expanded="false"><i class="fa fa-circle-o text-success"></i><span class="hide-menu">Đăng xuất</span></a></li>
+
+
+    </ul>
+</nav>

@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PayrollPro - Quản lý lương chuyên nghiệp</title>
+    
+    <!-- CSS Dependencies -->
+    <link rel="stylesheet" href="../assets/css/design-system.css">
+    <link rel="stylesheet" href="../assets/css/layout.css">
+    <link rel="stylesheet" href="../assets/css/components.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/handsontable@14.6.1/dist/handsontable.full.min.css">
+    
+    <!-- JS Dependencies -->
+    <script src="https://cdn.jsdelivr.net/npm/handsontable@14.6.1/dist/handsontable.full.min.js"></script>
+</head>
+<body>
+    <div id="app-root">
+        <!-- Sidebar (loaded dynamically) -->
+        <aside class="sidebar" id="appSidebar">
+            <div class="sidebar-toggle-inner" id="sidebarToggle" title="Thu gọn/Mở rộng">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+            </div>
+            <div id="sidebar-menu-container"></div>
+        </aside>
+
+        <!-- Flyout Submenu Container -->
+        <div id="sidebarFlyout" class="sidebar-flyout"></div>
+
+        <div class="main-wrapper">
+            <!-- Header Slot -->
+            <header id="header-container"></header>
+
+            <!-- Main Content Area -->
+            <main id="content-area">
+                <!-- Page Content will be injected here -->
+            </main>
+        </div>
+    </div>
+
+    <!-- Layout Logic -->
+    <script src="../assets/js/utils.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            // 1. Kiểm tra quyền truy cập
+            const userData = Utils.checkAuth();
+            if (!userData) return;
+
+            // 2. Load Partials
+            await Utils.loadComponent('#sidebar-menu-container', '../partials/sidebar-menu.html');
+            await Utils.loadComponent('#header-container', '../partials/header.html');
+            
+            // 3. Cập nhật thông tin User trên UI
+            const nameEl = document.querySelector('.user-name');
+            const avatarEl = document.querySelector('.user-avatar');
+            if (nameEl) nameEl.textContent = userData.name;
+            if (avatarEl) avatarEl.textContent = userData.name.substring(0, 2).toUpperCase();
+
+            // 4. Initial Page Load
+            Utils.navigateTo('dashboard');
+        });
+    </script>
+</body>
+</html>

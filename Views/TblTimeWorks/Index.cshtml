@@ -1,0 +1,174 @@
+@model IEnumerable<PMS.Models.TblTimeWork>
+
+@{
+    ViewData["Title"] = "Danh mục thời gian làm việc";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    .tbl-year-select {
+        width: 140px;
+        padding: 6px 30px 6px 10px;
+        border-radius: 6px;
+        border: 1px solid #ced4da;
+        background: #fff;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 0.5rem center;
+        background-size: 16px 12px;
+        appearance: none;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+    }
+</style>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+
+                <div id="customToolbar" class="d-flex align-items-center gap-3 mb-3">
+                    <div class="d-flex align-items-center gap-2" style="padding-right: 20px">
+                        <label class="mb-0 fw-semibold text-nowrap" style="padding-right: 10px">Chọn năm:</label>
+                        <select id="cboYear" name="cboYear" class="tbl-year-select" aria-label="Chọn năm">
+                            @for (int i = DateTime.Now.Year + 1; i >= 2024; i--)
+                            {
+                                <option value="@i" selected="@(i == DateTime.Now.Year ? "selected" : null)">@i</option>
+                            }
+                        </select>
+                    </div>
+
+                    <div id="datatableSearchContainer"></div>
+
+                    <div class="d-flex gap-2" style="margin-left: 10px;">
+                        <a class="btn btn-sm btn-primary" href="@Url.Action("Create", "TblTimeWorks")">
+                            Thêm mới
+                        </a>
+                        <button type="button" class="btn btn-sm btn-outline-secondary" id="btnEdit" style = "margin-left: 10px;">
+                            Cập nhật
+                        </button>
+                    </div>
+                </div>
+
+                <div class="table-responsive">
+                    <table id="myTable" class="table table-bordered table-striped">
+                        <thead>
+                            <tr>
+                                <th style="width: 50px;" class="text-center">#</th>
+                                <th class="text-center">Tháng</th>
+                                <th class="text-center">Số ngày làm việc</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @* Nội dung sẽ load động bằng AJAX *@
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    var tblTimeTable = null;
+    var toolbarInitialized = false;
+    var editBaseUrl = '@Url.Action("Edit", "TblTimeWorks")';
+
+    function initDataTable() {
+        if ($.fn.dataTable.isDataTable('#myTable')) {
+            try { $('#myTable').DataTable().destroy(); } catch (e) {}
+        }
+
+        tblTimeTable = $('#myTable').DataTable({
+            pageLength: 12,
+            ordering: true,
+            searching: true,
+            lengthChange: false,
+            dom: 'frtip',
+            language: {
+                zeroRecords: "Không tìm thấy bản ghi phù hợp",
+                info: "",
+                infoEmpty: "",
+                infoFiltered: "(lọc từ _MAX_ bản ghi)",
+                search: "Tìm kiếm:",
+                emptyTable: "Không có dữ liệu trong bảng",
+                paginate: { first: "Đầu", previous: "Trước", next: "Tiếp", last: "Cuối" }
+            },
+            initComplete: function () {
+                if (!toolbarInitialized) {
+                    var searchBox = $('.dataTables_filter').first();
+                    $('#datatableSearchContainer').append(searchBox);
+                    $('.dataTables_filter label').css({
+                        'margin-bottom': '0',
+                        'display': 'flex',
+                        'align-items': 'center',
+                        'gap': '8px',
+                        'white-space': 'nowrap'
+                    });
+
+                    $('#cboYear').off('change').on('change', function () {
+                        ChangeData();
+                    });
+
+                    toolbarInitialized = true;
+                }
+                $('.dataTables_wrapper .dataTables_filter')
+                    .not('#datatableSearchContainer .dataTables_filter').hide();
+                $('.dataTables_info').hide();
+            }
+        });
+    }
+
+    function replaceTableBody(html) {
+        if ($.fn.dataTable.isDataTable('#myTable')) {
+            try { $('#myTable').DataTable().destroy(); } catch (e) {}
+        }
+        $("#myTable tbody").html(html);
+    }
+
+    function loadByYear(year) {
+        $.ajax({
+            url: '@Url.Action("GetByYear", "TblTimeWorks")',
+            type: 'GET', cache: false,
+            data: { year: year },
+            success: function (data) { replaceTableBody(data); initDataTable(); },
+            error: function () {
+                replaceTableBody('<tr><td colspan="3">Không thể tải dữ liệu</td></tr>');
+                initDataTable();
+            }
+        });
+    }
+
+    function loadAllDataAndInit() {
+        $.ajax({
+            url: '@Url.Action("GetAllData", "TblTimeWorks")',
+            type: 'GET', cache: false,
+            success: function (data) { replaceTableBody(data); initDataTable(); },
+            error: function () {
+                replaceTableBody('<tr><td colspan="3">Không thể tải dữ liệu</td></tr>');
+                initDataTable();
+            }
+        });
+    }
+
+    function ChangeData() {
+        var year = parseInt($("#cboYear").val(), 10);
+        if (isNaN(year) || year === 0) loadAllDataAndInit();
+        else loadByYear(year);
+    }
+
+    // Nút Sửa → điều hướng đến Edit với năm đang chọn
+    $('#btnEdit').on('click', function () {
+        var year = parseInt($("#cboYear").val(), 10);
+        if (!year || isNaN(year)) {
+            alert('Vui lòng chọn năm trước khi sửa.');
+            return;
+        }
+        window.location.href = editBaseUrl + '?year=' + year;
+    });
+
+    $(document).ready(function () {
+        ChangeData();
+    });
+</script>

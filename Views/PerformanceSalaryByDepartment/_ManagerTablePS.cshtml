@@ -1,0 +1,600 @@
+﻿@model IEnumerable<object[]>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/handsontable@14.3.0/dist/handsontable.full.min.css" />
+<link rel="stylesheet" href="~/Content/css/MyStyle.css" />
+<style>
+    /* Tăng font-size và màu chữ */
+    .handsontable td {
+        color: #333333 !important;
+        font-size: 14px !important;
+        white-space: nowrap !important;
+    }
+    .handsontable .htDimmed {
+        color: #333333 !important;
+    }
+    .handsontable span.colHeader {
+        color: #333333 !important;
+        font-weight: 700 !important;
+    }
+    /* Ẩn scrollbar dọc của Handsontable, giữ scrollbar ngang ở dưới */
+    #salaryPolicyTable .wtHolder {
+        overflow-x: auto !important;
+        overflow-y: visible !important;
+        height: auto !important;
+    }
+    #salaryPolicyTable .ht_master .wtHolder {
+        overflow-x: auto !important;
+        overflow-y: visible !important;
+    }
+    /* Ẩn scrollbar của header clone */
+    #salaryPolicyTable .ht_clone_top .wtHolder {
+        overflow: hidden !important;
+    }
+</style>
+<div id="salaryPolicyTableWrapper" style="overflow:visible;">
+    <div id="salaryPolicyTable"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/handsontable@14.3.0/dist/handsontable.full.min.js"></script>
+    <script src="~/js/handsontable-formula.js?v=2.1"></script>    
+
+    <script>
+        (function () {
+            const container = document.getElementById('salaryPolicyTable');
+            const currentMonth = @(ViewBag.Month ?? DateTime.Now.Month);
+            const currentYear = @(ViewBag.Year ?? DateTime.Now.Year);
+            let isBatch = false;
+
+            // headers
+        //     const nestedHeaders = [
+        //         [
+        //             'TT', 'Họ và tên', 'Mã cán bộ', 'Số TK',
+        //             'Tổng <br/> hệ số','Ki', 'Hệ số <br/> quy đổi <br/> theo tháng', 'Hệ số quy đổi theo ngày',
+        //             { label: 'Xếp loại ngày công đi làm', colspan: 8 }, { label: 'Xếp loại ngày công đi học', colspan: 3 },
+        //             'Xếp loại NC<sub>CĐ</sub> ', 'HSL bình quân theo thực tế', {label: 'CHI', colspan : 1}, {label:'THU', colspan: 3 } ,'Truy lĩnh V1', 'Truy lĩnh ăn ca','Tổng lĩnh', 'Ghi chú'
+        //         ],  
+        //         [
+        //             '', '', '', '', '', '', '', '',
+        //             '1.10','1.05', '1.00', '0.95', '0.90', '0.85', '0.80','0.75', '1.00', '0.40', '0.20', '0.80', '', 'Số tiền nhận theo hệ số quy đổi', 'Truy thu BHXH,BHYT,BHTN', 'Thu phí công đoàn', 'Thu chi phí điện thoại',
+        //             '', '', '', ''
+        //         ]
+        //     ];
+
+        //     // mapping column index
+        //             const columns = [
+        //     { data: 0, type: 'numeric', width: 50, readOnly: true, className: "htCenter", filters: false, dropdownMenu: false },   // TT
+        //     { data: 1, type: 'text', width: 160, readOnly: true },                           // Họ và tên
+        //     { data: 2, type: 'text', width: 110, readOnly: true, className: "htCenter" },    // Mã cán bộ
+        //     { data: 3, type: 'text', width: 100, readOnly: true, className: "htCenter" },    // Số TK
+        //     { data: 4, type: 'numeric', numericFormat: { pattern: '0.000' }, width: 70, readOnly: true }, // Tổng hệ số
+        //     { data: 5, type: 'numeric', numericFormat: { pattern: '0.0' }, width: 40, readOnly: true },    // Ki
+        //     { data: 6, type: 'numeric', numericFormat: { pattern: '0.000' }, width: 70, readOnly: true }, // Hệ số quy đổi theo tháng
+        //     { data: 7, type: 'numeric', numericFormat: { pattern: '0.000' }, width: 70, readOnly: true }, // Hệ số quy đổi theo ngày
+
+        //     // Xếp loại ngày công đi làm (8 cột)
+        //     { data: 8, type: 'numeric', width: 60 },  // 1.10
+        //     { data: 9, type: 'numeric', width: 60 },  // 1.05
+        //     { data: 10, type: 'numeric', width: 60 }, // 1.00
+        //     { data: 11, type: 'numeric', width: 60 }, // 0.95
+        //     { data: 12, type: 'numeric', width: 60 }, // 0.90
+        //     { data: 13, type: 'numeric', width: 60 }, // 0.85
+        //     { data: 14, type: 'numeric', width: 60 }, // 0.80
+        //     { data: 15, type: 'numeric', width: 60 }, // 0.75
+
+        //     // Xếp loại ngày công đi học (3 cột)
+        //     { data: 16, type: 'numeric', width: 60 }, // 1.00
+        //     { data: 17, type: 'numeric', width: 60 }, // 0.40
+        //     { data: 18, type: 'numeric', width: 60 }, // 0.20
+
+        //     // Các cột còn lại
+        //     { data: 19, type: 'numeric', width: 60 }, // Xếp loại NC<sub>CĐ</sub> 0.80
+        //     { data: 20, type: 'numeric', numericFormat: { pattern: '0.000' }, width: 70, readOnly: true },  // HSL bình quân theo thực tế
+        //     { data: 21, type: 'numeric', numericFormat: { pattern: '0,0' }, width: 110, readOnly: true },   // Số Tiền nhận theo hệ số quy đổi
+        //     { data: 22, type: 'numeric', numericFormat: { pattern: '0,0' }, width: 100 },   // Truy thu BHXH,BHYT,BHTN
+        //     { data: 23, type: 'numeric', numericFormat: { pattern: '0,0' }, width: 90 },    // Thu phí công đoàn
+        //     { data: 24, type: 'numeric', numericFormat: { pattern: '0,0' }, width: 90 },    // Thu chi phí điện thoại
+        //     { data: 25, type: 'numeric', numericFormat: { pattern: '0,0' }, width: 100 },   // Truy lĩnh V1
+        //     { data: 26, type: 'numeric', numericFormat: { pattern: '0,0' }, width: 90 },    // Truy lĩnh ăn ca
+        //     { data: 27, type: 'numeric', numericFormat: { pattern: '0,0' }, width: 110, readOnly: true },   // Tổng lĩnh
+        //     { data: 28, type: 'text', width: 120 },                                                         // Ghi chú
+        //     { data: 29, type: 'numeric', width: 0, readOnly: true }                                         // UserId (ẩn)
+        // ];
+
+        const nestedHeaders = [
+                [
+                    'TT', 'Họ và tên', 'Mã cán bộ', 'Số TK',
+                    'Tổng<br/>hệ số','Ki', 'Hệ số quy đổi<br/>theo tháng', 'Hệ số quy đổi<br/>theo ngày',
+                    { label: 'Xếp loại ngày công<br/> đi làm', colspan: 8 }, { label: 'Xếp loại ngày công <br/> đi học', colspan: 3 },
+                    'Xếp loại <br/> NC<sub>CĐ</sub> ', 'HSL bình quân <br/> theo thực tế', 'Số tiền nhận<br/>theo hệ số quy đổi', {label:'THU', colspan: 3 } ,'Truy lĩnh<br/>V1', 'Truy lĩnh<br/>ăn ca','Số tiền', 'Ghi chú'
+                ],
+                [
+                    '', '', '', '', '', '', '', '',
+                    '1.10','1.05', '1.00', '0.95', '0.90', '0.85', '0.80','0.75', '1.00', '0.40', '0.20', '0.80', '', '', 'BHXH,<br/>BHYT,<br/>BHTN', 'Phí<br/>công đoàn', 'Phí<br/>điện thoại',
+                    '', '', '', ''
+                ]
+            ];
+
+            // mapping column index
+                    const columns = [
+            { data: 0, type: 'numeric', width: 50, readOnly: true, className: "htCenter" },   // TT
+            { data: 1, type: 'text', width: 120, readOnly: true },                           // Họ và tên
+            { data: 2, type: 'text', width: 110, readOnly: true, className: "htCenter" },    // Mã cán bộ
+            { data: 3, type: 'text', width: 100, readOnly: true, className: "htCenter" },    // Số TK
+            { data: 4, type: 'numeric', numericFormat: { pattern: '0.000' }, width: 70, readOnly: true, filter: true, dropdownMenu: true }, // Tổng hệ số
+            { data: 5, type: 'numeric', numericFormat: { pattern: '0.000' }, width: 40, readOnly: true, filter: true },    // Ki
+            { data: 6, type: 'numeric', numericFormat: { pattern: '0.000' }, width: 70, readOnly: true, filter: true }, // Hệ số quy đổi theo tháng
+            { data: 7, type: 'numeric', numericFormat: { pattern: '0.000' }, width: 70, readOnly: true, filter: true }, // Hệ số quy đổi theo ngày
+
+            // Xếp loại ngày công đi làm (8 cột)
+            { data: 8, type: 'numeric', width: 0, filter: false },  // 1.10
+            { data: 9, type: 'numeric', width: 0, filter: false },  // 1.05
+            { data: 10, type: 'numeric', width: 0, filter: false }, // 1.00
+            { data: 11, type: 'numeric', width: 0, filter: false }, // 0.95
+            { data: 12, type: 'numeric', width: 0, filter: false }, // 0.90
+            { data: 13, type: 'numeric', width: 0, filter: false }, // 0.85
+            { data: 14, type: 'numeric', width: 0, filter: false }, // 0.80
+            { data: 15, type: 'numeric', width: 0, filter: false }, // 0.75
+
+            // Xếp loại ngày công đi học (3 cột)
+            { data: 16, type: 'numeric', width: 0, filter: false }, // 1.00
+            { data: 17, type: 'numeric', width: 0, filter: false }, // 0.40
+            { data: 18, type: 'numeric', width: 0, filter: false }, // 0.20
+
+            // Các cột còn lại
+            { data: 19, type: 'numeric', width: 0, filter: false }, // Xếp loại NC<sub>CĐ</sub> 0.80
+            { data: 20, type: 'numeric', numericFormat: { pattern: '0.000' }, width: 70, readOnly: true, filter: false },  // HSL bình quân theo thực tế
+            { data: 21, type: 'numeric', numericFormat: { pattern: '0,0' }, width: 120, readOnly: true, filter: false },   // Số Tiền nhận theo hệ số quy đổi
+            { data: 22, type: 'numeric', numericFormat: { pattern: '0,0' }, width: 100, filter: false },   // Truy thu BHXH,BHYT,BHTN
+            { data: 23, type: 'numeric', numericFormat: { pattern: '0,0' }, width: 90, filter: false },    // Thu phí công đoàn
+            { data: 24, type: 'numeric', numericFormat: { pattern: '0,0' }, width: 90, filter: false },    // Thu chi phí điện thoại
+            { data: 25, type: 'numeric', numericFormat: { pattern: '0,0' }, width: 100, filter: false },   // Truy lĩnh V1
+            { data: 26, type: 'numeric', numericFormat: { pattern: '0,0' }, width: 90, filter: false },    // Truy lĩnh ăn ca
+            { data: 27, type: 'numeric', numericFormat: { pattern: '0,0' }, width: 110, readOnly: true, filter: false },   // Tổng lĩnh
+            { data: 28, type: 'text', width: 120, filter: false },                                                         // Ghi chú
+            { data: 29, type: 'numeric', width: 0, readOnly: true }                                         // UserId (ẩn)
+        ];
+
+
+
+            // data từ controller (convert sang JSON)
+            const data = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model));
+
+            // Lương cơ sở từ database
+
+
+            // State management để tránh infinite loop
+            let isCalculating = false;
+            let isSaving = false;
+            let saveTimeout = null;
+
+            // Queue để xử lý batch updates khi paste nhiều cells
+            let updateQueue = [];
+            let updateQueuePerformace =[];
+            let updateTimer = null;
+
+            const hot = new Handsontable(container, {
+                data: data,
+                columns: columns,
+                colHeaders: false,
+                rowHeaders: false,
+                wordWrap: true,
+                nestedHeaders: nestedHeaders,
+                height: 'auto',  // Sử dụng scroll dọc của web
+                width: '100%',
+                stretchH: 'all',
+                autoColumnSize: true,
+                manualColumnFreeze: true,
+                manualColumnMove: true,
+                fixedColumnsLeft: 4,
+
+                // Bật Copy/Paste từ Excel
+                copyPaste: {
+                    enabled: true,
+                    pasteMode: 'overwrite',
+                    rowsLimit: 1000,
+                    columnsLimit: 50
+                },
+
+                // Bật fill handle để kéo copy nhanh
+                fillHandle: {
+                    direction: 'vertical',
+                    autoInsertRow: false
+                },
+
+                contextMenu: {
+                    items: {
+                        row_above: {},
+                        row_below: {},
+                        hsep1: '---------',
+                        copy: { name: 'Sao chép (Ctrl+C)' },
+                        cut: { name: 'Cắt (Ctrl+X)' },
+                        hsep2: '---------',
+                        freeze_column: { name: 'Cố định cột' },
+                        unfreeze_column: { name: 'Bỏ cố định cột' },
+                        hsep3: '---------',
+                        undo: {},
+                        redo: {},
+                        clear_custom: {
+                            name: 'Xóa nội dung các ô đã chọn',
+                            callback() { hot.emptySelectedCells(); }
+                        }
+                    }
+                },
+                filters: false,
+                dropdownMenu: false,
+                hiddenColumns: { columns: [22, 23, 24, 25, 26, 29], indicators: false },
+                licenseKey: 'non-commercial-and-evaluation',
+
+                // beforechange: function(changes, source){
+                //     if (source === 'edit')
+                //     {
+                //         try
+                //         {
+                //             changes.forEach(([row, prop, oldval,newval]) =>
+                //             {
+                //                 if (prop >= 8 && prop <= 19)
+                //                 {
+                //                     if (!isDigit(newval.charAt(newVal.length - 1)))
+                //                     {
+                //                         showUpdateNotification('error', 'Chỉ chấp nhận số ở ô này');
+                //                         return false;
+                //                     }
+                //                 }
+                //                 return true;
+                //             });
+                //         }
+                //         catch
+                //         {
+                //              return false;
+                //         }
+                //     }
+                // },
+
+                // Cải thiện afterChange để tránh infinite loop và auto-save
+                afterChange: function (changes, source)     {
+                    // Bỏ qua nếu đang tính toán hoặc load data
+                    if (source === 'loadData' || !changes || isCalculating) {
+                        return;
+                    }
+                    // Set flag để tránh loop
+                    isCalculating = true;
+
+                    try {
+                        changes.forEach(([row, prop, oldVal, newVal]) => {
+                            // Chỉ tính toán nếu giá trị thực sự thay đổi
+                            if (oldVal === newVal) return;
+
+                            const rowData = hot.getSourceDataAtRow(row);
+                            // Thử nhiều cách lấy userId
+                            let userId = null;
+                            if (rowData && rowData.UserId) {
+                                userId = rowData.UserId;
+                            } else if (rowData && rowData.userId) {
+                                userId = rowData.userId;
+                            } else if (rowData && rowData.length > 29) {
+                                userId = parseInt(rowData[29]); // UserId ở cột 29 (index cuối)
+                            }
+
+                            if (prop >= 8 && prop <= 19) {
+                                const WorkDay = @ViewBag.WorkDay;
+                                //Lấy loại ngày công
+                                if (prop >= 8 && prop <= 15) var TypeDays = 1;
+                                else if (prop <= 18) var TypeDays = 2;
+                                else var TypeDays = 3;
+                                // Tạo list đánh giá ngày công
+                                const rattingval = [1.10, 1.05, 1, 0.95, 0.9, 0.85, 0.8, 0.75, 1, 0.4, 0.2, 0.8]
+                                //Lấy đánh giá ngày công
+                                var Ratting = rattingval[prop - 8];
+                                // Lấy ngày công
+                                var Days = rowData[prop];
+                                // Cập nhật lại cột dánh giá ngày làm việc
+                                const totalExpecDays = rowData[8] + rowData[9] + rowData[11] + rowData[12] + rowData[13] + rowData[14] + rowData[15] + rowData[16] + rowData[17] + rowData[18] + rowData[19] ;
+                                // Tính ngày làm đánh giá 1.0
+                                let PerformDays = WorkDay - totalExpecDays;
+                                const SalaryCoeffic = caculateSalaryActualCoefficient(rowData);
+                                const moneyPerPoint = @(ViewBag.MoneyPerExchangePoint ?? 0);
+                                const totalsalary = SalaryCoeffic * moneyPerPoint;
+
+                                hot.setDataAtCell(row, 10, PerformDays, 'calculation');
+                                hot.setDataAtCell(row, 20, SalaryCoeffic, 'calculation');
+                                hot.setDataAtCell(row, 21, roundToTwoDecimals(totalsalary), 'calculation');
+                                console.log(SalaryCoeffic + " - " + moneyPerPoint);
+                                // Cập nhật đữ liệu lên Handsotable
+                                if (userId && userId > 0) {
+                                    // Thêm vào queue để batch update - chỉ cho các cột có thể edit
+                                    updateQueue.push({
+                                        userId: userId,
+                                        TypeDays: TypeDays,
+                                        Days: Days,
+                                        Ratting: Ratting
+                                    });
+                                    console.log('Added to queue:', {
+                                        userId, TypeDays, Days, PerformDays, Ratting
+                                        });
+                                }
+                            }
+
+                            if (prop >= 20 && prop <= 26 )
+                            {   
+                                if (userId && userId > 0) {
+                                    // Thêm vào queue để batch update - chỉ cho các cột có thể edit
+                                    const SalaryCoeffic = caculateSalaryActualCoefficient(rowData);
+                                    const moneyPerPoint = @(ViewBag.MoneyPerExchangePoint ?? 0);
+                                    const totalSalary = (moneyPerPoint * SalaryCoeffic) - rowData[22] - rowData[23] - rowData[24] + rowData[25] + rowData[26];
+                                    hot.setDataAtCell(row, 27,roundToTwoDecimals(totalSalary),'calculation');
+                                    const data = {
+                                        userId : userId,
+                                        totalSalaryCoefficent : rowData[4],
+                                        ki : rowData[5],
+                                        coefficientByMonth : rowData[6],
+                                        coefficientByDay : rowData[7],
+                                        salaryCoefficientByActualWorkDays : rowData[20],
+                                        salaryByCoefficient : rowData[21],
+                                        insuranceFee :  rowData[22],
+                                        unionFee : rowData[23],
+                                        telephoneFee : rowData[24],
+                                        arreasV1Salary : rowData[25],
+                                        arreasMealAllowance : rowData[26],
+                                        totalSalary : rowData[27]
+                                    };
+                                    updateQueuePerformace.push({
+                                        data
+                                    });
+                                }
+                                else
+                                {
+                                    showUpdateNotification('erro','Lỗi không lấy được dữ liệu');
+                                }
+                            }
+                        });
+                // Debounce batch update - chờ 500ms sau lần thay đổi cuối
+                        if (updateTimer) clearTimeout(updateTimer);
+                        updateTimer = setTimeout(() => {
+                            processBatchUpdates();
+                        }, 500);
+                }finally {
+                        // Reset flag sau khi tính toán xong
+                        isCalculating = false;
+                    }
+                }
+            });
+
+            function caculateSalaryActualCoefficient(rowData) {
+                const rattingval = [1.10, 1.05, 1, 0.95, 0.9, 0.85, 0.8, 0.75, 1, 0.4, 0.2, 0.8];
+                let totalDay = 0;
+                let j = 8;
+                for (let i = 0; i < rattingval.length; i++) {
+                    let days = parseFloat(rowData[j]) || 0;
+                    console.log(days + " - ");
+                    totalDay += days * rattingval[i];
+                    j++;
+                }
+                const coefficientByDay = rowData[7];
+                const result = totalDay * coefficientByDay;
+                return result;
+            }
+
+            // Làm tròn đến 2 chữ số thập phân
+            function roundToTwoDecimals(num) {
+                return Math.round(num * 100) / 100;
+            }
+
+            function processBatchUpdates() {
+                if (updateQueue.length === 0 && updateQueuePerformace.length === 0) return;
+
+                const batchPerform = updateQueuePerformace.slice();
+                const batch = updateQueue.slice(); // Copy queue
+                updateQueue = []; // Reset queue
+                updateQueuePerformace = [];
+                console.log('Processing batch updates:', batch);
+
+                // Gửi tất cả requests
+                const promises = batch.map(update =>
+                    updateRattingData(update.userId, update.TypeDays, update.Days, update.Ratting, true)
+                );
+
+                const promisesPerformance = batchPerform.map(update =>
+                    updatePerformanceSalaryData(update.data)
+                );
+
+                const allpromises = [promises,promisesPerformance];
+
+                // Xử lý khi tất cả hoàn thành
+                Promise.all(allpromises)
+                    .then(() => {
+                        showUpdateNotification('success', `Đã cập nhật ${batch.length} bản ghi`);
+                    })
+                    .catch(error => {
+                        console.error('Batch update error:', error);
+                        showUpdateNotification('error', 'Có lỗi khi cập nhật hàng loạt');
+                    });
+            }
+
+            function updateRattingData(userId,type, day, rate , isBatch = false) {
+                // Lấy tháng và năm hiện tại
+                const currentMonth = @ViewBag.Month;
+                const currentYear = @ViewBag.Year;
+
+                const requestData = {
+                    userId: userId,
+                    month: currentMonth,
+                    year: currentYear,
+                    typeDays: type,
+                    days: day,
+                    ratting: rate
+                };
+
+                console.log('Sending request:', requestData);
+
+                return $.ajax({
+                    url: '/PerformanceSalaryByDepartment/UpdateRattingData',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(requestData),
+                    success: function(response) {
+                        console.log('Response received:', response);
+                        if (!isBatch) {
+                            if (response && response.success) {
+                                showUpdateNotification('success', 'Đã cập nhật!');
+                            } else {
+                                showUpdateNotification('error', response ? response.message : 'Lỗi không xác định');
+                            }
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('AJAX Error:', { xhr, status, error, responseText: xhr.responseText });
+                        if (!isBatch) {
+                            let errorMessage = 'Lỗi kết nối';
+                            if (xhr.responseText) {
+                                try {
+                                    const errorResponse = JSON.parse(xhr.responseText);
+                                    errorMessage = errorResponse.message || errorMessage;
+                                } catch (e) {
+                                    errorMessage = xhr.responseText.substring(0, 100);
+                                }
+                            }
+                            showUpdateNotification('error', errorMessage + ': ' + error);
+                        }
+                    }
+                });
+            }
+
+            function updatePerformanceSalaryData(data, isBatch = false) {
+                // Lấy tháng và năm hiện tại
+                const currentMonth = @ViewBag.Month;
+                const currentYear = @ViewBag.Year;
+
+                const requestData = {
+                    userId: data.userId,
+                    month: currentMonth,
+                    year: currentYear,
+                    totalSalaryCoefficent : data.totalSalaryCoefficent,
+                    ki : data.ki,
+                    coefficientByMonth : data.coefficientByMonth,
+                    coefficientByDay : data.coefficientByDay,
+                    salaryCoefficientByActualWorkDays : data.salaryCoefficientByActualWorkDays,
+                    salaryByCoefficient : data.salaryByCoefficient,
+                    insuranceFee : data.insuranceFee,
+                    unionFee : data.unionFee,   
+                    telephoneFee : data.telephoneFee,
+                    arreasV1Salary : data.arreasV1Salary,
+                    arreasMealAllowance : data.arreasMealAllowance,
+                    totalSalary : data.totalSalary,
+                    note : data.note
+                };
+
+                console.log('Sending request:', requestData);
+
+                return $.ajax({
+                    url: '/PerformanceSalaryByDepartment/UpdatePerformanceSalary',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(requestData),
+                    success: function(response) {
+                        console.log('Response received:', response);
+                        if (!isBatch) {
+                            if (response && response.success) {
+                                showUpdateNotification('success', 'Đã cập nhật!');
+                            } else {
+                                showUpdateNotification('error', response ? response.message : 'Lỗi không xác định');
+                            }
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('AJAX Error:', { xhr, status, error, responseText: xhr.responseText });
+                        if (!isBatch) {
+                            let errorMessage = 'Lỗi kết nối';
+                            if (xhr.responseText) {
+                                try {
+                                    const errorResponse = JSON.parse(xhr.responseText);
+                                    errorMessage = errorResponse.message || errorMessage;
+                                } catch (e) {
+                                    errorMessage = xhr.responseText.substring(0, 100);
+                                }
+                            }
+                            showUpdateNotification('error', errorMessage + ': ' + error);
+                        }
+                    }
+                });
+            }
+
+            function calculateHotHeight() {
+                const windowHeight = window.innerHeight;
+                const wrapper = document.getElementById('salaryPolicyTableWrapper');
+                const wrapperRect = wrapper.getBoundingClientRect();
+                const topOffset = wrapperRect.top;
+                const margin = 50; // margin an toàn
+                return Math.max(400, windowHeight - topOffset - margin);
+            }
+
+            // ===== HIỂN THỊ CÔNG THỨC TRONG SEARCH-BOX =====
+            HandsontableFormula.init(hot, 'formulaInput', {
+                getFormula: function(row, col, value, hotInstance) {
+                    const colHeader = hotInstance.getColHeader(col);
+                    if (col == 4 ) {
+                        return `= Hệ số lương cơ bản  + Hệ số chức vụ + Hệ số phụ cấp`;
+                    }
+                    else if (col == 5 ) {
+                        return `= Hệ số hiệu quả `;
+                    }
+                    else if (col == 6 ) {
+                        return `= Tổng hệ số lương * Ki`;
+                    }
+                    else if (col == 7 ) {
+                        return `= Hệ số lương quy đổi theo tháng / Số ngày công đi làm quy định`;
+                    }
+                    else if (col == 20 ) {
+                        return `= Hệ số quy đổi theo ngày * Tổng các (Ngày công * Đánh giá hiệu quả) của tất cả xếp loại ngày công`;
+                    }
+                    else if (col == 21 ) {
+                        return `= Hệ số quy đổi thực tế * Số tiền trên 1 hệ số`;
+                    }
+                    else if (col == 27 ) {
+                        return `= Số tiền nhận theo hệ số quy đổi - Truy thu BHYT,BHXH,BHTN - Truy thu thuế - Truy thu phí điện thoại - Truy thu phí công đoàn + Truy lĩnh V1 + Truy lĩnh ăn ca`;
+                    }
+                    return `= Cột ${value}`;
+                },
+                shouldShow: function(row, col, value) {
+                    return value != null && value !== '';
+                }
+            });
+
+            // Hàm hiển thị thông báo cập nhật (như TimeKeeping)
+            function showUpdateNotification(type, message) {
+                try {
+                    let alertClass, icon;
+                    if (type === 'success') {
+                        alertClass = 'alert-success';
+                        icon = 'fa-check-circle';
+                    } else if (type === 'info') {
+                        alertClass = 'alert-info';
+                        icon = 'fa-info-circle';
+                    } else {
+                        alertClass = 'alert-danger';
+                        icon = 'fa-exclamation-triangle';
+                    }
+
+                    const notification = $(`
+                        <div class="alert ${alertClass} alert-dismissible fade show update-notification" role="alert" style="position: fixed; top: 20px; right: 20px; z-index: 99999; min-width: 300px; max-width: 400px;">
+                            <i class="fa ${icon}"></i> ${message}
+                            <button type="button" class="close" data-dismiss="alert">
+                                <span>&times;</span>
+                            </button>
+                        </div>
+                    `);
+
+                    $('body').append(notification);
+
+                    setTimeout(() => {
+                        try {
+                            notification.alert('close');
+                        } catch (e) {
+                            notification.remove();
+                        }
+                    }, 3000);
+                } catch (error) {
+                    alert(message);
+                }   
+            }
+        })();
+    </script>
+</div>

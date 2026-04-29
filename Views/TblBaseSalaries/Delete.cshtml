@@ -1,0 +1,103 @@
+﻿@model PMS.Models.TblBaseSalary
+
+@{
+    ViewData["Title"] = "DANH MỤC MỨC LƯƠNG CƠ SỞ";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row">
+    <div class="col-12">
+        <div class="card shadow border-0 rounded-3">
+            <div class="card-body">
+                <div class="row row-head mb-2">
+                    <div class="col-lg-9">
+                        <h5 class="card-title mb-0">Xóa hệ số lương cơ bản</h5>
+                    </div>
+                </div>
+                <hr class="mt-2 mb-3" />
+
+                <div class="alert alert-danger mb-3">
+                    <h6 class="mb-1"><i class="fa fa-exclamation-triangle"></i> Cảnh báo!</h6>
+                    <p class="mb-1">Bạn có chắc chắn muốn xóa hệ số lương cơ bản <strong>"@Model.Name"</strong> không?</p>
+                    <p class="mb-0 text-muted">Hành động này không thể hoàn tác.</p>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="card border">
+                            <div class="card-header bg-light py-2">
+                                <h6 class="card-title mb-0">Thông tin hệ số lương</h6>
+                            </div>
+                            <div class="card-body py-2">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <dl class="row mb-0">
+                                            <dt class="col-sm-4">Tên:</dt>
+                                            <dd class="col-sm-8">@Html.DisplayFor(m => m.Name)</dd>
+
+                                            <dt class="col-sm-4">Giá trị:</dt>
+                                            <dd class="col-sm-8">@Html.DisplayFor(m => m.Value)</dd>
+
+                                            <dt class="col-sm-4">Ngày ban hành:</dt>
+                                            <dd class="col-sm-8">@Html.DisplayFor(m => m.DateIssued)</dd>
+                                        </dl>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <dl class="row mb-0">
+                                            <dt class="col-sm-4">Trạng thái:</dt>
+                                            <dd class="col-sm-8">
+                                                @if (Model.Status == 1)
+                                                {
+                                                    <span>Hoạt động</span>
+                                                }
+                                                else
+                                                {
+                                                    <span>Ngưng hoạt động</span>
+                                                }
+                                            </dd>
+                                            <dt class="col-sm-4">Mô tả:</dt>
+                                            <dd class="col-sm-8">@Html.DisplayFor(m => m.Description)</dd>
+                                        </dl>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mt-3">
+                            <form asp-action="Delete" style="display: inline;" id="deleteForm">
+                                <input type="hidden" asp-for="Id" />
+                                <button type="submit" class="btn btn-danger btn">
+                                    <i class="fa fa-trash"></i> Xác nhận xóa
+                                </button>
+                            </form>
+                            <a asp-action="Index" class="btn btn-secondary btn ms-2">
+                                <i class="fa fa-times"></i> Hủy bỏ
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.getElementById("deleteForm").addEventListener("submit", function (e) {
+        if (!confirm("Bạn có chắc chắn muốn xóa hệ số lương '@Html.Raw(@Model.Name)'?")) {
+            e.preventDefault();
+        }
+    });
+</script>
+
+<style>
+    /* Thu nhỏ khoảng cách trong delete view */
+    .card-body dl dt,
+    .card-body dl dd {
+        margin-bottom: 0.25rem;
+    }
+
+    .card-body h5,
+    .card-body h6 {
+        margin-bottom: 0.5rem;
+    }
+</style>

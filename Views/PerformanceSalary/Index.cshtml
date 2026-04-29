@@ -1,0 +1,298 @@
+﻿@{
+    ViewData["Title"] = "QUẢN LÝ CHI LƯƠNG THEO THÁNG";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+
+                <!-- Bộ lọc -->
+                <div class="row align-items-center mt-2 mb-2">
+                    <div class="col-auto d-flex align-items-center mr-3 mb-2">
+                        <label class="fw-bold me-3 mb-0" style="min-width: 90px;">Chọn phòng: </label>
+                        <select class="form-control form-select-sm" id="selectDepartment" style="width: auto; min-width: 150px;"></select>
+                    </div>
+                    <div class="col-auto d-flex align-items-center mr-3 mb-2">
+                        <label class="fw-bold me-3 mb-0" style="min-width: 90px;">Chọn tháng:</label>
+                        <select class="form-control form-select-sm" id="selectMonth" style="width:80px;">
+                            <option value="">Tất cả</option>
+                            @for (int i = 1; i <= 12; i++)
+                            {
+                                if (i == DateTime.Now.Month)
+                                {
+                                    <option value="@i" selected>@i</option>
+                                }
+                                else
+                                {
+                                    <option value="@i">@i</option>
+                                }
+                            }
+                        </select>
+                    </div>
+                    <div class="col-auto d-flex align-items-center mr-3 mb-2">
+                        <label class="fw-bold me-3 mb-0" style="min-width: 90px;">Chọn năm:</label>
+                        <select class="form-control form-select-sm" id="selectYear" style="width:100px;">
+                        </select>
+                    </div>
+
+                    <div class="col-auto d-flex align-items-center mr-3 mb-2">
+                        <label class="fw-bold me-3 mb-0" style="min-width: 120px;">Chọn đối tượng: </label>
+                        <div class="d-flex" style="gap: 1rem;">
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="loaiDoiTuong" value="1" checked id="doiTuongNQL">
+                                <label class="form-check-label" for="doiTuongNQL">NQL</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="loaiDoiTuong" value="2" id="doiTuongNLD">
+                                <label class="form-check-label" for="doiTuongNLD">NLĐ</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-auto d-flex align-items-center mb-2 ms-auto">
+                         <button id="btnExportExcel" class="btn btn-primary btn-sm" title="Xuất dữ liệu">
+                            <i class="fa fa-download"></i> Xuất Excel
+                        </button>
+                    </div>
+
+                </div>
+
+                <!-- Kết quả load AJAX -->
+                <div class="table-responsive" id="bangKetQua">
+                    @{
+                        var defaultData = ViewBag.DefaultData as List<object[]> ?? new List<object[]>();
+                    }
+                    @Html.Partial("_ManagerTablePerformSalary.cshtml", defaultData) <!-- Load partial view với dữ liệu mặc định -->
+                </div>
+
+
+
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="~/js/handsontable-formula.js?v=2.1"></script>
+    <script>
+        // Sử dụng jQuery thay vì native JS để tránh conflict
+        $(document).ready(function () {
+
+
+            const departmentSelect = $('#selectDepartment');
+            const monthSelect = $('#selectMonth');
+            const yearSelect = $('#selectYear');
+
+            // Kiểm tra xem elements có tồn tại không
+            if (departmentSelect.length === 0) {
+                console.error('Department select element not found!');
+                return;
+            }
+
+            // Load danh sách phòng ban từ server
+            function loadDepartments() {
+                return $.ajax({
+                    url: '/PerformanceSalary/GetDepartments',
+                    type: 'GET',
+                    success: function(result) {
+                        if (result.success && result.data) {
+                            // Clear dropdown trước
+                            departmentSelect.empty();
+
+                            // Thêm các departments
+                            $.each(result.data, function(index, dept) {
+                                departmentSelect.append($('<option>', {
+                                    value: dept.id,
+                                    text: dept.name
+                                }));
+                            });
+
+                            // Tự động chọn phòng ban của user hiện tại
+                            const currentUserDeptId = @(ViewBag.CurrentUserDepartmentId ?? 0);
+                            const isSuperAdmin = @((ViewBag.IsSuperAdmin ?? false).ToString().ToLower());
+
+                            if (currentUserDeptId > 0) {
+                                departmentSelect.val(currentUserDeptId);
+                                // Nếu không phải admin (RoleId != 1) thì disable selection
+                            if (!isSuperAdmin) {
+                                selectDepartment.disabled = true;
+                            }
+                            }
+                        } else {
+                            console.error('No departments data received:', result);
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Error loading departments:', error);
+                        alert('Không thể tải danh sách phòng ban. Vui lòng thử lại.');
+                    }
+                });
+            }
+
+            loadDepartments();
+
+            function loadYear() {
+                return $.ajax({
+                    url: '/PerformanceSalary/GetYears',
+                    type: 'GET',
+                    success: function(result) {
+                        if (result.success && result.data) {
+                            // Clear dropdown trước
+                            yearSelect.empty();
+
+                            $.each(result.data, function(index, year) {
+                                yearSelect.append($('<option>', {
+                                    value: year.value,
+                                    text: year.value
+                                }));
+                            });
+
+                            // Tự động chọn nam hiện tại
+                            const currentYear  = @DateTime.Now.Year;
+                            console.log("Nam duoc chon: " + currentYear);
+                            yearSelect.val(currentYear);
+                        }
+                        else {
+                            console.error('No years data received:', result);
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Error loading years:', error);
+                        alert('Không thể tải danh sách năm. Vui lòng thử lại.');
+                    }
+                });
+            }
+
+            loadYear();
+
+            // Hàm load bảng theo tháng
+            function loadBangTheoThang() {
+                var thang = monthSelect.val();
+                var nam = yearSelect.val();
+                var phong = departmentSelect.val();
+                console.log(thang + " - " + nam + " - ");
+                var loai =  $('input[name="loaiDoiTuong"]:checked').val();
+
+                // Xử lý giá trị tháng/năm
+                if (thang === "" || thang === null) {
+                    thang = @DateTime.Now.Month;
+                } else {
+                    thang = parseInt(thang);
+                }
+
+                if (nam === "" || nam === null) {
+                    nam = @DateTime.Now.Year;
+                } else {
+                    nam = parseInt(nam);
+                }
+
+                $('#bangKetQua').html('<div class="text-center py-4">Đang tải dữ liệu...</div>');
+
+                $.ajax({
+                    url: '/PerformanceSalary/RenderPerformanceSalary',
+                    type: 'GET',
+                    data: {
+                        loai: loai,
+                        thang: thang,
+                        nam: nam,
+                        phong: phong
+                    },
+                    success: function (data) {
+                        $('#bangKetQua').html(data);
+                    },
+                    error: function (xhr, status, error) {
+                        console.error('AJAX Error:', error);
+                        showUpdateNotification('error', 'Lỗi khi tải dữ liệu: ' + error);
+                    }
+                });
+            }
+
+            //Loại người dùng
+            $('input[name="loaiDoiTuong"]').on('change', function () {
+                loadBangTheoThang();
+            });
+
+            // Load departments và years trước, sau đó load dữ liệu bảng
+            $.when(loadDepartments(), loadYear()).done(function() {
+                // Sau khi load xong departments và years, luôn load dữ liệu bảng
+                console.log("Departments and years loaded. Loading table data...");
+                console.log("Nam: " + yearSelect.val() + ", Thang: " + monthSelect.val() + ", Phong ban: " + departmentSelect.val());
+                
+                // Luôn load dữ liệu khi vừa mở trang
+                loadBangTheoThang();
+            }).fail(function() {
+                console.error("Failed to load departments or years");
+            });
+
+            // Event listeners
+            departmentSelect.change(function() {
+
+                loadBangTheoThang();
+            });
+
+            monthSelect.change(function() {
+
+                loadBangTheoThang();
+            });
+
+            yearSelect.change(function() {
+
+                loadBangTheoThang();
+            });
+
+            // Export Excel
+            $('#btnExportExcel').on('click', function() {
+                const thang = monthSelect.val() || @DateTime.Now.Month;
+                const nam = yearSelect.val() || @DateTime.Now.Year;
+                const phong = departmentSelect.val() || 0;
+                const loai = $('input[name="loaiDoiTuong"]:checked').val() || 1;
+                
+                const url = `/PerformanceSalary/ExportPerformanceSalary?loai=${loai}&phong=${phong}&thang=${thang}&nam=${nam}`;
+                window.location.href = url;
+            });
+
+            // Hàm hiển thị thông báo cập nhật
+            function showUpdateNotification(type, message) {
+                try {
+                    let alertClass, icon;
+                    if (type === 'success') {
+                        alertClass = 'alert-success';
+                        icon = 'fa-check-circle';
+                    } else if (type === 'info') {
+                        alertClass = 'alert-info';
+                        icon = 'fa-info-circle';
+                    } else {
+                        alertClass = 'alert-danger';
+                        icon = 'fa-exclamation-triangle';
+                    }
+
+                    const notification = $(`
+                        <div class="alert ${alertClass} alert-dismissible fade show update-notification" role="alert" style="position: fixed; top: 20px; right: 20px; z-index: 99999; min-width: 300px; max-width: 400px;">
+                            <i class="fa ${icon}"></i> ${message}
+                            <button type="button" class="close" data-dismiss="alert">
+                                <span>&times;</span>
+                            </button>
+                        </div>
+                    `);
+
+                    $('body').append(notification);
+
+                    setTimeout(() => {
+                        try {
+                            notification.alert('close');
+                        } catch (e) {
+                            notification.remove();
+                        }
+                    }, 3000);
+                } catch (error) {
+                    alert(message);
+                }
+            }
+
+
+        });
+    </script>
+}

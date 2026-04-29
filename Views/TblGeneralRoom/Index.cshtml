@@ -1,0 +1,134 @@
+﻿@model IEnumerable<PMS.Models.GroupedGeneralRoomVM>
+
+@{
+    ViewData["Title"] = "DANH MỤC PHÒNG BAN CHUNG";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                @* <div class="row">
+                    <div class="col-lg-5">
+                        <h4 class="card-title" style="margin-bottom:0px;">Thông tin chi tiết</h4>
+                    </div>
+                    <div class="col-lg-7" style="text-align: right;">
+                        <a class="btn btn-sm btn-primary" href="@Url.Action("Create")">Thêm mới</a>
+                    </div>
+                </div> *@
+
+                <div class="table-responsive mt-2">
+                    <table id="myTable" class="table table-bordered table-striped">
+                        <thead>
+                            <tr>
+                                <th class="text-center" style="width: 50px;">#</th>
+                                <th class="text-center" style="width: 150px !important">Tên nhóm phòng ban</th>
+                                <th class="text-center" id="list">Danh sách phòng quản lý</th>
+                                @* <th class="text-center">Người đứng đầu</th> *@
+                                <th class="text-center">Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (Model != null)
+                            {
+                                int i = 1;
+                                foreach (var item in Model)
+                                {
+                                    <tr>
+                                        <td class="text-center">@(i++)</td>
+                                        <td>@item.GeneralName</td>
+                                        <td>
+                                            @if (item.Departments != null && item.Departments.Any())
+                                            {
+                                                @* <div class="department-list" style="width : max-content "> *@
+                                                    @foreach (var dept in item.Departments)
+                                                    {
+                                                        <span class="badge badge-info mr-1 mb-1">@dept.DepartmentName</span>
+                                                    }
+                                                @* </div> *@
+                                            }
+                                            else
+                                            {
+                                                <span class="text-muted">Chưa có phòng ban</span>
+                                            }
+                                        </td>
+                                        @* <td class="text-center"></td> *@
+                                        <td class="text-nowrap">
+                                            <a href="@Url.Action("Edit", new { id = item.GeneralId })" data-toggle="tooltip" data-original-title="Sửa">
+                                                <i class="fa fa-pencil text-inverse m-r-10"></i>
+                                            </a>
+                                            <form asp-action="Delete" asp-route-id="@item.GeneralId" method="post" class="d-inline"
+                                                  onsubmit="return confirm('Bạn có muốn xóa dữ liệu không?');">
+                                                <button type="submit" class="btn btn-link p-0 m-0" style="border:none; background:none;">
+                                                    <i class="fa fa-close text-danger" data-toggle="tooltip" data-original-title="Xóa"></i>
+                                                </button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="~/assets/node_modules/datatables/jquery.dataTables.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $('#myTable').DataTable({
+            "pageLength": 10,
+            "ordering": true,
+            "searching": true,
+            "lengthChange": true,
+
+            // DOM với 3 phần cùng hàng
+            "dom":
+                '<"d-flex justify-content-between align-items-center mb-3"<"d-flex align-items-center"l><"d-flex align-items-center"f>>' +
+                '<"row"<"col-sm-12"tr>>' +
+                '<"row"<"col-sm-5"i><"col-sm-7"p>>',
+
+            "language": {
+                "lengthMenu": "Hiển thị _MENU_ bản ghi",
+                "search": "Tìm kiếm:"
+            },
+
+            "initComplete": function () {
+                // 1. Lấy container bên trái (chứa "Hiển thị")
+                var leftContainer = $('.dataTables_wrapper .d-flex.align-items-center').first();
+
+                // 2. Thêm nút "Thêm mới" vào container bên trái
+                var addButton = '<a class="btn btn-sm btn-primary ms-5" href="@Url.Action("Create")">Thêm mới</a>';
+                leftContainer.append(addButton);
+
+                // 3. Điều chỉnh khoảng cách
+                leftContainer.css('gap', '20px');
+
+                // 4. Điều chỉnh label
+                $('.dataTables_length label, .dataTables_filter label').css({
+                    'margin-bottom': '0',
+                    'margin-right': '8px'
+                });
+            }
+        });
+    });
+</script>
+
+<style>
+    .dataTables_wrapper .d-flex.justify-content-between {
+        flex-wrap: nowrap;
+        justify-content: flex-start !important; /* Thay space-between */
+        gap: 80px; /* Khoảng cách cố định 20px */
+    }
+    .department-list {
+        max-width: 300px;
+    }
+
+    .badge {
+        font-size: 12px;
+        padding: 4px 8px;
+    }
+</style>

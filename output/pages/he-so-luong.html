@@ -1,0 +1,36 @@
+<!-- partial: he-so-luong.html -->
+<div class="mod-header">
+    <div class="mod-title-wrap">
+        <div class="mod-breadcrumb"><span>Tiền lương</span><span>Hệ số lương</span></div>
+        <h1 class="mod-title">Bảng hệ số lương</h1>
+    </div>
+    <div class="mod-actions"><button class="btn-premium btn-premium-blue">Lưu bảng hệ số</button></div>
+</div>
+<div class="table-card">
+    <div id="hslHotContainer" style="height: 400px;"></div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/handsontable@14.6.1/dist/handsontable.full.min.js"></script>
+<script>
+    (function() {
+        const container = document.getElementById('hslHotContainer');
+        const data = [
+            { id: 1, name: 'Nguyễn Văn An', dept: 'Kỹ thuật', hsl: 4.4, hstn: 1.0, hsk: 0.5, total: 5.9 },
+            { id: 2, name: 'Trần Thị Bình', dept: 'Kinh doanh', hsl: 3.8, hstn: 0.5, hsk: 0.8, total: 5.1 },
+            { id: 3, name: 'Lê Hoàng Cường', dept: 'Hành chính', hsl: 3.2, hstn: 0.0, hsk: 0.3, total: 3.5 },
+        ];
+        new Handsontable(container, {
+            data: data,
+            colHeaders: ['ID', 'Họ Tên', 'Phòng Ban', 'HS Lương', 'HS Trách Nhiệm', 'HS Khác', 'Tổng Hệ Số'],
+            columns: [
+                { data: 'id', width: 40 },
+                { data: 'name', width: 150 },
+                { data: 'dept', width: 120 },
+                { data: 'hsl', type: 'numeric', format: '0.00' },
+                { data: 'hstn', type: 'numeric', format: '0.00' },
+                { data: 'hsk', type: 'numeric', format: '0.00' },
+                { data: 'total', type: 'numeric', format: '0.00', readOnly: true },
+            ],
+            stretchH: 'all', licenseKey: 'non-commercial-and-evaluation'
+        });
+    })();
+</script>

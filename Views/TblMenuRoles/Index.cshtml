@@ -1,0 +1,151 @@
+﻿@model IEnumerable<PMS.Models.TblMenuRole>
+
+@{
+    ViewData["Title"] = "Quản lý Quyền - Chức năng";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@{
+    var roles = (IEnumerable<PMS.Models.TblRole>)ViewBag.Roles;
+    var menus = (IEnumerable<PMS.Models.TblMenu>)ViewBag.Menus;
+    var menuRoles = (IEnumerable<PMS.ViewModels.MenuWithRoleViewModel>)ViewBag.MenuRoles;
+}
+
+@using (Html.BeginForm("Index", "QL_QUYEN_CNANG", FormMethod.Post))
+{
+    <div class="row">
+        <!-- Column -->
+        <div class="col-lg-12 col-xlg-12 col-md-4">
+            <div class="card">
+                <div class="card-body" style="padding-bottom:0px !important">
+                    <div class="row">
+                        <div class="col-lg-3 col-xs-3" style="padding-bottom:5px;padding-left:0px; padding-right:0px;">
+                            <select id="roleSelect" class="form-control" onclick="ChangeRole()">
+                                @foreach (var item in roles)
+                                {
+                                    <option value="@item.Id">@item.Name</option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-12" class="table-responsive">
+                            @* Danh sách các chức năng tương ứng với quyền *@
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th class="text-center">#</th>
+                                        <th class="text-center">Tên chức năng</th>
+                                        <th class="text-center">Chức năng cha</th>
+                                        <th class="text-center">Số thứ tự</th>
+                                        <th class="text-center">Meta Title</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="menuTableBody">
+                                    @foreach (var item in menuRoles)
+                                    {
+                                        <tr>
+                                            <td>
+                                                <input type="checkbox" @(item.IsChecked ? "checked" : "") value="@item.Id" onchange="updateMenuRole(this)"
+                                                       data-menuid="@item.Id" />
+                                            </td>
+                                            <td > @item.Name</td>
+                                            <td class="text-center">
+                                                @item.ParentName
+                                            </td>
+                                            <td class="text-center">@item.OrderNumber</td>
+                                            <td class="text-center">@item.MetaTitle</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>                    
+                </div>
+            </div>
+        </div>      
+    </div>
+}
+<style>
+    .table {
+        border-collapse: collapse;
+        width: 100%;
+    }
+
+        .table th, .table td {
+            border: 1px solid #dee2e6;
+            padding: 8px;
+            text-align: left;
+        }
+
+        .table th {
+            background-color: #f8f9fa;
+            border-bottom: 2px solid #dee2e6;
+        }
+</style>
+
+<script>
+    function updateMenuRole(checkbox) {
+        var menuId = $(checkbox).data("menuid");   // lấy id từ data-menuid
+        var isChecked = $(checkbox).is(":checked"); // true/false
+        var roleId = $("#roleSelect").val();
+        $.ajax({
+            url: '/TblMenuRoles/UpdateRoleMenu',   // controller/action bạn tạo
+            type: 'POST',
+            data: {
+                menuId: menuId,
+                roleId: roleId,
+                isChecked: isChecked
+            },
+            success: function (res) {
+                if (res.success) {
+                    toastr.success(res.message); // toast alert nếu thành công
+                } else {
+                    toastr.error(res.message);
+                }
+            },
+            error: function (xhr, status, error) {
+                toastr.error("Có lỗi khi gọi server!");
+                console.error(error);
+            }
+        });
+    }
+
+    function ChangeRole() {
+        var roleId = $("#roleSelect").val();
+
+        $.ajax({
+            url: '/TblMenuRoles/GetMenusByRole',
+            type: 'GET',
+            data: { roleId: roleId },
+            success: function (res) {
+                if (res.success) {
+                    var rows = "";
+                    $.each(res.data, function (i, item) {
+                        rows += `
+                            <tr>
+                                <td>
+                                    <input type="checkbox"
+                                           data-menuid="${item.id}"
+                                           onchange="updateMenuRole(this)"
+                                           ${item.isChecked ? "checked" : ""} />
+                                </td>
+                                <td>${item.name}</td>
+                                <td>${item.parentName}</td>
+                                <td>${item.orderNumber}</td>
+                                <td>${item.metaTitle}</td>
+                            </tr>
+                        `;
+                    });
+                    $("#menuTableBody").html(rows);
+                } else {
+                    toastr.error(res.message);
+                }
+            },
+            error: function () {
+                toastr.error("Không load được dữ liệu");
+            }
+        });
+    }
+
+</script>
