@@ -1164,19 +1164,51 @@
         <div class="page-section fade-in" id="page-phan-quyen-cn">
           <div class="cat-header">
             <div class="cat-header-left">
-              <div class="cat-icon-wrap" style="background:#FEF3E2;color:#B45309"><svg viewBox="0 0 20 20" fill="none">
-                  <rect x="4" y="8" width="12" height="10" rx="1.5" stroke="currentColor" stroke-width="1.6" />
+              <div class="cat-icon-wrap" style="background:#FEF3E2;color:#B45309">
+                <svg viewBox="0 0 20 20" fill="none">
                   <path d="M7 8V6a3 3 0 0 1 6 0v2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
-                  <path d="M10 12v2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
-                </svg></div>
+                  <rect x="4" y="8" width="12" height="10" rx="1.5" stroke="currentColor" stroke-width="1.6" />
+                  <circle cx="10" cy="13" r="1.5" stroke="currentColor" stroke-width="1.4" />
+                </svg>
+              </div>
               <div>
                 <div class="cat-title">Phân quyền Quyền - chức năng</div>
-                <div class="cat-sub">Gán chức năng cho từng nhóm quyền</div>
+                <div class="cat-sub">Gán các chức năng hệ thống cho từng nhóm quyền</div>
               </div>
-            </div><button class="btn-cat-add">+ Thêm mới</button>
+            </div>
           </div>
-          <div class="placeholder">
-            <p>Ma trận phân quyền sẽ hiển thị tại đây</p>
+
+          <div class="cat-toolbar" style="gap:15px;">
+            <div style="display:flex; align-items:center; gap:8px;">
+              <span style="font-size:13px; font-weight:600; color:#64748B; white-space:nowrap;">Chọn quyền:</span>
+              <select id="permRoleSelect" class="cat-select" style="min-width:200px; height:36px; border-radius:8px;" onchange="permRender()">
+                <!-- Options populated by JS -->
+              </select>
+            </div>
+
+            <div class="cat-search-wrap" style="max-width:300px;">
+              <svg viewBox="0 0 16 16" fill="none">
+                <circle cx="6.5" cy="6.5" r="4" stroke="currentColor" stroke-width="1.4" />
+                <path d="M11 11l3 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" />
+              </svg>
+              <input type="text" id="permSearch" placeholder="Tìm kiếm chức năng..." oninput="permRender()" />
+            </div>
+            <div class="cat-count-pill" id="permTotal" style="margin-left:auto;"></div>
+          </div>
+
+          <div class="cat-table-wrap">
+            <table class="cat-table no-hover">
+              <thead>
+                <tr>
+                  <th style="width:50px; text-align:center">#</th>
+                  <th style="width:300px">Tên chức năng</th>
+                  <th style="width:200px">Chức năng cha</th>
+                  <th style="width:80px; text-align:center">STT</th>
+                  <th>Meta Title</th>
+                </tr>
+              </thead>
+              <tbody id="permTbody"></tbody>
+            </table>
           </div>
         </div>
 
@@ -1950,7 +1982,7 @@
   <script src="asset/role.system.js"></script>
   <script src="asset/phan-quyen-nguoi-dung.system.js"></script>
   <script src="asset/phan-quyen-nd.js"></script>
-  <script src="asset/phan-quyen-cn.js"></script>
+  <script src="asset/permission.system.js"></script>
   <script src="asset/phu-tro.category.js"></script>
   <script src="asset/he-so-danh-gia.category.js"></script>
   <script src="asset/nguoi-dung.category.js"></script>

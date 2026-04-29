@@ -2419,3 +2419,25 @@ tbody tr:hover td { background: #FAFAFA; }
 .btn-cat-action.gray:hover {
   background: #e2e8f0;
 }
+
+/* ══════════ PERMISSION STYLES ══════════ */
+.perm-row-checked td {
+  background-color: #F0F9FF !important;
+}
+.perm-row-checked td:nth-child(2) {
+  color: #185FA5 !important;
+}
+.perm-checkbox {
+  width: 17px;
+  height: 17px;
+  cursor: pointer;
+  accent-color: #185FA5;
+}
+
+/* Remove hover effect for permission table */
+.cat-table.no-hover tbody tr:hover td {
+  background-color: transparent !important;
+}
+.cat-table.no-hover tbody tr.perm-row-checked:hover td {
+  background-color: #F0F9FF !important;
+}
