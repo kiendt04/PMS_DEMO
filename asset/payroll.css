@@ -3642,15 +3642,18 @@ tbody tr:hover td {
   background: #1E3A5F !important;
   color: #E0EAFF !important;
   font-weight: 600;
-  font-size: 10px !important; /* Smaller font to allow smaller columns */
+  font-size: 10px !important;
+  /* Smaller font to allow smaller columns */
   text-align: center !important;
-  padding: 2px 1px !important; /* Minimal padding */
+  padding: 2px 1px !important;
+  /* Minimal padding */
   min-height: 34px !important;
   line-height: 1.1 !important;
   border-right: 1px solid #2D5A8E !important;
   border-bottom: 1px solid #2D5A8E !important;
   vertical-align: middle !important;
-  white-space: normal !important; /* Allow wrapping */
+  white-space: normal !important;
+  /* Allow wrapping */
   word-break: break-all !important;
 }
 
@@ -3659,7 +3662,8 @@ tbody tr:hover td {
   color: #0F172A;
   height: 26px !important;
   line-height: 26px !important;
-  padding: 0 2px !important; /* Narrow padding for narrow columns */
+  padding: 0 2px !important;
+  /* Narrow padding for narrow columns */
   border-right: 1px solid #F1F5F9 !important;
   border-bottom: 1px solid #F1F5F9 !important;
 }
@@ -3675,13 +3679,15 @@ tbody tr:hover td {
   font-size: 11px;
   text-align: center !important;
   padding: 4px 3px !important;
-  height: 42px !important; /* Strict fixed height to sync frozen/scrollable */
+  height: 42px !important;
+  /* Strict fixed height to sync frozen/scrollable */
   min-height: 42px !important;
   line-height: 1.2 !important;
   border-right: 1px solid #2D5A8E !important;
   border-bottom: 1px solid #2D5A8E !important;
   vertical-align: middle !important;
-  white-space: normal !important; /* Allow wrap but height is fixed */
+  white-space: normal !important;
+  /* Allow wrap but height is fixed */
 }
 
 #lhqHotContainer .handsontable td {
@@ -4310,6 +4316,33 @@ tbody tr:hover td {
   background: #e2e8f0;
 }
 
+
+/* ══════════ PERMISSION STYLES ══════════ */
+.perm-row-checked td {
+  background-color: #F0F9FF !important;
+}
+
+.perm-row-checked td:nth-child(2) {
+  color: #185FA5 !important;
+}
+
+.perm-checkbox {
+  width: 17px;
+  height: 17px;
+  cursor: pointer;
+  accent-color: #185FA5;
+}
+
+/* Remove hover effect for permission table */
+.cat-table.no-hover tbody tr:hover td {
+  background-color: transparent !important;
+}
+
+.cat-table.no-hover tbody tr.perm-row-checked:hover td {
+  background-color: #F0F9FF !important;
+}
+
+
 /* ══════════════════════════════════════════════════════════════
    GLOBAL HANDSONTABLE HEADER UNIFICATION
    Applied last — highest cascade priority.
@@ -4773,4 +4806,4 @@ tbody tr:hover td {
   background-color: #F8FAFC !important;
   font-weight: 600 !important;
   color: #475569 !important;
-}
+}
