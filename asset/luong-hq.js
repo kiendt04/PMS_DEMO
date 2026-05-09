@@ -8,7 +8,7 @@
   let hotInstance = null;
   let _initializing = false;
 
-  const FIXED = 4;
+  const FIXED = 0;
 
   const DEPTS = [
     {

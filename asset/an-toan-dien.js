@@ -9,7 +9,8 @@
   const MONTH_LBL = { 1: 'Tháng 1', 2: 'Tháng 2', 3: 'Tháng 3', 4: 'Tháng 4', 5: 'Tháng 5', 6: 'Tháng 6', 7: 'Tháng 7', 8: 'Tháng 8', 9: 'Tháng 9', 10: 'Tháng 10', 11: 'Tháng 11', 12: 'Tháng 12' };
   // Per month: 4 cols = 1 (so ngay cong ATD) + 3 (Kcvi, Knqi, Ki)
   const SUB_PER_MONTH = 4;
-  const FIXED = 3;
+  const FIXED = 0;
+  const OFFSET = 3;
 
   const DEPTS = [
     {
@@ -76,7 +77,7 @@
   /* ── Build data ── */
   function buildData(q) {
     const months = Q_MONTHS[q];
-    const totalCols = FIXED + months.length * SUB_PER_MONTH;
+    const totalCols = OFFSET + months.length * SUB_PER_MONTH;
     const rows = [];
     deptSet = new Set();
 
@@ -135,7 +136,7 @@
       { data: 1, readOnly: true, width: 140, type: 'text', className: 'htLeft   htMiddle' },
       { data: 2, readOnly: true, width: 100, type: 'text', className: 'htCenter htMiddle' },
     ];
-    let ci = FIXED;
+    let ci = OFFSET;
     months.forEach(() => {
       cols.push({ data: ci++, type: 'numeric', width: 48, className: 'htCenter htMiddle' }); // ngay cong ATD
       cols.push({ data: ci++, type: 'numeric', width: 36, className: 'htCenter htMiddle' }); // Kcvi
@@ -161,7 +162,10 @@
     deptSet.forEach(ri => merges.push({ row: ri, col: 0, rowspan: 1, colspan: cols.length }));
 
     if (hotATD) { hotATD.destroy(); hotATD = null; }
-    container.style.height = 'auto';
+    const headerH = headers.length * 42;
+    const dataH = data.length * 26;
+    const scrollH = 20; 
+    const finalH = headerH + dataH + scrollH;
 
     hotATD = new Handsontable(container, {
       data,
@@ -169,7 +173,7 @@
       columns: cols,
       rowHeaders: false,
       fixedColumnsStart: FIXED,
-      height: 'auto',
+      height: finalH,
       width: '100%',
       stretchH: 'all',
       autoColumnSize: false,

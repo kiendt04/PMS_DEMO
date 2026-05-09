@@ -8,7 +8,8 @@
   let hotInstance = null;
   let _initializing = false;
 
-  const FIXED = 4; // STT | Họ tên | Mã NV | Chức danh
+  const FIXED = 0; 
+  const OFFSET = 4; // STT | Họ tên | Mã NV | Chức danh
 
   /* ── Synced Data ── */
   const DEPTS = [
@@ -86,7 +87,7 @@
         row[1] = emp.name;
         row[2] = emp.ma;
         row[3] = emp.pos;
-        for (let d = 1; d <= days; d++) row[3 + d] = (d % 7 === 6 || d % 7 === 0) ? '' : '8';
+        for (let d = 1; d <= days; d++) row[OFFSET - 1 + d] = (d % 7 === 6 || d % 7 === 0) ? '' : '8';
         rows.push(row);
       });
     });
@@ -113,13 +114,18 @@
       hotInstance = null; 
     }
 
+    const headerH = headers.length * 42;
+    const dataH = rows.length * 26;
+    const scrollH = 20; 
+    const finalH = headerH + dataH + scrollH;
+
     hotInstance = new Handsontable(container, {
       data: rows,
       nestedHeaders: headers,
       columns: cols,
       rowHeaders: false,
       fixedColumnsStart: FIXED,
-      height: 'auto',
+      height: finalH,
       width: '100%',
       stretchH: 'all',
       autoColumnSize: false,

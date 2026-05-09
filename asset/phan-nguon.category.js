@@ -1,261 +1,217 @@
-// ══════════ DANH MỤC PHÂN NGUỒN ══════════
+/**
+ * phan-nguon.category.js — Quản lý phân nguồn ngân sách
+ * Giao diện tùy biến cao, không dùng Handsontable.
+ * Cấu trúc phân cấp Year -> Quarter -> Month.
+ * Cập nhật: Phân bổ HDTV chia làm 2 bảng (Chuyên trách & Không chuyên trách).
+ */
+(function () {
+  'use strict';
 
-// ─── Dữ liệu mẫu Bảng 1: Nguồn chính theo năm ───
-let pnMainData = [
-  { id: 1, nam: 2024, tongNganSach: 5000000000, nsNhanVien: 3500000000, nsQuanLy: 1500000000, nguoiTao: 'Admin', ngayTao: '2024-01-01' },
-  { id: 2, nam: 2025, tongNganSach: 5500000000, nsNhanVien: 3800000000, nsQuanLy: 1700000000, nguoiTao: 'Admin', ngayTao: '2024-12-15' },
-];
-
-// ─── Dữ liệu mẫu Bảng 2: Phân nguồn theo tháng ───
-let pnMonthData = [
-  { id: 1, nam: 2024, quy: 1, thang: 1, nld: 280000000, nql: 120000000, tong: 400000000, ghiChu: 'Phân nguồn tháng 1' },
-  { id: 2, nam: 2024, quy: 1, thang: 2, nld: 290000000, nql: 125000000, tong: 415000000, ghiChu: 'Phân nguồn tháng 2' },
-  { id: 3, nam: 2024, quy: 1, thang: 3, nld: 285000000, nql: 122000000, tong: 407000000, ghiChu: 'Phân nguồn tháng 3' },
-];
-
-let pnMainNextId = 3;
-let pnMonthNextId = 4;
-let pnMainEditId = null;
-let pnMonthEditId = null;
-let pnMainDeleteId = null;
-let pnMonthDeleteId = null;
-
-// ─── RENDER BẢNG 1: NGUỒN CHÍNH ─────────────────────────────────────
-function pnMainRender() {
-  const filterNam = document.getElementById('pnMainFilterNam')?.value || '';
-  const filtered = pnMainData.filter(r => !filterNam || r.nam.toString() === filterNam);
-
-  const tbody = document.getElementById('pnMainTbody');
-  if (!tbody) return;
-
-  if (filtered.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:30px;color:#94A3B8;">Không có dữ liệu nguồn chính cho năm này.</td></tr>`;
-    return;
-  }
-
-  tbody.innerHTML = filtered.map(r => `
-    <tr>
-      <td style="text-align:center;color:#94A3B8;font-size:12px">${r.id}</td>
-      <td style="text-align:center;font-weight:700;color:#1E293B">${r.nam}</td>
-      <td style="text-align:right;font-weight:700;color:#185FA5">${r.tongNganSach.toLocaleString()}</td>
-      <td style="text-align:right;color:#059669">${r.nsNhanVien.toLocaleString()}</td>
-      <td style="text-align:right;color:#D97706">${r.nsQuanLy.toLocaleString()}</td>
-      <td style="text-align:center">${r.nguoiTao}</td>
-      <td style="text-align:center;color:#64748B;font-size:12px">${r.ngayTao}</td>
-      <td style="text-align:center">
-        <div class="cat-action-btns">
-          <button class="cat-btn-edit" onclick="pnMainOpenEdit(${r.id})">Sửa</button>
-          <button class="cat-btn-del" onclick="pnMainOpenDelete(${r.id})">Xóa</button>
-        </div>
-      </td>
-    </tr>
-  `).join('');
-}
-
-// ─── RENDER BẢNG 2: PHÂN NGUỒN THÁNG ────────────────────────────────
-function pnMonthRender() {
-  const filterQuy = document.getElementById('pnMonthFilterQuy')?.value || '';
-  const filterNam = document.getElementById('pnMonthFilterNam')?.value || '';
-  
-  const filtered = pnMonthData.filter(r => 
-    (!filterQuy || r.quy.toString() === filterQuy) && 
-    (!filterNam || r.nam.toString() === filterNam)
-  );
-
-  const tbody = document.getElementById('pnMonthTbody');
-  if (!tbody) return;
-
-  if (filtered.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="10" style="text-align:center;padding:30px;color:#94A3B8;">Không tìm thấy dữ liệu phân nguồn theo tháng.</td></tr>`;
-    return;
-  }
-
-  tbody.innerHTML = filtered.map(r => `
-    <tr>
-      <td style="text-align:center;color:#94A3B8;font-size:12px">${r.id}</td>
-      <td style="text-align:center">${r.nam}</td>
-      <td style="text-align:center"><span class="cat-badge cat-badge-blue">Quý ${r.quy}</span></td>
-      <td style="text-align:center;font-weight:600">Tháng ${r.thang}</td>
-      <td style="text-align:right">${r.nld.toLocaleString()}</td>
-      <td style="text-align:right">${r.nql.toLocaleString()}</td>
-      <td style="text-align:right;font-weight:700;color:#185FA5">${r.tong.toLocaleString()}</td>
-      <td style="font-size:12px;color:#64748B">${r.ghiChu || '—'}</td>
-      <td style="text-align:center">
-        <div class="cat-action-btns">
-          <button class="cat-btn-edit" onclick="pnMonthOpenEdit(${r.id})" title="Sửa"><svg viewBox="0 0 14 14" fill="none" width="12"><path d="M9.5 2.5l2 2L4 12H2v-2L9.5 2.5z" stroke="currentColor" stroke-width="1.4"/></svg></button>
-          <button class="cat-btn-del" onclick="pnMonthOpenDelete(${r.id})" title="Xóa"><svg viewBox="0 0 14 14" fill="none" width="12"><path d="M2 4h10M4 4v8a1 1 0 001 1h4a1 1 0 001-1V4" stroke="currentColor" stroke-width="1.4"/></svg></button>
-          <button class="cat-btn-edit" onclick="pnMonthViewDetail(${r.id})" style="background:#F0F9FF;color:#0369A1;border-color:#BAE6FD;" title="Chi tiết theo phòng">
-            <svg viewBox="0 0 14 14" fill="none" width="12"><path d="M1 7s2.5-4.5 6-4.5 6 4.5 6 4.5-2.5 4.5-6 4.5-6-4.5-6-4.5z" stroke="currentColor" stroke-width="1.4"/><circle cx="7" cy="7" r="2" stroke="currentColor" stroke-width="1.4"/></svg>
-            Chi tiết
-          </button>
-        </div>
-      </td>
-    </tr>
-  `).join('');
-}
-
-// ─── MODAL NGUỒN CHÍNH ─────────────────────────────────────────────
-function pnMainOpenAdd() {
-  pnMainEditId = null;
-  document.getElementById('pnMainModalTitle').textContent = 'Thêm nguồn chính';
-  document.getElementById('pnMainNam').value = new Date().getFullYear();
-  document.getElementById('pnMainTong').value = '';
-  document.getElementById('pnMainNsNLĐ').value = '';
-  document.getElementById('pnMainNsNQL').value = '';
-  document.getElementById('pnMainModal').classList.add('open');
-}
-
-function pnMainOpenEdit(id) {
-  const r = pnMainData.find(x => x.id === id);
-  if (!r) return;
-  pnMainEditId = id;
-  document.getElementById('pnMainModalTitle').textContent = 'Sửa nguồn chính';
-  document.getElementById('pnMainNam').value = r.nam;
-  document.getElementById('pnMainTong').value = r.tongNganSach;
-  document.getElementById('pnMainNsNLĐ').value = r.nsNhanVien;
-  document.getElementById('pnMainNsNQL').value = r.nsQuanLy;
-  document.getElementById('pnMainModal').classList.add('open');
-}
-
-function pnMainSave() {
-  const nam = parseInt(document.getElementById('pnMainNam').value);
-  const tong = parseFloat(document.getElementById('pnMainTong').value) || 0;
-  const nld = parseFloat(document.getElementById('pnMainNsNLĐ').value) || 0;
-  const nql = parseFloat(document.getElementById('pnMainNsNQL').value) || 0;
-
-  if (pnMainEditId) {
-    const r = pnMainData.find(x => x.id === pnMainEditId);
-    if (r) { r.nam = nam; r.tongNganSach = tong; r.nsNhanVien = nld; r.nsQuanLy = nql; }
-  } else {
-    pnMainData.unshift({
-      id: pnMainNextId++, nam, tongNganSach: tong, nsNhanVien: nld, nsQuanLy: nql,
-      nguoiTao: 'Admin', ngayTao: new Date().toISOString().split('T')[0]
-    });
-  }
-  pnMainCloseModal();
-  pnMainRender();
-}
-
-function pnMainCloseModal() { document.getElementById('pnMainModal').classList.remove('open'); }
-
-// ─── MODAL PHÂN NGUỒN THÁNG ─────────────────────────────────────────
-function pnMonthOpenAdd() {
-  pnMonthEditId = null;
-  document.getElementById('pnMonthModalTitle').textContent = 'Thêm phân nguồn tháng';
-  document.getElementById('pnMonthNam').value = new Date().getFullYear();
-  document.getElementById('pnMonthQuy').value = Math.floor((new Date().getMonth() + 3) / 3);
-  document.getElementById('pnMonthThang').value = new Date().getMonth() + 1;
-  document.getElementById('pnMonthNLD').value = '';
-  document.getElementById('pnMonthNQL').value = '';
-  document.getElementById('pnMonthGhiChu').value = '';
-  document.getElementById('pnMonthModal').classList.add('open');
-}
-
-function pnMonthOpenEdit(id) {
-  const r = pnMonthData.find(x => x.id === id);
-  if (!r) return;
-  pnMonthEditId = id;
-  document.getElementById('pnMonthModalTitle').textContent = 'Sửa phân nguồn tháng';
-  document.getElementById('pnMonthNam').value = r.nam;
-  document.getElementById('pnMonthQuy').value = r.quy;
-  document.getElementById('pnMonthThang').value = r.thang;
-  document.getElementById('pnMonthNLD').value = r.nld;
-  document.getElementById('pnMonthNQL').value = r.nql;
-  document.getElementById('pnMonthGhiChu').value = r.ghiChu;
-  document.getElementById('pnMonthModal').classList.add('open');
-}
-
-function pnMonthSave() {
-  const nam = parseInt(document.getElementById('pnMonthNam').value);
-  const quy = parseInt(document.getElementById('pnMonthQuy').value);
-  const thang = parseInt(document.getElementById('pnMonthThang').value);
-  const nld = parseFloat(document.getElementById('pnMonthNLD').value) || 0;
-  const nql = parseFloat(document.getElementById('pnMonthNQL').value) || 0;
-  const ghiChu = document.getElementById('pnMonthGhiChu').value;
-
-  if (pnMonthEditId) {
-    const r = pnMonthData.find(x => x.id === pnMonthEditId);
-    if (r) { r.nam = nam; r.quy = quy; r.thang = thang; r.nld = nld; r.nql = nql; r.tong = nld + nql; r.ghiChu = ghiChu; }
-  } else {
-    pnMonthData.unshift({ id: pnMonthNextId++, nam, quy, thang, nld, nql, tong: nld + nql, ghiChu });
-  }
-  pnMonthCloseModal();
-  pnMonthRender();
-}
-
-function pnMonthCloseModal() { document.getElementById('pnMonthModal').classList.remove('open'); }
-
-// ─── XÓA ────────────────────────────────────────────────────────────
-function pnMainOpenDelete(id) { pnMainDeleteId = id; document.getElementById('pnMainDeleteModal').classList.add('open'); }
-function pnMainConfirmDelete() { pnMainData = pnMainData.filter(x => x.id !== pnMainDeleteId); pnMainCloseDelete(); pnMainRender(); }
-function pnMainCloseDelete() { document.getElementById('pnMainDeleteModal').classList.remove('open'); }
-
-function pnMonthOpenDelete(id) { pnMonthDeleteId = id; document.getElementById('pnMonthDeleteModal').classList.add('open'); }
-function pnMonthConfirmDelete() { pnMonthData = pnMonthData.filter(x => x.id !== pnMonthDeleteId); pnMonthCloseDelete(); pnMonthRender(); }
-function pnMonthCloseDelete() { document.getElementById('pnMonthDeleteModal').classList.remove('open'); }
-
-// ─── CHI TIẾT THEO PHÒNG ────────────────────────────────────────────
-function pnMonthViewDetail(id) {
-  const r = pnMonthData.find(x => x.id === id);
-  if (!r) return;
-  
-  document.getElementById('pnDetailTitle').textContent = `Chi tiết phân nguồn - Tháng ${r.thang}/${r.nam}`;
-  
-  // 1. Tính toán & hiển thị chỉ số tổng hợp (Mock calculations)
-  const v1 = r.nld * 0.7;
-  const v2 = r.nld * 0.3;
-  const nql = r.nql;
-  const tong = r.tong;
-  const tongHS = 150.5; // Mock
-  const giaTri1HS = tongHS > 0 ? Math.round(v1 / tongHS) : 0;
-
-  document.getElementById('pnSumV1').textContent = v1.toLocaleString() + ' VNĐ';
-  document.getElementById('pnSumV2').textContent = v2.toLocaleString() + ' VNĐ';
-  document.getElementById('pnSumNQL').textContent = nql.toLocaleString() + ' VNĐ';
-  document.getElementById('pnSumTong').textContent = tong.toLocaleString() + ' VNĐ';
-  document.getElementById('pnSumHeSo').textContent = tongHS.toFixed(2);
-  document.getElementById('pnSumGiaTri1HS').textContent = giaTri1HS.toLocaleString() + ' VNĐ';
-
-  // 2. Mock data cho bảng chi tiết
-  const units = [
-    { pb: 'Ban Giám đốc', hs: 25.5, gt1hs: giaTri1HS, ghiChu: '' },
-    { pb: 'Phòng Kỹ thuật', hs: 60.2, gt1hs: giaTri1HS, ghiChu: 'Đã duyệt' },
-    { pb: 'Phòng Kinh doanh', hs: 45.8, hs: 45.8, gt1hs: giaTri1HS, ghiChu: '' },
-    { pb: 'Phòng Hành chính', hs: 19.0, gt1hs: giaTri1HS, ghiChu: '' },
+  const DEPTS = [
+    'Phòng Tổng hợp HĐTV', 'Phòng Kinh doanh', 'Phòng Kỹ thuật', 
+    'Phòng Nhân sự', 'Phòng Kế toán', 'Phòng Công nghệ', 'Phòng Chất Lượng'
   ];
 
-  const tbody = document.getElementById('pnDetailTbody');
-  tbody.innerHTML = units.map((u, i) => {
-    const quyLuongKH = Math.round(u.hs * u.gt1hs);
-    const quyLuongTT = quyLuongKH; // Mock
-    const thuongCD = Math.round(quyLuongKH * 0.05); // Mock 5%
-    const thuQuy = 0; // Mock
+  /* ── 1. DỮ LIỆU MẪU ── */
+  let sourceData = [
+    {
+      id: 'y2024', label: 'NĂM 2024', hdtv: 1500000000, nld: 3500000000, note: 'Kế hoạch ngân sách 2024', isOpen: true,
+      quarters: [
+        {
+          id: 'q1-2024', label: 'Quý 1', hdtv: 400000000, nld: 900000000, note: 'Tạm giao Q1', isOpen: true,
+          months: [
+            { id: 'm1-2024', label: 'Tháng 1', hdtv: 120000000, nld: 280000000, note: 'Thực hiện T1' },
+            { id: 'm2-2024', label: 'Tháng 2', hdtv: 115000000, nld: 260000000, note: 'Thực hiện T2' },
+            { id: 'm3-2024', label: 'Tháng 3', hdtv: 165000000, nld: 360000000, note: 'Thực hiện T3' },
+          ]
+        }
+      ]
+    }
+  ];
 
-    return `
-      <tr>
-        <td style="text-align:center; color:#94A3B8">${i + 1}</td>
-        <td style="font-weight:600; color:#1E293B">${u.pb}</td>
-        <td style="text-align:right">${u.hs.toFixed(2)}</td>
-        <td style="text-align:right; color:#059669">${u.gt1hs.toLocaleString()}</td>
-        <td style="text-align:right; font-weight:700">${quyLuongKH.toLocaleString()}</td>
-        <td style="text-align:right; font-weight:700; color:#185FA5">${quyLuongTT.toLocaleString()}</td>
-        <td style="text-align:right; color:#D97706">${thuongCD.toLocaleString()}</td>
-        <td style="text-align:right">${thuQuy.toLocaleString()}</td>
-        <td style="font-size:12px; color:#64748B">${u.ghiChu || '—'}</td>
+  const HDTV_CT = [
+    { stt: 1, name: 'Nguyễn A', ma: 'HDTV01', pos: 'Chủ tịch HĐTV', hsl: 10, hspc: 1, luongTH: 100000000, luongTU: 80000000 },
+    { stt: 2, name: 'Nguyễn B', ma: 'HDTV02', pos: 'Thành viên HĐTV', hsl: 8, hspc: 0.5, luongTH: 100000000, luongTU: 80000000 }
+  ];
+
+  const HDTV_KCT = [
+    { stt: 1, name: 'Nguyễn C', ma: 'HDTV03', pos: 'Thành viên HĐTV', hsl: 8, hspc: 0.5, luongTH: 1200000000, luongTU: 960000000 },
+    { stt: 2, name: 'Nguyễn E', ma: 'BKS02', pos: 'KSV', hsl: 8, hspc: 0.5, luongTH: 1200000000, luongTU: 960000000 }
+  ];
+
+  /* ── 2. RENDER BẢNG CHÍNH ── */
+  function renderMainTable() {
+    const tbody = document.getElementById('pnTableBody');
+    if (!tbody) return;
+
+    let html = '';
+    sourceData.forEach(year => {
+      html += `<tr class="pn-row-level-0" onclick="pnToggleRow('${year.id}')">
+        <td class="pn-cell-expand"><span class="pn-toggle-icon ${year.isOpen ? 'open' : ''}"></span><strong>${year.label}</strong></td>
+        <td colspan="4" style="text-align:right; padding-right: 20px;"><span class="pn-badge pn-badge-blue">TỔNG CỘNG: ${(year.hdtv + year.nld).toLocaleString()} VNĐ</span></td>
+      </tr>`;
+
+      if (year.isOpen) {
+        html += renderTypeRows(year, 'pn-row-sub-0');
+        year.quarters.forEach(q => {
+          html += `<tr class="pn-row-level-1" onclick="pnToggleRow('${year.id}', '${q.id}')">
+            <td class="pn-cell-expand" style="padding-left: 30px;"><span class="pn-toggle-icon ${q.isOpen ? 'open' : ''}"></span>${q.label}</td>
+            <td colspan="4" style="text-align:right; padding-right: 20px;"><span class="pn-badge pn-badge-teal">Tổng Quý: ${(q.hdtv + q.nld).toLocaleString()} VNĐ</span></td>
+          </tr>`;
+
+          if (q.isOpen) {
+            html += renderTypeRows(q, 'pn-row-sub-1', 40);
+            q.months.forEach(m => {
+              html += `<tr class="pn-row-level-2"><td style="padding-left: 60px; color: #64748B;">↳ ${m.label}</td><td colspan="4"></td></tr>
+                <tr class="pn-row-data">
+                   <td style="padding-left: 80px; font-size: 12px; color: #94A3B8;">Thành phần HDTV</td>
+                   <td style="text-align:center"><span class="pn-type-tag hdtv">HDTV</span></td>
+                   <td style="text-align:right; font-weight: 600;">${m.hdtv.toLocaleString()}</td>
+                   <td style="font-size: 12px; color: #64748B;">${m.note}</td>
+                   <td style="text-align:center"><button class="pn-action-btn" onclick="pnOpenDetailModal('${m.label}', 'HDTV', ${m.hdtv})"><svg viewBox="0 0 24 24" fill="none" width="16"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>Phân bổ</button></td>
+                </tr>
+                <tr class="pn-row-data">
+                   <td style="padding-left: 80px; font-size: 12px; color: #94A3B8;">Thành phần NLĐ</td>
+                   <td style="text-align:center"><span class="pn-type-tag nld">NLĐ</span></td>
+                   <td style="text-align:right; font-weight: 600;">${m.nld.toLocaleString()}</td>
+                   <td style="font-size: 12px; color: #64748B;">${m.note}</td>
+                   <td style="text-align:center"><button class="pn-action-btn" onclick="pnOpenDetailModal('${m.label}', 'NLĐ', ${m.nld})"><svg viewBox="0 0 24 24" fill="none" width="16"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>Phân bổ</button></td>
+                </tr>`;
+            });
+          }
+        });
+      }
+    });
+    tbody.innerHTML = html;
+  }
+
+  function renderTypeRows(item, className, pad = 20) {
+    return `<tr class="${className} pn-row-data">
+        <td style="padding-left: ${pad}px; font-style: italic; color: #94A3B8;">— Thành phần HDTV</td>
+        <td style="text-align:center"><span class="pn-type-tag hdtv">HDTV</span></td>
+        <td style="text-align:right; font-weight: 600;">${item.hdtv.toLocaleString()}</td>
+        <td style="font-size: 12px; color: #64748B;">${item.note}</td>
+        <td></td>
       </tr>
-    `;
-  }).join('');
+      <tr class="${className} pn-row-data">
+        <td style="padding-left: ${pad}px; font-style: italic; color: #94A3B8;">— Thành phần NLĐ</td>
+        <td style="text-align:center"><span class="pn-type-tag nld">NLĐ</span></td>
+        <td style="text-align:right; font-weight: 600;">${item.nld.toLocaleString()}</td>
+        <td style="font-size: 12px; color: #64748B;">${item.note}</td>
+        <td></td>
+      </tr>`;
+  }
 
-  document.getElementById('pnDetailModal').classList.add('open');
-}
-
-function pnDetailCloseModal() { document.getElementById('pnDetailModal').classList.remove('open'); }
-
-// ─── KHỞI TẠO ───────────────────────────────────────────────────────
-(function() {
-  const prevOnPageActivate = window.onPageActivate;
-  window.onPageActivate = function(page) {
-    if (prevOnPageActivate) prevOnPageActivate(page);
-    if (page === 'dm-phan-nguon') { pnMainRender(); pnMonthRender(); }
+  window.pnToggleRow = function (yearId, quarterId = null) {
+    const year = sourceData.find(y => y.id === yearId);
+    if (!year) return;
+    if (!quarterId) year.isOpen = !year.isOpen;
+    else { const q = year.quarters.find(x => x.id === quarterId); if (q) q.isOpen = !q.isOpen; }
+    renderMainTable();
   };
+
+  /* ── 3. RENDER MODAL CHI TIẾT ── */
+  window.pnOpenDetailModal = function (monthLabel, type, totalAmount) {
+    const title = document.getElementById('pnDetailTitle');
+    title.innerHTML = `Phân bổ nguồn <strong>${type}</strong> - ${monthLabel}`;
+
+    const viewNLD = document.getElementById('pnDetailViewNLD');
+    const viewHDTV = document.getElementById('pnDetailViewHDTV');
+    const summary = document.getElementById('pnDetailSummary');
+
+    if (type === 'NLĐ') {
+      viewNLD.style.display = 'block';
+      viewHDTV.style.display = 'none';
+      summary.style.display = 'grid';
+      renderNLDTable(totalAmount);
+    } else {
+      viewNLD.style.display = 'none';
+      viewHDTV.style.display = 'block';
+      summary.style.display = 'none'; // HDTV often has fixed plans, hide summary if not needed
+      renderHDTVTables();
+    }
+
+    document.getElementById('pnDetailModal').classList.add('open');
+  };
+
+  function renderNLDTable(totalAmount) {
+    const totalHS = 23.04;
+    const giaTri1HS = totalAmount > 0 ? Math.round(totalAmount / totalHS) : 0;
+    document.getElementById('pnDetailSourceType').textContent = 'NLĐ';
+    document.getElementById('pnDetailTotalAmount').textContent = totalAmount.toLocaleString() + ' VNĐ';
+    document.getElementById('pnDetailTotalHS').textContent = totalHS.toFixed(2);
+    document.getElementById('pnDetailValPerHS').textContent = giaTri1HS.toLocaleString() + ' VNĐ';
+
+    const tbody = document.getElementById('pnDetailTbodyNLD');
+    tbody.innerHTML = DEPTS.map((name, i) => {
+      const hs = i === 0 ? 11.77 : (i === 1 ? 11.27 : 0);
+      const qlKH = Math.round(hs * giaTri1HS);
+      return `<tr>
+        <td style="font-weight: 600; color: #1E293B;">${name}</td>
+        <td style="text-align:center"><input type="number" class="pn-input-sm" value="1" style="width: 50px;"></td>
+        <td style="text-align:center"><input type="number" class="pn-input-sm" value="${hs}" step="0.01" style="width: 70px;"></td>
+        <td style="text-align:right; color: #64748B;">${giaTri1HS.toLocaleString()}</td>
+        <td style="text-align:right; font-weight: 700;">${qlKH.toLocaleString()}</td>
+        <td style="text-align:right; font-weight: 700; color: #185FA5;">${qlKH.toLocaleString()}</td>
+        <td style="text-align:right; color: #059669">0</td>
+        <td style="text-align:right; color: #D97706">0</td>
+        <td style="text-align:right; font-weight: 600;">${(i < 2 ? (i === 0 ? 40000000 : 30000000) : 0).toLocaleString()}</td>
+      </tr>`;
+    }).join('');
+  }
+
+  function renderHDTVTables() {
+    const tbodyCT = document.getElementById('pnDetailTbodyHDTV_CT');
+    tbodyCT.innerHTML = HDTV_CT.map(item => `<tr>
+      <td style="text-align:center">${item.stt}</td>
+      <td style="font-weight:600">${item.name}</td>
+      <td style="text-align:center">${item.ma}</td>
+      <td>${item.pos}</td>
+      <td style="text-align:center">${item.hsl}</td>
+      <td style="text-align:center">${item.hspc}</td>
+      <td style="text-align:right; font-weight:700">${item.luongTH.toLocaleString()}</td>
+      <td style="text-align:right; font-weight:700; color:#185FA5">${item.luongTU.toLocaleString()}</td>
+    </tr>`).join('');
+
+    const tbodyKCT = document.getElementById('pnDetailTbodyHDTV_KCT');
+    tbodyKCT.innerHTML = HDTV_KCT.map(item => `<tr>
+      <td style="text-align:center">${item.stt}</td>
+      <td style="font-weight:600">${item.name}</td>
+      <td style="text-align:center">${item.ma}</td>
+      <td>${item.pos}</td>
+      <td style="text-align:center">${item.hsl}</td>
+      <td style="text-align:center">${item.hspc}</td>
+      <td style="text-align:right; font-weight:700">${item.luongTH.toLocaleString()}</td>
+      <td style="text-align:right; font-weight:700; color:#185FA5">${item.luongTU.toLocaleString()}</td>
+    </tr>`).join('');
+  }
+
+  window.pnDetailCloseModal = function () { document.getElementById('pnDetailModal').classList.remove('open'); };
+  window.pnDetailSave = function () { alert('Đã lưu dữ liệu phân bổ thành công!'); pnDetailCloseModal(); };
+
+  // Logic Thêm mới phân nguồn
+  window.pnOpenAdd = function () {
+    document.getElementById('pnAddModal').classList.add('open');
+  };
+  window.pnCloseAdd = function () {
+    document.getElementById('pnAddModal').classList.remove('open');
+  };
+  window.pnSaveNew = function () {
+    const amount = document.getElementById('pnAddAmount').value;
+    if (!amount) { alert('Vui lòng nhập số tiền!'); return; }
+    alert('Thêm phân nguồn mới thành công!');
+    pnCloseAdd();
+  };
+
+  if (!window.onPageActivateRegistry) window.onPageActivateRegistry = {};
+  window.onPageActivateRegistry['dm-phan-nguon'] = renderMainTable;
+
+  const _old = window.onPageActivate;
+  window.onPageActivate = function (page) {
+    if (typeof _old === 'function') _old(page);
+    if (window.onPageActivateRegistry[page]) { setTimeout(window.onPageActivateRegistry[page], 50); }
+  };
+
+  setTimeout(() => { if (document.querySelector('.nav-item.active')?.dataset.page === 'dm-phan-nguon') renderMainTable(); }, 500);
+
 })();

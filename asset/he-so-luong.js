@@ -5,7 +5,7 @@
 (function () {
   'use strict';
 
-  const FIXED = 5;
+  const FIXED = 0;
 
   const DEPTS = [
     {

@@ -12,7 +12,8 @@
     'ca-dem': ['LCD', 'HCD', 'PCD', 'OTSCD'],
     'them-gio': ['OT', 'OTN', 'OTH']
   };
-  const FIXED = 3; // STT | Họ và tên | Số TK
+  const FIXED = 0; // Disable frozen columns
+  const OFFSET = 3; // STT | Họ và tên | Số TK
 
   /* ── Sample data ── */
   const DEPTS = [
@@ -75,7 +76,7 @@
   function buildData(q, colType) {
     const months = Q_MONTHS[q];
     const subCols = SUB_COLS[colType];
-    const totalCols = FIXED + months.length * subCols.length + 1;
+    const totalCols = OFFSET + months.length * subCols.length + 1;
     const rows = [];
     deptRowSet = new Set();
 
@@ -94,7 +95,7 @@
         let total = 0;
         months.forEach((m, mi) => {
           subCols.forEach((sc, si) => {
-            const idx = FIXED + mi * subCols.length + si;
+            const idx = OFFSET + mi * subCols.length + si;
             const v = emp.data[m] && emp.data[m][sc] != null ? emp.data[m][sc] : '';
             row[idx] = v;
             if (v !== '') total += Number(v);
@@ -136,7 +137,7 @@
       { data: 1, readOnly: true, width: 140, type: 'text', className: 'htLeft   htMiddle cc-fixed' },
       { data: 2, readOnly: true, width: 100, type: 'text', className: 'htCenter htMiddle cc-fixed' },
     ];
-    let ci = FIXED;
+    let ci = OFFSET;
     months.forEach(() => {
       subCols.forEach(() => {
         cols.push({ data: ci++, type: 'numeric', width: 36, className: 'htCenter htMiddle' });
@@ -173,7 +174,11 @@
 
     if (hotInstance) { hotInstance.destroy(); hotInstance = null; }
 
-    container.style.height = 'auto';
+    // Calculate height: headers + data + scrollbar buffer
+    const headerH = headers.length * 42;
+    const dataH = data.length * 26;
+    const scrollH = 20; 
+    const finalH = headerH + dataH + scrollH;
 
     hotInstance = new Handsontable(container, {
       data,
@@ -181,7 +186,7 @@
       columns: cols,
       rowHeaders: false,
       fixedColumnsStart: FIXED,
-      height: 'auto',
+      height: finalH,
       width: '100%',
       stretchH: 'all',
       autoColumnSize: false,

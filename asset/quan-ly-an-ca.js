@@ -5,7 +5,7 @@
 (function () {
   'use strict';
 
-  const FIXED = 4; // TT | Họ và tên | Mã nhân viên | Số TK
+  const FIXED = 0; // TT | Họ và tên | Mã nhân viên | Số TK
   const MEAL_RATE = { l1: 730000, l2: 730000, l3: 31000, l4: 27000 };
 
   /* ── Mock data ── */
@@ -169,7 +169,10 @@
     deptSet.forEach(ri => merges.push({ row: ri, col: 0, rowspan: 1, colspan: totalCols }));
 
     if (hotInstance) { hotInstance.destroy(); hotInstance = null; }
-    container.style.height = 'auto';
+    const headerH = headers.length * 42;
+    const dataH = data.length * 26;
+    const scrollH = 20; 
+    const finalH = headerH + dataH + scrollH;
 
     hotInstance = new Handsontable(container, {
       data,
@@ -177,7 +180,7 @@
       columns: cols,
       rowHeaders: false,
       fixedColumnsStart: FIXED,
-      height: 'auto',
+      height: finalH,
       width: '100%',
       stretchH: 'all',
       manualColumnResize: true,

@@ -5,7 +5,7 @@
 (function () {
   'use strict';
 
-  const FIXED = 4; // STT | Họ và tên | Mã CB | Số TK
+  const FIXED = 0; // STT | Họ và tên | Mã CB | Số TK
   const BASE_SALARY = 2340000;
 
   const DEPTS = [
@@ -112,6 +112,11 @@
 
     if (hotInstance) { hotInstance.destroy(); hotInstance = null; }
 
+    const headerH = 2 * 42; // [h1, h2]
+    const dataH = data.length * 26;
+    const scrollH = 20; 
+    const finalH = headerH + dataH + scrollH;
+
     hotInstance = new Handsontable(container, {
       data,
       nestedHeaders: [h1, h2],
@@ -136,7 +141,7 @@
       rowHeaders: false,
       rowHeights: 26,
       fixedColumnsStart: FIXED,
-      height: 'auto',
+      height: finalH,
       width: '100%',
       stretchH: 'all',
       autoColumnSize: false,

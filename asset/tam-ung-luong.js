@@ -9,7 +9,7 @@
   let _initializing = false;
 
   const BASE_SALARY = 3600000;
-  const FIXED = 4;
+  const FIXED = 0;
 
   const DEPTS = [
     {
@@ -165,7 +165,7 @@
   window.onPageActivateRegistry['tam-ung-luong'] = initHot;
 
   const _old = window.onPageActivate;
-  window.onPageActivate = function(page) {
+  window.onPageActivate = function (page) {
     if (typeof _old === 'function') _old(page);
     if (window.onPageActivateRegistry[page]) {
       setTimeout(window.onPageActivateRegistry[page], 50);

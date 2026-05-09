@@ -5,7 +5,7 @@
 (function () {
   'use strict';
 
-  const FIXED = 4; // STT | Họ và tên | Mã CB | Số TK
+  const FIXED = 0; // STT | Họ và tên | Mã CB | Số TK
 
   const DEPTS = [
     { name: 'Phòng Tổng hợp HĐTV', employees: [

@@ -6,7 +6,9 @@
   <meta name="viewport" content="width=device-width,initial-scale=1.0" />
   <title>PayrollPro - Dashboard</title>
   <meta name="description" content="Hệ thống quản lý lương PayrollPro" />
-  <link rel="stylesheet" href="asset/payroll.css" />
+  <link rel="stylesheet" href="asset/payroll.css">
+  <link rel="stylesheet" href="asset/phan-nguon.css">
+  <link rel="stylesheet" href="asset/nguoi-dung.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/handsontable@14.6.1/dist/handsontable.full.min.css" />
   <style>
     /* Robust Handsontable alignment */
@@ -651,86 +653,207 @@
         </div>
 
         <div class="page-section fade-in" id="page-dm-phan-nguon">
-          <!-- BẢNG 1: NGUỒN CHÍNH THEO NĂM -->
-
-          <div class="cat-toolbar">
-            <div class="cat-search-wrap">
-              <span style="font-size: 13px; font-weight: 600; color: #64748B; margin-right: 8px;">Lọc theo năm:</span>
-              <input type="number" id="pnMainFilterNam" placeholder="VD: 2024"
-                style="width: 100px; height: 36px; border-radius: 8px; border: 1px solid #E2E8F0; padding: 0 10px;"
-                oninput="pnMainRender()" />
-            </div>
-            <div class="cat-filter-wrap">
-              <button class="btn-cat-add" onclick="pnMainOpenAdd()" style="margin: 0; height: 36px;">
-                <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-                  <path d="M7 1v12M1 7h12" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
-                </svg> Thêm Nguồn chính
-              </button>
-            </div>
-          </div>
-          <div class="cat-table-wrap">
-            <table class="cat-table">
-              <thead>
-                <tr>
-                  <th style="width:40px;text-align:center">ID</th>
-                  <th style="width:80px;text-align:center">Năm</th>
-                  <th style="width:160px;text-align:right">Tổng ngân sách</th>
-                  <th style="width:160px;text-align:right">NS nhân viên</th>
-                  <th style="width:160px;text-align:right">NS quản lý</th>
-                  <th style="width:120px;text-align:center">Người tạo</th>
-                  <th style="width:120px;text-align:center">Ngày tạo</th>
-                  <th style="width:130px;text-align:center">Thao tác</th>
-                </tr>
-              </thead>
-              <tbody id="pnMainTbody"></tbody>
-            </table>
-          </div>
-
-          <div style="height: 40px;"></div>
-
-          <!-- BẢNG 2: PHÂN NGUỒN THEO THÁNG -->
-
-          <div class="cat-toolbar" style="gap: 15px;">
-            <div class="cat-filter-wrap">
-              <select id="pnMonthFilterQuy" onchange="pnMonthRender()" class="cat-select"
-                style="height: 36px; border-radius: 8px;">
-                <option value="">Tất cả quý</option>
-                <option value="1">Quý 1</option>
-                <option value="2">Quý 2</option>
-                <option value="3">Quý 3</option>
-                <option value="4">Quý 4</option>
+          <div class="cc-toolbar" style="display: flex; align-items: center; gap: 20px; padding: 10px 15px; background: #fff; border-bottom: 1px solid #E2E8F0;">
+            <div class="cc-filter-group">
+              <label>Năm quản lý</label>
+              <select id="pnFilterNam" class="cc-select" style="width: 120px;">
+                <option value="2024">2024</option>
+                <option value="2025">2025</option>
               </select>
             </div>
-            <div class="cat-filter-wrap">
-              <input type="number" id="pnMonthFilterNam" placeholder="Năm (VD: 2024)"
-                style="width: 120px; height: 36px; border-radius: 8px; border: 1px solid #E2E8F0; padding: 0 10px;"
-                oninput="pnMonthRender()" />
-            </div>
-            <div class="cat-filter-wrap">
-              <button class="btn-cat-add" onclick="pnMonthOpenAdd()" style="margin: 0; height: 36px;">
-                <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-                  <path d="M7 1v12M1 7h12" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
-                </svg> Thêm mới phân nguồn
+            <div class="cc-filter-group">
+              <button class="pn-btn-add-new" onclick="pnOpenAdd()">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                Thêm phân nguồn mới
               </button>
             </div>
           </div>
-          <div class="cat-table-wrap">
-            <table class="cat-table">
+
+          <div class="cc-card-grid" style="padding: 0; overflow: visible;">
+            <table class="pn-table" id="pnMainTable">
               <thead>
                 <tr>
-                  <th style="width:40px;text-align:center">ID</th>
-                  <th style="width:80px;text-align:center">Năm</th>
-                  <th style="width:80px;text-align:center">Quý</th>
-                  <th style="width:100px;text-align:center">Tháng</th>
-                  <th style="width:140px;text-align:right">NLĐ (VNĐ)</th>
-                  <th style="width:140px;text-align:right">NQL (VNĐ)</th>
-                  <th style="width:140px;text-align:right">Tổng (VNĐ)</th>
-                  <th>Ghi chú</th>
-                  <th style="width:200px;text-align:center">Thao tác</th>
+                  <th style="width: 250px;">GIAI ĐOẠN / THỜI GIAN</th>
+                  <th style="width: 120px; text-align: center;">ĐỐI TƯỢNG</th>
+                  <th style="width: 180px; text-align: right;">SỐ TIỀN (VNĐ)</th>
+                  <th style="text-align: left;">GHI CHÚ</th>
+                  <th style="width: 100px; text-align: center;">THAO TÁC</th>
                 </tr>
               </thead>
-              <tbody id="pnMonthTbody"></tbody>
+              <tbody id="pnTableBody">
+                <!-- Data will be injected here -->
+              </tbody>
             </table>
+          </div>
+        </div>
+        <div class="modal-overlay" id="pnDetailModal">
+          <div class="cat-modal" style="max-width: 1200px;">
+            <div class="cat-modal-accent cat-modal-accent-blue"></div>
+            <div class="cat-modal-body">
+              <div class="cat-modal-header">
+                <div class="cat-modal-title-wrap">
+                  <span class="cat-modal-title" id="pnDetailTitle">Phân bổ nguồn tiền về phòng ban</span>
+                </div>
+                <button class="cat-btn-close" onclick="pnDetailCloseModal()"><svg viewBox="0 0 14 14" fill="none">
+                    <path d="M2 2l10 10M12 2L2 12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+                  </svg></button>
+              </div>
+              
+              <div id="pnDetailSummary" class="cat-form-grid" style="grid-template-columns: repeat(4, 1fr); margin-bottom: 20px; background: #F8FAFC; padding: 15px; border-radius: 8px; border: 1px solid #E2E8F0;">
+                <div class="cat-field">
+                  <label style="color: #64748B; font-size: 11px; text-transform: uppercase;">Loại nguồn</label>
+                  <div id="pnDetailSourceType" style="font-weight: 700; color: #1E293B;">NLD</div>
+                </div>
+                <div class="cat-field">
+                  <label style="color: #64748B; font-size: 11px; text-transform: uppercase;">Tổng tiền phân bổ</label>
+                  <div id="pnDetailTotalAmount" style="font-weight: 700; color: #185FA5; font-size: 16px;">0</div>
+                </div>
+                <div class="cat-field">
+                  <label style="color: #64748B; font-size: 11px; text-transform: uppercase;">Tổng hệ số</label>
+                  <div id="pnDetailTotalHS" style="font-weight: 700; color: #059669;">0.00</div>
+                </div>
+                <div class="cat-field">
+                  <label style="color: #64748B; font-size: 11px; text-transform: uppercase;">Giá trị 1 hệ số</label>
+                  <div id="pnDetailValPerHS" style="font-weight: 700; color: #D97706;">0</div>
+                </div>
+              </div>
+
+              <!-- View cho NLĐ -->
+              <div id="pnDetailViewNLD" class="pn-detail-table-wrap">
+                <table class="pn-detail-table">
+                  <thead>
+                    <tr>
+                      <th rowspan="2">ĐƠN VỊ</th>
+                      <th style="text-align: center;">HS BÌNH XÉT (1)</th>
+                      <th style="text-align: center;">TỔNG HS CẤP BẬC (2)</th>
+                      <th style="text-align: center;">GIÁ TRỊ 1 HS (3)</th>
+                      <th style="text-align: center;">QUỸ LƯƠNG KH (4)</th>
+                      <th style="text-align: center;">PHÂN PHỐI LẠI (5)</th>
+                      <th style="text-align: center;">THƯỞNG HS (6)</th>
+                      <th style="text-align: center;">THU DỰ PHÒNG (7)</th>
+                      <th style="text-align: center;">QUỸ CLC (8)</th>
+                    </tr>
+                    <tr>
+                      <th colspan="8" style="font-size: 10px; color: #94A3B8; text-align: center; background: #F8FAFC;">DỮ LIỆU TÍNH TOÁN THEO PHÒNG BAN</th>
+                    </tr>
+                  </thead>
+                  <tbody id="pnDetailTbodyNLD"></tbody>
+                </table>
+              </div>
+
+              <!-- View cho HDTV -->
+              <div id="pnDetailViewHDTV" style="display:none;">
+                <div class="pn-table-title">BẢNG PHÂN PHỐI QUỸ LƯƠNG - HDTV, BKS CHUYÊN TRÁCH</div>
+                <div class="pn-detail-table-wrap" style="margin-bottom: 30px;">
+                  <table class="pn-detail-table">
+                    <thead>
+                      <tr>
+                        <th>STT</th>
+                        <th>TÊN</th>
+                        <th>MÃ NV</th>
+                        <th>CHỨC VỤ</th>
+                        <th>HỆ SỐ LƯƠNG</th>
+                        <th>HỆ SỐ PHỤ CẤP</th>
+                        <th>QUỸ LƯƠNG THỰC HIỆN</th>
+                        <th>QUỸ LƯƠNG TẠM ỨNG</th>
+                      </tr>
+                    </thead>
+                    <tbody id="pnDetailTbodyHDTV_CT"></tbody>
+                  </table>
+                </div>
+
+                <div class="pn-table-title">BẢNG PHÂN PHỐI QUỸ LƯƠNG - HDTV, BKS KHÔNG CHUYÊN TRÁCH</div>
+                <div class="pn-detail-table-wrap">
+                  <table class="pn-detail-table">
+                    <thead>
+                      <tr>
+                        <th>STT</th>
+                        <th>TÊN</th>
+                        <th>MÃ NV</th>
+                        <th>CHỨC VỤ</th>
+                        <th>HỆ SỐ LƯƠNG</th>
+                        <th>HỆ SỐ PHỤ CẤP</th>
+                        <th>QUỸ THÙ LAO THỰC HIỆN</th>
+                        <th>QUỸ THÙ LAO TẠM ỨNG</th>
+                      </tr>
+                    </thead>
+                    <tbody id="pnDetailTbodyHDTV_KCT"></tbody>
+                  </table>
+                </div>
+              </div>
+
+              <div class="cat-modal-footer">
+                <button class="cat-btn-cancel" onclick="pnDetailCloseModal()">Đóng</button>
+                <button class="cat-btn-save" onclick="pnDetailSave()">Lưu phân bổ</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ═══ MODAL THÊM MỚI PHÂN NGUỒN ═══ -->
+        <div class="modal-overlay" id="pnAddModal">
+          <div class="cat-modal" style="max-width: 600px;">
+            <div class="cat-modal-accent cat-modal-accent-blue"></div>
+            <div class="cat-modal-body">
+              <div class="cat-modal-header">
+                <div class="cat-modal-title-wrap">
+                  <span class="cat-modal-title">Thêm phân nguồn mới</span>
+                </div>
+                <button class="cat-btn-close" onclick="pnCloseAdd()"><svg viewBox="0 0 14 14" fill="none">
+                    <path d="M2 2l10 10M12 2L2 12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+                  </svg></button>
+              </div>
+              
+              <div class="cat-form-grid" style="grid-template-columns: repeat(3, 1fr);">
+                <div class="cat-field">
+                  <label>Năm <span class="req">*</span></label>
+                  <select id="pnAddNam" class="cat-select">
+                    <option value="2024">2024</option>
+                    <option value="2025">2025</option>
+                  </select>
+                </div>
+                <div class="cat-field">
+                  <label>Quý <span class="req">*</span></label>
+                  <select id="pnAddQuy" class="cat-select">
+                    <option value="1">Quý 1</option>
+                    <option value="2">Quý 2</option>
+                    <option value="3">Quý 3</option>
+                    <option value="4">Quý 4</option>
+                  </select>
+                </div>
+                <div class="cat-field">
+                  <label>Tháng <span class="req">*</span></label>
+                  <select id="pnAddThang" class="cat-select">
+                    <option value="1">Tháng 1</option><option value="2">Tháng 2</option><option value="3">Tháng 3</option>
+                    <option value="4">Tháng 4</option><option value="5">Tháng 5</option><option value="6">Tháng 6</option>
+                    <option value="7">Tháng 7</option><option value="8">Tháng 8</option><option value="9">Tháng 9</option>
+                    <option value="10">Tháng 10</option><option value="11">Tháng 11</option><option value="12">Tháng 12</option>
+                  </select>
+                </div>
+
+                <div class="cat-field" style="grid-column: span 1;">
+                  <label>Loại nguồn <span class="req">*</span></label>
+                  <select id="pnAddType" class="cat-select">
+                    <option value="HDTV">HDTV</option>
+                    <option value="NLĐ">NLĐ</option>
+                  </select>
+                </div>
+                <div class="cat-field" style="grid-column: span 2;">
+                  <label>Số tiền (VNĐ) <span class="req">*</span></label>
+                  <input type="number" id="pnAddAmount" placeholder="Nhập số tiền..." class="cat-input" />
+                </div>
+
+                <div class="cat-field" style="grid-column: 1/-1;">
+                  <label>Ghi chú</label>
+                  <textarea id="pnAddNote" placeholder="Ghi chú phân nguồn..." style="min-height: 80px;"></textarea>
+                </div>
+              </div>
+
+              <div class="cat-modal-footer">
+                <button class="cat-btn-cancel" onclick="pnCloseAdd()">Hủy bỏ</button>
+                <button class="cat-btn-save" onclick="pnSaveNew()">Xác nhận thêm</button>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -774,54 +897,55 @@
         </div>
 
         <div class="page-section fade-in" id="page-dm-nguoi-dung">
-          <div class="cc-filterbar">
-            <!-- 1. Trạng thái (moved to left) -->
-            <div class="cc-filter-group">
-              <label>Trạng thái</label>
-              <select class="cc-select" style="height: 38px;">
+          <div class="cc-toolbar" style="display: flex; align-items: center; gap: 15px; padding: 10px 15px; background: #fff; border-bottom: 1px solid #E2E8F0;">
+            <!-- 1. Trạng thái -->
+            <div class="cc-filter-group" style="display: flex; align-items: center; gap: 8px;">
+              <label style="margin: 0; white-space: nowrap; color: #64748B; font-size: 13px;">Trạng thái:</label>
+              <select id="nsFilterStatus" class="cc-select" style="width: 130px; height: 36px;">
                 <option value="1">Đang làm việc</option>
                 <option value="0">Đã nghỉ việc</option>
               </select>
             </div>
-
-            <!-- 2. Tìm kiếm nhanh (flexible) -->
-            <div class="cc-filter-group" style="min-width: 300px;">
-              <label>Tìm kiếm nhanh</label>
-              <div class="cat-search-wrap" style="width: 100%; margin-top: 0;">
-                <svg viewBox="0 0 16 16" fill="none">
-                  <circle cx="6.5" cy="6.5" r="4" stroke="currentColor" stroke-width="1.4" />
-                  <path d="M11 11l3 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" />
-                </svg>
-                <input type="text" id="nsSearch" placeholder="Tìm theo tên, mã hoặc tài khoản..."
-                  style="height: 38px;" />
+            
+            <!-- 2. Tìm kiếm -->
+            <div class="cc-filter-group" style="width: 300px;">
+              <div class="cat-search-wrap" style="width: 100%; margin-top: 0; height: 36px;">
+                <svg viewBox="0 0 16 16" fill="none"><circle cx="6.5" cy="6.5" r="4" stroke="currentColor" stroke-width="1.4" /><path d="M11 11l3 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" /></svg>
+                <input type="text" id="nsSearch" placeholder="Tìm tên, mã, tài khoản..." style="height: 100%;" />
               </div>
             </div>
 
-            <!-- 3. Thao tác (Buttons) -->
-            <div class="cc-filter-group">
-              <label>&nbsp;</label>
-              <div style="display: flex; gap: 10px;">
-                <button class="btn-premium btn-premium-blue">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
-                    stroke-linejoin="round">
-                    <line x1="12" y1="5" x2="12" y2="19"></line>
-                    <line x1="5" y1="12" x2="19" y2="12"></line>
-                  </svg>
-                  Thêm nhân viên
-                </button>
-                <button class="btn-premium btn-premium-green" id="nsExcel">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                    stroke-linejoin="round">
-                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3" />
-                  </svg>
-                  Xuất Excel
-                </button>
-              </div>
+            <!-- 3. Các nút chức năng (Nằm sau thanh tìm kiếm) -->
+            <div style="display: flex; gap: 10px;">
+              <button type="button" class="btn-premium btn-premium-blue" onclick="window.nsOpenAdd()" style="height: 36px; padding: 0 15px; cursor: pointer; display: flex; align-items: center; gap: 8px;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                Thêm nhân viên
+              </button>
+              <button type="button" class="btn-premium btn-premium-green" id="nsExcel" style="height: 36px; padding: 0 15px; cursor: pointer; display: flex; align-items: center; gap: 8px;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3" /></svg>
+                Xuất Excel
+              </button>
             </div>
           </div>
 
-          <div class="table-card">
-            <div id="nsHotContainer" style="width:100%;"></div>
+          <div class="ns-table-container" style="border-radius: 0; border: none; width: 100%; margin: 0;">
+            <table class="ns-table" id="nsMainTable">
+              <thead>
+                <tr>
+                  <th style="width: 50px; text-align: center;">STT</th>
+                  <th style="width: 120px; text-align: center;">MÃ NHÂN VIÊN</th>
+                  <th style="width: 250px;">HỌ VÀ TÊN</th>
+                  <th style="width: 200px;">PHÒNG BAN</th>
+                  <th style="width: 180px;">CHỨC VỤ</th>
+                  <th style="width: 120px; text-align: center;">TÀI KHOẢN</th>
+                  <th style="width: 100px; text-align: right;">HSL</th>
+                  <th style="width: 120px; text-align: center;">THAO TÁC</th>
+                </tr>
+              </thead>
+              <tbody id="nsTableBody">
+                <!-- Data will be injected here -->
+              </tbody>
+            </table>
           </div>
         </div>
 
@@ -1070,6 +1194,54 @@
 
 
         <!-- ═══ QUYẾT TOÁN LƯƠNG ═══ -->
+        <div class="page-section fade-in" id="page-luong-clc">
+          <div class="cc-filterbar">
+            <div class="cc-filter-group">
+              <label>Tháng</label>
+              <select id="clcMonth" class="cc-select" style="width: 100px;">
+                <option value="1">Tháng 1</option>
+                <option value="2">Tháng 2</option>
+                <option value="3">Tháng 3</option>
+                <option value="4" selected>Tháng 4</option>
+                <option value="5">Tháng 5</option>
+                <option value="6">Tháng 6</option>
+                <option value="7">Tháng 7</option>
+                <option value="8">Tháng 8</option>
+                <option value="9">Tháng 9</option>
+                <option value="10">Tháng 10</option>
+                <option value="11">Tháng 11</option>
+                <option value="12">Tháng 12</option>
+              </select>
+            </div>
+            <div class="cc-filter-group">
+              <label>Năm</label>
+              <select id="clcYear" class="cc-select" style="width: 100px;">
+                <option selected>2024</option>
+                <option>2025</option>
+              </select>
+            </div>
+            <div class="cc-filter-group">
+              <label>Phòng ban</label>
+              <select id="clcDept" class="cc-select" style="min-width: 200px;">
+                <option value="ALL">-- Tất cả phòng ban --</option>
+                <option value="1">Phòng Tổng hợp HĐTV</option>
+                <option value="2">Phòng Kinh doanh</option>
+              </select>
+            </div>
+            <div class="cc-filter-group" style="margin-left: auto;">
+              <button class="btn-premium btn-premium-green" id="clcExcel">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3" />
+                </svg>
+                Xuất Excel
+              </button>
+            </div>
+          </div>
+          <div class="table-card">
+            <div id="luongClcHot" style="width:100%;"></div>
+          </div>
+        </div>
+
         <div class="page-section fade-in" id="page-quyet-toan">
           <div class="cc-filterbar"
             style="display: flex; align-items: flex-end; gap: 20px; justify-content: flex-start;">
@@ -1210,18 +1382,6 @@
           <div id="hdtvChuyenTrachHot" style="width:100%;"></div>
         </div>
 
-        <!-- ═══ HĐTV KHÔNG CHUYÊN TRÁCH ═══ -->
-        <div class="page-section fade-in" id="page-hdtv-khong-chuyen-trach">
-
-          <div class="cc-filterbar">
-            <div class="cc-filter-group"><label>Kỳ lương</label>
-              <select class="cc-select">
-                <option>Tháng 04/2024</option>
-              </select>
-            </div>
-          </div>
-          <div id="hdtvKhongChuyenTrachHot" style="width:100%;"></div>
-        </div>
 
         <!-- ═══ CHI TRẢ LƯƠNG ═══ -->
         <div class="page-section fade-in" id="page-chi-luong">
@@ -2370,6 +2530,197 @@
         </script>
 
         <script src="https://cdn.jsdelivr.net/npm/handsontable@14.6.1/dist/handsontable.full.min.js"></script>
+
+        <script>
+          // Centralized page activation system
+          window.pageInitRegistry = window.pageInitRegistry || {};
+          window.onPageActivate = function(page) {
+            console.log('Activating page:', page);
+            if (window.pageInitRegistry[page]) {
+              window.pageInitRegistry[page]();
+            }
+          };
+        </script>
+      <!-- ═══ MODAL THÊM MỚI NHÂN VIÊN ═══ -->
+      <div class="modal-overlay" id="nsAddModal">
+        <div class="cat-modal" style="max-width: 1000px;">
+          <div class="cat-modal-accent cat-modal-accent-blue"></div>
+          <div class="cat-modal-body">
+            <div class="cat-modal-header">
+              <div class="cat-modal-title-wrap">
+                <span class="cat-modal-title"><i class="fas fa-user-plus me-2"></i> THÊM MỚI NHÂN VIÊN</span>
+              </div>
+              <button class="cat-btn-close" onclick="nsCloseAdd()"><svg viewBox="0 0 14 14" fill="none"><path d="M2 2l10 10M12 2L2 12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" /></svg></button>
+            </div>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1px 1fr; gap: 30px; padding: 10px 0;">
+              <!-- Cột trái: Thông tin cá nhân -->
+              <div>
+                <div class="section-header" style="margin-top: 0; color: #2563EB; font-size: 13px;">THÔNG TIN CƠ BẢN</div>
+                <div class="cat-form-grid" style="grid-template-columns: 1fr 1fr; gap: 15px;">
+                  <div class="cat-field">
+                    <label>Mã nhân viên <span class="req">*</span></label>
+                    <input type="text" id="add_ma" class="cat-input" placeholder="VD: NV001">
+                  </div>
+                  <div class="cat-field">
+                    <label>Họ và tên <span class="req">*</span></label>
+                    <input type="text" id="add_name" class="cat-input" placeholder="Nhập họ tên...">
+                  </div>
+                  <div class="cat-field">
+                    <label>Ngày sinh</label>
+                    <input type="date" id="add_dob" class="cat-input">
+                  </div>
+                  <div class="cat-field">
+                    <label>Giới tính</label>
+                    <select id="add_gender" class="cat-select"><option>Nam</option><option>Nữ</option></select>
+                  </div>
+                  <div class="cat-field" style="grid-column: span 2;">
+                    <label>Email liên hệ</label>
+                    <input type="email" id="add_email" class="cat-input" placeholder="example@gmail.com">
+                  </div>
+                </div>
+
+                <div class="section-header" style="color: #2563EB; font-size: 13px;">TÀI KHOẢN & NGÂN HÀNG</div>
+                <div class="cat-form-grid" style="grid-template-columns: 1fr 1fr; gap: 15px;">
+                  <div class="cat-field">
+                    <label>Tên đăng nhập <span class="req">*</span></label>
+                    <input type="text" class="cat-input" placeholder="username">
+                  </div>
+                  <div class="cat-field">
+                    <label>Mật khẩu <span class="req">*</span></label>
+                    <input type="password" class="cat-input" placeholder="••••••••">
+                  </div>
+                  <div class="cat-field" style="grid-column: span 2;">
+                    <label>Số tài khoản ngân hàng</label>
+                    <input type="text" class="cat-input" placeholder="Số tài khoản + Ngân hàng">
+                  </div>
+                </div>
+              </div>
+
+              <!-- Divider -->
+              <div style="background: #E2E8F0; width: 1px;"></div>
+
+              <!-- Cột phải: Công tác & Lương -->
+              <div>
+                <div class="section-header" style="margin-top: 0; color: #059669; font-size: 13px;">VỊ TRÍ & CÔNG TÁC</div>
+                <div class="cat-form-grid" style="grid-template-columns: 1fr 1fr; gap: 15px;">
+                  <div class="cat-field">
+                    <label>Phòng ban <span class="req">*</span></label>
+                    <select class="cat-select"><option>Phòng Tổng hợp HĐTV</option><option>Phòng Kinh doanh</option></select>
+                  </div>
+                  <div class="cat-field">
+                    <label>Chức vụ <span class="req">*</span></label>
+                    <select class="cat-select"><option>Trưởng phòng</option><option>Nhân viên</option></select>
+                  </div>
+                  <div class="cat-field">
+                    <label>Hệ số lương <span class="req">*</span></label>
+                    <input type="number" step="0.001" class="cat-input" value="1.000">
+                  </div>
+                  <div class="cat-field">
+                    <label>Ngày vào làm</label>
+                    <input type="date" class="cat-input">
+                  </div>
+                </div>
+
+                <div class="section-header" style="color: #059669; font-size: 13px;">PHỤ CẤP</div>
+                <div class="cat-form-grid" style="grid-template-columns: 1fr 1fr; gap: 15px;">
+                  <div class="cat-field">
+                    <label>Phụ cấp thu hút</label>
+                    <input type="number" class="cat-input" value="0">
+                  </div>
+                  <div class="cat-field">
+                    <label>Phụ cấp độc hại</label>
+                    <input type="number" class="cat-input" value="0">
+                  </div>
+                  <div class="cat-field">
+                    <label>Phụ cấp lưu động</label>
+                    <input type="number" class="cat-input" value="0">
+                  </div>
+                  <div class="cat-field">
+                    <label>Đính kèm hồ sơ</label>
+                    <input type="file" class="cat-input">
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="cat-modal-footer">
+              <button class="cat-btn-cancel" onclick="nsCloseAdd()">Hủy bỏ</button>
+              <button class="cat-btn-save" onclick="nsSaveNew()">Lưu & Xác nhận</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ MODAL CHỈNH SỬA / CHI TIẾT NHÂN VIÊN ═══ -->
+      <div class="modal-overlay" id="nsEditModal">
+        <div class="cat-modal" style="max-width: 1100px;">
+          <div class="cat-modal-accent cat-modal-accent-blue"></div>
+          <div class="cat-modal-body">
+            <div class="cat-modal-header">
+              <div class="cat-modal-title-wrap">
+                <span class="cat-modal-title"><i class="fas fa-user-edit me-2"></i> CHỈNH SỬA HỒ SƠ NHÂN SỰ</span>
+              </div>
+              <button class="cat-btn-close" onclick="nsCloseEdit()"><svg viewBox="0 0 14 14" fill="none"><path d="M2 2l10 10M12 2L2 12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" /></svg></button>
+            </div>
+            
+            <div class="cat-form-grid" style="grid-template-columns: repeat(4, 1fr); margin-bottom: 25px;">
+              <div class="cat-field">
+                <label>Mã nhân viên</label>
+                <input type="text" id="edit_ma" class="cat-input" readonly style="background: #F8FAFC;">
+              </div>
+              <div class="cat-field">
+                <label>Họ và tên</label>
+                <input type="text" id="edit_name" class="cat-input">
+              </div>
+              <div class="cat-field">
+                <label>Ngày sinh</label>
+                <input type="date" id="edit_dob" class="cat-input">
+              </div>
+              <div class="cat-field">
+                <label>Ngày tuyển dụng</label>
+                <input type="date" id="edit_join" class="cat-input" readonly>
+              </div>
+            </div>
+
+            <div class="section-header" style="color: #1E3A5F; border-bottom: 2px solid #E2E8F0; padding-bottom: 5px;">QUẢN LÝ BIẾN ĐỘNG CÔNG TÁC</div>
+            <div style="display: flex; gap: 10px; margin-bottom: 20px; padding: 15px; background: #F8FAFC; border-radius: 8px;">
+               <button class="btn-action" onclick="nsToggleSubForm('formTransfer')"><i class="fas fa-exchange-alt me-1"></i> Điều chuyển</button>
+               <button class="btn-action" onclick="nsToggleSubForm('formSalary')"><i class="fas fa-chart-line me-1"></i> Thay đổi lương</button>
+               <button class="btn-action" onclick="nsToggleSubForm('formResign')"><i class="fas fa-user-slash me-1"></i> Thôi việc</button>
+            </div>
+
+            <!-- Subforms (hidden by default) -->
+            <div id="formTransfer" class="ns-subform-panel" style="display:none; border: 2px solid #3B82F6; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+               <h6 style="font-weight: 700; color: #1D4ED8; margin-bottom: 10px;">ĐIỀU CHUYỂN CÔNG TÁC</h6>
+               <div class="cat-form-grid" style="grid-template-columns: 1fr 1fr 1fr;">
+                  <div class="cat-field"><label>Đơn vị mới</label><select class="cat-select"><option>Phòng Kỹ thuật</option></select></div>
+                  <div class="cat-field"><label>Chức vụ mới</label><select class="cat-select"><option>Trưởng nhóm</option></select></div>
+                  <div class="cat-field"><label>Ngày hiệu lực</label><input type="date" class="cat-input"></div>
+               </div>
+            </div>
+
+            <div class="section-header" style="color: #1E3A5F;">LỊCH SỬ BIẾN ĐỘNG</div>
+            <div style="max-height: 200px; overflow-y: auto; border: 1px solid #E2E8F0; border-radius: 8px;">
+               <table class="cc-table" style="font-size: 12px;">
+                  <thead>
+                    <tr><th>Ngày tạo</th><th>Loại biến động</th><th>Phòng ban</th><th>Chức vụ</th><th>Ghi chú</th></tr>
+                  </thead>
+                  <tbody>
+                    <tr><td>20/04/2026</td><td><span class="pn-badge pn-badge-blue">ĐIỀU CHUYỂN</span></td><td>Phòng Kỹ thuật</td><td>Trưởng nhóm</td><td>QĐ số 45/QĐ</td></tr>
+                    <tr><td>10/05/2023</td><td><span class="pn-badge pn-badge-teal">NÂNG LƯƠNG</span></td><td>Phòng Tổng hợp</td><td>Nhân viên</td><td>Nâng bậc niên độ</td></tr>
+                  </tbody>
+               </table>
+            </div>
+
+            <div class="cat-modal-footer">
+              <button class="cat-btn-cancel" onclick="nsCloseEdit()">Đóng</button>
+              <button class="cat-btn-save" onclick="nsSaveEdit()">Lưu thay đổi</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
         <script src="asset/chamcong.js"></script>
         <script src="asset/an-toan-dien.js"></script>
         <script src="asset/tam-ung-luong.js"></script>
@@ -2389,7 +2740,10 @@
         <script src="asset/phan-quyen-cn.js"></script>
         <script src="asset/phu-tro.category.js"></script>
         <script src="asset/he-so-danh-gia.category.js"></script>
-        <script src="asset/nguoi-dung.category.js"></script>
+        <script src="asset/quan-ly-nhan-su.js"></script>
+        <script src="asset/hdtv-chuyen-trach.js"></script>
+        <script src="asset/hdtv-khong-chuyen-trach.js"></script>
+        <script src="asset/luong-clc.js"></script>
 </body>
 
 </html>

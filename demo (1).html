@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PMS Nova | Thêm mới nhân viên</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --pms-primary: #0f2b3d;
+            --pms-accent: #2c7da0;
+            --pms-success: #2a9d8f;
+            --pms-success-light: #e9f5f3;
+            --pms-warning: #e9c46a;
+            --pms-danger: #e76f51;
+            --bg-page: #f4f7fc;
+            --card-white: #ffffff;
+            --text-dark: #1e2a3e;
+            --text-muted: #5c6b7a;
+            --border-light: #e9edf2;
+            --shadow-sm: 0 8px 20px rgba(0, 0, 0, 0.02), 0 2px 6px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 20px 35px -12px rgba(0, 0, 0, 0.08);
+            --transition: all 0.25s ease;
+        }
+
+        body {
+            background: linear-gradient(135deg, #eef2f7 0%, #d9e2ec 100%);
+            font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            padding: 2rem;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* main card */
+        .glass-card {
+            max-width: 1300px;
+            width: 100%;
+            background: var(--card-white);
+            border-radius: 2rem;
+            box-shadow: var(--shadow-md), 0 1px 2px rgba(0, 0, 0, 0.03);
+            overflow: hidden;
+            transition: transform 0.2s;
+        }
+
+        /* header nâng cấp */
+        .modern-header {
+            padding: 1.5rem 2rem;
+            background: var(--card-white);
+            border-bottom: 1px solid var(--border-light);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .title-section h2 {
+            font-size: 1.6rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--pms-primary) 0%, var(--pms-accent) 100%);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            letter-spacing: -0.3px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .title-section h2 i {
+            background: var(--pms-success-light);
+            padding: 10px;
+            border-radius: 18px;
+            color: var(--pms-success);
+            font-size: 1.3rem;
+            background: linear-gradient(145deg, #f0f9f6, #e2f0ec);
+        }
+
+        .badge-id {
+            background: #f0f4f9;
+            padding: 0.5rem 1.2rem;
+            border-radius: 100px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--pms-accent);
+            backdrop-filter: blur(2px);
+            letter-spacing: 0.3px;
+            border: 1px solid rgba(44, 125, 160, 0.2);
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.6);
+        }
+
+        .badge-id i {
+            margin-right: 6px;
+            font-size: 0.75rem;
+        }
+
+        /* form content */
+        .form-luxury {
+            padding: 1rem 2rem 0.5rem 2rem;
+        }
+
+        .two-columns {
+            display: flex;
+            gap: 2.5rem;
+            flex-wrap: wrap;
+        }
+
+        .column-left, .column-right {
+            flex: 1;
+            min-width: 300px;
+        }
+
+        /* separator gradient */
+        .vertical-divider {
+            width: 1px;
+            background: linear-gradient(to bottom, #e2e8f0, #cbd5e1, #e2e8f0);
+            margin: 0.5rem 0;
+        }
+
+        /* sections style */
+        .section-modern {
+            margin-bottom: 2.2rem;
+            background: var(--card-white);
+            border-radius: 1.25rem;
+            transition: var(--transition);
+        }
+
+        .section-head {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 1.5rem;
+        }
+
+        .section-head .icon-bg {
+            width: 36px;
+            height: 36px;
+            background: var(--pms-success-light);
+            border-radius: 14px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--pms-success);
+            font-size: 1.2rem;
+        }
+
+        .section-head h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-dark);
+            letter-spacing: -0.2px;
+            margin: 0;
+        }
+
+        /* grid form */
+        .form-row-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.2rem;
+            margin-bottom: 1.2rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .form-group.full-width {
+            grid-column: span 2;
+        }
+
+        label {
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        label i {
+            font-size: 0.75rem;
+            color: var(--pms-accent);
+        }
+
+        .required-star {
+            color: var(--pms-danger);
+            font-size: 1rem;
+            margin-left: 2px;
+        }
+
+        .input-modern {
+            padding: 0.85rem 1rem;
+            border: 1.5px solid var(--border-light);
+            border-radius: 1rem;
+            font-size: 0.9rem;
+            transition: var(--transition);
+            background-color: #fefefe;
+            font-family: inherit;
+            color: var(--text-dark);
+        }
+
+        .input-modern:focus {
+            outline: none;
+            border-color: var(--pms-success);
+            box-shadow: 0 0 0 4px rgba(42, 157, 143, 0.12);
+            background-color: #fff;
+        }
+
+        select.input-modern {
+            appearance: none;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="%235c6b7a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>');
+            background-repeat: no-repeat;
+            background-position: right 1rem center;
+            background-size: 14px;
+        }
+
+        textarea.input-modern {
+            resize: vertical;
+        }
+
+        /* file upload custom hint */
+        input[type="file"].input-modern {
+            padding: 0.6rem 0.8rem;
+        }
+
+        /* note area */
+        .note-area {
+            margin: 1rem 0 1.5rem 0;
+        }
+
+        /* footer buttons */
+        .action-footer {
+            padding: 1.2rem 2rem 2rem 2rem;
+            background: var(--card-white);
+            border-top: 1px solid var(--border-light);
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 0.8rem 1.8rem;
+            border-radius: 2rem;
+            font-weight: 600;
+            font-size: 0.85rem;
+            transition: var(--transition);
+            cursor: pointer;
+            border: none;
+            background: transparent;
+            font-family: inherit;
+            letter-spacing: 0.2px;
+        }
+
+        .btn-primary {
+            background: var(--pms-success);
+            color: white;
+            box-shadow: 0 2px 6px rgba(42, 157, 143, 0.25);
+        }
+
+        .btn-primary:hover {
+            background: #248277;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 18px rgba(42, 157, 143, 0.3);
+        }
+
+        .btn-secondary {
+            background: #f1f5f9;
+            color: #334155;
+            border: 1px solid #e2e8f0;
+        }
+
+        .btn-secondary:hover {
+            background: #e6edf4;
+            transform: translateY(-1px);
+        }
+
+        /* làm đẹp hint nho nhỏ */
+        .helper-text {
+            font-size: 0.7rem;
+            color: #94a3b8;
+            margin-top: 0.25rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        /* responsive */
+        @media (max-width: 900px) {
+            body {
+                padding: 1rem;
+            }
+            .two-columns {
+                flex-direction: column;
+                gap: 0;
+            }
+            .vertical-divider {
+                display: none;
+            }
+            .form-row-grid {
+                gap: 1rem;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .form-row-grid {
+                grid-template-columns: 1fr;
+            }
+            .form-group.full-width {
+                grid-column: span 1;
+            }
+            .action-footer {
+                justify-content: stretch;
+            }
+            .btn {
+                justify-content: center;
+                flex: 1;
+            }
+        }
+
+        /* micro-interaction */
+        .input-modern:hover {
+            border-color: #cbd5e1;
+        }
+
+        ::placeholder {
+            color: #b9c2cf;
+            font-weight: 400;
+        }
+    </style>
+</head>
+<body>
+
+<div class="glass-card">
+    <div class="modern-header">
+        <div class="title-section">
+            <h2>
+                <i class="fas fa-user-plus"></i> 
+                Thêm mới nhân viên
+            </h2>
+            <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 6px; display: flex; gap: 8px;">
+                <span><i class="fas fa-database"></i> PMS v3.0</span>
+                <span><i class="fas fa-chart-line"></i> Bảng lương thông minh</span>
+            </div>
+        </div>
+        <div class="badge-id">
+            <i class="fas fa-id-card"></i> ID tự động: <strong>NV-2410-09</strong>
+        </div>
+    </div>
+
+    <form onsubmit="handleFormSubmit(event)">
+        <div class="form-luxury">
+            <div class="two-columns">
+                <!-- Cột trái: thông tin cá nhân + tài khoản -->
+                <div class="column-left">
+                    <!-- THÔNG TIN CÁ NHÂN -->
+                    <div class="section-modern">
+                        <div class="section-head">
+                            <div class="icon-bg"><i class="fas fa-user-astronaut"></i></div>
+                            <h3>Thông tin cá nhân</h3>
+                        </div>
+                        <div class="form-row-grid">
+                            <div class="form-group">
+                                <label><i class="fas fa-hashtag"></i> Mã nhân viên <span class="required-star">*</span></label>
+                                <input type="text" class="input-modern" value="NV-6688" placeholder="VD: NV-1001">
+                                <div class="helper-text"><i class="fas fa-info-circle"></i> Duy nhất trong hệ thống</div>
+                            </div>
+                            <div class="form-group">
+                                <label><i class="fas fa-signature"></i> Họ và tên <span class="required-star">*</span></label>
+                                <input type="text" class="input-modern" value="Trần Minh Đức" placeholder="Nhập họ và tên">
+                            </div>
+                            <div class="form-group">
+                                <label><i class="fas fa-calendar-alt"></i> Ngày sinh <span class="required-star">*</span></label>
+                                <input type="date" class="input-modern" value="1995-10-24">
+                            </div>
+                            <div class="form-group">
+                                <label><i class="fas fa-envelope"></i> Email liên hệ <span class="required-star">*</span></label>
+                                <input type="email" class="input-modern" value="duc.tm@pms-corp.vn" placeholder="example@company.com">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- TÀI KHOẢN HỆ THỐNG & NGÂN HÀNG -->
+                    <div class="section-modern">
+                        <div class="section-head">
+                            <div class="icon-bg"><i class="fas fa-laptop-code"></i></div>
+                            <h3>Tài khoản & chi trả</h3>
+                        </div>
+                        <div class="form-row-grid">
+                            <div class="form-group">
+                                <label><i class="fas fa-user-tag"></i> Tên đăng nhập <span class="required-star">*</span></label>
+                                <input type="text" class="input-modern" value="duc.tm" placeholder="username">
+                            </div>
+                            <div class="form-group">
+                                <label><i class="fas fa-key"></i> Mật khẩu <span class="required-star">*</span></label>
+                                <input type="password" class="input-modern" value="password123" placeholder="••••••••">
+                            </div>
+                            <div class="form-group full-width">
+                                <label><i class="fas fa-university"></i> Số tài khoản ngân hàng (chi trả lương)</label>
+                                <input type="text" class="input-modern" value="00110022334455 - Vietcombank" placeholder="STK + ngân hàng">
+                                <div class="helper-text"><i class="fas fa-shield-alt"></i> Bảo mật thông tin thanh toán</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Divider nhẹ -->
+                <div class="vertical-divider"></div>
+                
+                <!-- Cột phải: Công tác & Phụ cấp -->
+                <div class="column-right">
+                    <!-- VỊ TRÍ & CÔNG TÁC -->
+                    <div class="section-modern">
+                        <div class="section-head">
+                            <div class="icon-bg"><i class="fas fa-briefcase"></i></div>
+                            <h3>Vị trí & công tác</h3>
+                        </div>
+                        <div class="form-row-grid">
+                            <div class="form-group">
+                                <label><i class="fas fa-building"></i> Phòng ban <span class="required-star">*</span></label>
+                                <select class="input-modern">
+                                    <option>Phòng Điều Hành</option>
+                                    <option selected>Trung Tâm Kỹ Thuật</option>
+                                    <option>Phòng Dự Án Chiến Lược</option>
+                                    <option>Khối Nhân Sự</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label><i class="fas fa-user-graduate"></i> Chức vụ <span class="required-star">*</span></label>
+                                <select class="input-modern">
+                                    <option>Quản lý cấp cao</option>
+                                    <option selected>Kỹ sư trưởng</option>
+                                    <option>Chuyên viên chính</option>
+                                    <option>Nhân viên</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label><i class="fas fa-chart-simple"></i> Hệ số lương <span class="required-star">*</span></label>
+                                <input type="number" step="0.01" class="input-modern" value="3.99" placeholder="0.00">
+                            </div>
+                            <div class="form-group">
+                                <label><i class="fas fa-calendar-check"></i> Ngày vào làm <span class="required-star">*</span></label>
+                                <input type="date" class="input-modern" value="2024-04-20">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- PHỤ CẤP & HỒ SƠ -->
+                    <div class="section-modern">
+                        <div class="section-head">
+                            <div class="icon-bg"><i class="fas fa-coins"></i></div>
+                            <h3>Phụ cấp & tệp đính kèm</h3>
+                        </div>
+                        <div class="form-row-grid">
+                            <div class="form-group">
+                                <label><i class="fas fa-star-of-life"></i> Phụ cấp thu hút</label>
+                                <input type="text" class="input-modern" value="1,200,000 ₫" placeholder="0">
+                            </div>
+                            <div class="form-group">
+                                <label><i class="fas fa-biohazard"></i> Phụ cấp độc hại</label>
+                                <input type="text" class="input-modern" value="500,000 ₫" placeholder="0">
+                            </div>
+                            <div class="form-group">
+                                <label><i class="fas fa-car"></i> Phụ cấp lưu động</label>
+                                <input type="text" class="input-modern" value="300,000 ₫" placeholder="0">
+                            </div>
+                            <div class="form-group">
+                                <label><i class="fas fa-paperclip"></i> Hồ sơ đính kèm (PDF/IMG)</label>
+                                <input type="file" class="input-modern" accept=".pdf,.jpg,.png">
+                                <div class="helper-text">Hợp đồng, bằng cấp, sơ yếu lý lịch</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Khu vực ghi chú rộng rãi -->
+            <div class="note-area">
+                <div class="form-group full-width">
+                    <label><i class="fas fa-pen-alt"></i> Ghi chú nội bộ</label>
+                    <textarea class="input-modern" rows="2" placeholder="Thông tin thêm về quá trình làm việc, chứng chỉ, khen thưởng...">Hồ sơ nhân viên xuất sắc, có chứng chỉ chuyên môn quốc tế (PMP, AWS). Đề xuất hưởng phụ cấp kỹ năng cao.</textarea>
+                </div>
+            </div>
+        </div>
+        
+        <!-- FOOTER modern -->
+        <div class="action-footer">
+            <button type="button" class="btn btn-secondary" onclick="resetFormPreview()">
+                <i class="fas fa-undo-alt"></i> Nhập lại
+            </button>
+            <button type="button" class="btn btn-secondary" onclick="window.location.href='#';">
+                <i class="fas fa-times-circle"></i> Thoát
+            </button>
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-save"></i> Lưu & Xác nhận
+            </button>
+        </div>
+    </form>
+</div>
+
+<!-- Thêm hiệu ứng thông báo nho nhỏ khi submit (demo mượt mà) -->
+<script>
+    function handleFormSubmit(e) {
+        e.preventDefault();
+        // toast thông báo giả lập mượt
+        const form = e.target;
+        const nameInput = form.querySelector('input[placeholder="Nhập họ và tên"]') || form.querySelector('input[value="Trần Minh Đức"]');
+        const employeeName = nameInput ? nameInput.value : "Nhân viên";
+        
+        // Tạo toast thông báo tinh tế
+        const toast = document.createElement('div');
+        toast.innerHTML = `
+            <div style="position: fixed; bottom: 24px; right: 24px; background: #1e2a3e; color: white; padding: 14px 24px; border-radius: 40px; 
+                        font-size: 0.9rem; font-weight: 500; box-shadow: 0 20px 35px -8px rgba(0,0,0,0.2); backdrop-filter: blur(4px);
+                        background: rgba(30,42,62,0.95); border-left: 5px solid #2a9d8f; z-index: 1000; display: flex; align-items: center; gap: 12px;">
+                <i class="fas fa-check-circle" style="color: #2a9d8f; font-size: 1.2rem;"></i>
+                <span>✅ Đã lưu hồ sơ: <strong>${escapeHtml(employeeName)}</strong> thành công!</span>
+                <i class="fas fa-times-circle" style="margin-left: 8px; cursor: pointer; opacity: 0.7;" onclick="this.parentElement.remove()"></i>
+            </div>
+        `;
+        document.body.appendChild(toast);
+        setTimeout(() => {
+            if(toast && toast.parentNode) toast.remove();
+        }, 3800);
+        
+        // Có thể console log dữ liệu để debug
+        console.log("Dữ liệu nhân viên đã sẵn sàng lưu (mock)");
+    }
+    
+    function escapeHtml(str) {
+        if(!str) return '';
+        return str.replace(/[&<>]/g, function(m) {
+            if(m === '&') return '&amp;';
+            if(m === '<') return '&lt;';
+            if(m === '>') return '&gt;';
+            return m;
+        });
+    }
+    
+    function resetFormPreview() {
+        // reset các trường nhập liệu (nhẹ nhàng, chỉ làm mẫu một số trường chính)
+        const form = document.querySelector('form');
+        if(!form) return;
+        // reset text inputs
+        const inputs = form.querySelectorAll('input:not([type="file"]), select, textarea');
+        inputs.forEach(input => {
+            if(input.type === 'text' || input.type === 'email' || input.type === 'password' || input.type === 'number' || input.tagName === 'SELECT' || input.tagName === 'TEXTAREA') {
+                if(input.classList.contains('input-modern')) {
+                    // giữ lại giá trị mặc định logic demo nhưng không làm trống hết
+                    // thay vào đó reset về giá trị khởi tạo ban đầu nếu cần (tùy)
+                    if(input.hasAttribute('data-default')) {
+                        input.value = input.getAttribute('data-default');
+                    } else {
+                        // nếu không thì chỉ đặt placeholder hoặc giữ nguyên giá trị mặc định mong muốn
+                        // nhưng trong demo ta muốn làm mới có chọn lọc (ví dụ xóa ghi chú)
+                        if(input === form.querySelector('textarea')) input.value = '';
+                        if(input.type === 'email' && input.value.includes('duc.tm')) input.value = '';
+                        if(input.type === 'text' && input.placeholder === 'Nhập họ và tên') input.value = '';
+                        if(input.type === 'text' && input.value === 'NV-6688') input.value = 'NV-';
+                    }
+                }
+            }
+        });
+        // reset file input
+        const fileInput = form.querySelector('input[type="file"]');
+        if(fileInput) fileInput.value = '';
+        // set lại một số giá trị gợi ý tránh trắng toàn bộ
+        const nameField = form.querySelector('input[placeholder="Nhập họ và tên"]');
+        if(nameField && nameField.value === '') nameField.value = '';
+        const toastReset = document.createElement('div');
+        toastReset.innerHTML = `<div style="position: fixed; bottom: 24px; left: 24px; background: #334155; color: #f1f5f9; padding: 8px 18px; border-radius: 30px; font-size: 0.8rem; box-shadow: 0 8px 16px rgba(0,0,0,0.1); z-index: 999;">🧹 Đã làm mới form (nhập lại)</div>`;
+        document.body.appendChild(toastReset);
+        setTimeout(() => toastReset.remove(), 1800);
+    }
+    
+    // set default attributes để hỗ trợ reset
+    document.addEventListener('DOMContentLoaded', function() {
+        const formElem = document.querySelector('form');
+        if(formElem) {
+            const allInputs = formElem.querySelectorAll('.input-modern');
+            allInputs.forEach(el => {
+                if(el.value && el.type !== 'file' && el.type !== 'password') {
+                    el.setAttribute('data-default', el.value);
+                }
+            });
+        }
+        // thêm hiệu ứng nhẹ cho các nút
+    });
+</script>
+</body>
+</html>

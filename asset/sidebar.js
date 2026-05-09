@@ -19,7 +19,6 @@
     'phong-ban': 'Danh mục phòng ban',
     'dm-luong-co-ban': 'Danh mục lương cơ bản',
     'dm-he-so-danh-gia': 'Danh mục loại ngày công',
-    'dm-phu-tro': 'Danh mục phụ trợ',
     'dm-thoi-gian-lv': 'Danh mục thời gian làm việc',
     'dm-phan-nguon': 'Danh mục phân nguồn',
     'dm-an-ca': 'Danh mục định mức ăn ca',
@@ -34,6 +33,7 @@
     'an-toan-dien': 'Quản lý an toàn điện',
     // Tính lương Nhân viên
     'tam-ung-luong': 'Tạm ứng',
+    'luong-clc': 'Tính lương CLC',
     'quyet-toan': 'Quyết toán',
     'luong-hq': 'Chi lương hiệu quả',
     // Tính lương NQL
@@ -95,7 +95,6 @@
         <div class="nav-item" data-page="khoi-phong-ban">Danh mục nhóm phòng</div>
         <div class="nav-item" data-page="dm-luong-co-ban">Danh mục lương cơ bản</div>
         <div class="nav-item" data-page="dm-he-so-danh-gia">Danh mục loại ngày công</div>
-        <div class="nav-item" data-page="dm-phu-tro">Danh mục phụ trợ</div>
         <div class="nav-item" data-page="dm-thoi-gian-lv">Danh mục thời gian làm việc</div>
         <div class="nav-item" data-page="dm-phan-nguon">Danh mục phân nguồn</div>
         <div class="nav-item" data-page="dm-an-ca">Danh mục định mức ăn ca</div>
@@ -139,6 +138,7 @@
       </div>
       <div class="nav-group-items">
         <div class="nav-item" data-page="tam-ung-luong">Tạm ứng</div>
+        <div class="nav-item" data-page="luong-clc">Tính lương CLC</div>
         <div class="nav-item" data-page="quyet-toan">Quyết toán</div>
         <div class="nav-item" data-page="luong-hq">Chi lương hiệu quả</div>
       </div>

@@ -4760,3 +4760,17 @@ tbody tr:hover td {
   color: #EF4444;
   font-weight: 600;
 }
+
+/* ════════════════════════════════════════════════════
+   PHÂN NGUỒN — Grouping Rows
+   ════════════════════════════════════════════════════ */
+.pn-row-year {
+  background-color: #F1F5F9 !important;
+  font-weight: 700 !important;
+  color: #1E293B !important;
+}
+.pn-row-quarter {
+  background-color: #F8FAFC !important;
+  font-weight: 600 !important;
+  color: #475569 !important;
+}

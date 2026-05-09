@@ -6,7 +6,7 @@
   'use strict';
 
   const MONTH_LABELS = ['T1', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'T8', 'T9', 'T10', 'T11', 'T12'];
-  const FIXED = 3; // TT | HỌ VÀ TÊN | Mã nhân viên
+  const FIXED = 0; // TT | HỌ VÀ TÊN | Mã nhân viên
 
   /* ── Sample data (Synced with other modules) ── */
   const DEPTS = [
@@ -180,13 +180,18 @@
 
     if (hotInstance) { hotInstance.destroy(); hotInstance = null; }
 
+    const headerH = headers.length * 42;
+    const dataH = data.length * 32; // nghi-phep often has taller rows due to text
+    const scrollH = 20; 
+    const finalH = headerH + dataH + scrollH;
+
     hotInstance = new Handsontable(container, {
       data,
       nestedHeaders: headers,
       columns: cols,
       rowHeaders: false,
       fixedColumnsStart: FIXED,
-      height: 'auto',
+      height: finalH,
       width: '100%',
       stretchH: 'all',
       autoColumnSize: false,

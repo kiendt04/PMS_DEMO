@@ -8,7 +8,7 @@
   let hotInstance = null;
   let _initializing = false;
 
-  const FIXED = 3; // STT | Họ tên | Số TK
+  const FIXED = 0; // STT | Họ tên | Số TK
 
   /* ── Synced Data (from chamcong.js) ── */
   const DEPTS = [

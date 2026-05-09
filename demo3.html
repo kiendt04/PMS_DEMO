@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chỉnh sửa nhân事 - PMS Pro</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        body { background-color: #f1f5f9; font-family: 'Segoe UI', Tahoma, sans-serif; padding: 20px; color: #334155; }
+        .pms-container { max-width: 1200px; margin: 0 auto; background: #fff; border-radius: 8px; border: 1px solid #cbd5e1; box-shadow: 0 1px 3px rgba(0,0,0,0.1); padding: 30px; }
+        
+        .section-header { font-size: 14px; font-weight: 700; color: #1e40af; text-transform: uppercase; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px; margin-bottom: 15px; margin-top: 25px; }
+        .form-label { font-weight: 600; font-size: 13px; margin-bottom: 4px; color: #475569; }
+        .form-control, .form-select { font-size: 13.5px; border-radius: 4px; padding: 8px 12px; }
+
+        /* Action Buttons Area */
+        .btn-action-group { display: flex; gap: 10px; background: #f8fafc; padding: 15px; border-radius: 8px; border: 1px solid #e2e8f0; margin-bottom: 20px; flex-wrap: wrap; }
+        .btn-action { font-size: 13px; font-weight: 600; padding: 8px 18px; border-radius: 6px; transition: 0.2s; border: 1px solid #cbd5e1; background: #fff; color: #475569; }
+        .btn-action.active { background: #1e40af; color: #fff; border-color: #1e40af; }
+        .btn-action:hover:not(.active) { background: #f1f5f9; }
+
+        /* Dynamic Form Panel */
+        .action-form-panel { background: #fff; border: 2px solid #1e40af; border-radius: 8px; padding: 25px; margin-bottom: 25px; display: none; animation: slideDown 0.3s ease; }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .history-table { font-size: 13px; }
+        .history-table thead th { background: #f8fafc; font-weight: 700; color: #475569; font-size: 11px; text-transform: uppercase; }
+        .badge-pms { padding: 5px 10px; border-radius: 4px; font-size: 11px; font-weight: 700; }
+        .text-required { color: #e11d48; margin-left: 2px; }
+    </style>
+</head>
+<body>
+
+<div class="pms-container">
+    <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-3">
+        <h4 class="mb-0 fw-bold"><i class="fa fa-user-gear me-2"></i> CHỈNH SỬA HỒ SƠ NHÂN SỰ</h4>
+        <button class="btn btn-primary px-5 fw-bold shadow-sm" onclick="alert('Dữ liệu toàn bộ đã được lưu!')">LƯU THAY ĐỔI</button>
+    </div>
+
+    <!-- 1. Thông tin tài khoản & định danh -->
+    <div class="section-header">Thông tin tài khoản & định danh</div>
+    <div class="row g-3 mb-3">
+        <div class="col-md-3">
+            <label class="form-label">Mã nhân viên<span class="text-required">*</span></label>
+            <input type="text" class="form-control" value="2024.TH.A0">
+        </div>
+        <div class="col-md-3">
+            <label class="form-label">Tên nhân viên<span class="text-required">*</span></label>
+            <input type="text" class="form-control" value="Nguyễn Văn 001">
+        </div>
+        <div class="col-md-3">
+            <label class="form-label">Ngày sinh</label>
+            <input type="date" class="form-control" value="1990-05-15">
+        </div>
+        <div class="col-md-3">
+            <label class="form-label">Ngày tuyển dụng</label>
+            <input type="date" class="form-control" value="2020-01-01" readonly>
+        </div>
+    </div>
+    <div class="row g-3 mb-4">
+        <div class="col-md-3">
+            <label class="form-label">Tên tài khoản<span class="text-required">*</span></label>
+            <input type="text" class="form-control" value="nguyenvan001">
+        </div>
+        <div class="col-md-3">
+            <label class="form-label">Mật khẩu</label>
+            <input type="password" class="form-control" value="12345678">
+        </div>
+        <div class="col-md-3">
+            <label class="form-label">Số tài khoản</label>
+            <input type="text" class="form-control" value="0011223344">
+        </div>
+        <div class="col-md-3">
+            <label class="form-label">Địa chỉ Email</label>
+            <input type="email" class="form-control" value="van.nguyen@company.com">
+        </div>
+    </div>
+
+    <!-- 2. Quản lý Điều chuyển & Biến động -->
+    <div class="section-header">Quản lý biến động công tác</div>
+    <div class="btn-action-group">
+        <button class="btn-action" data-target="formTransfer" onclick="toggleForm(this)"><i class="fa fa-exchange-alt me-2"></i>Điều chuyển công tác</button>
+        <button class="btn-action" data-target="formConcurrent" onclick="toggleForm(this)"><i class="fa fa-copy me-2"></i>Kiêm nhiệm chức vụ</button>
+        <button class="btn-action" data-target="formSalary" onclick="toggleForm(this)"><i class="fa fa-chart-line me-2"></i>Thay đổi hệ số lương</button>
+        <button class="btn-action" data-target="formResign" onclick="toggleForm(this)"><i class="fa fa-user-slash me-2"></i>Thôi việc</button>
+    </div>
+
+    <!-- Form: Điều chuyển -->
+    <div id="formTransfer" class="action-form-panel">
+        <h6 class="fw-bold mb-3 text-primary">PHỎNG ĐIỀU CHUYỂN CÔNG TÁC</h6>
+        <div class="row g-3">
+            <div class="col-md-4">
+                <label class="form-label">Đơn vị tiếp nhận</label>
+                <select class="form-select"><option>Phòng Kỹ Thuật High-Tech</option><option>Phòng Dự Án</option></select>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Chức danh mới</label>
+                <select class="form-select"><option>Trưởng nhóm Kỹ thuật</option><option>Kỹ sư trưởng</option></select>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Ngày hiệu lực</label>
+                <input type="date" class="form-control">
+            </div>
+        </div>
+    </div>
+
+    <!-- Form: Kiêm nhiệm -->
+    <div id="formConcurrent" class="action-form-panel">
+        <h6 class="fw-bold mb-3 text-primary">ĐĂNG KÝ KIÊM NHIỆM</h6>
+        <div class="row g-3">
+            <div class="col-md-6">
+                <label class="form-label">Đơn vị kiêm nhiệm</label>
+                <input type="text" class="form-control" placeholder="Tên đơn vị kiêm nhiệm...">
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Hệ số phụ cấp</label>
+                <input type="number" class="form-control" value="0.5">
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Ngày bắt đầu</label>
+                <input type="date" class="form-control">
+            </div>
+        </div>
+    </div>
+
+    <!-- Form: Thay đổi hệ số lương (MỚI BỔ SUNG) -->
+    <div id="formSalary" class="action-form-panel">
+        <h6 class="fw-bold mb-3 text-primary">CẬP NHẬT HỆ SỐ LƯƠNG MỚI</h6>
+        <div class="row g-3">
+            <div class="col-md-4">
+                <label class="form-label">Hệ số lương mới</label>
+                <input type="number" class="form-control" step="0.001" placeholder="Ví dụ: 4.829">
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Ngày bắt đầu áp dụng</label>
+                <input type="date" class="form-control">
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Số quyết định nâng lương</label>
+                <input type="text" class="form-control" placeholder="VD: 123/QĐ-Lương">
+            </div>
+        </div>
+    </div>
+
+    <!-- Form: Thôi việc -->
+    <div id="formResign" class="action-form-panel">
+        <h6 class="fw-bold mb-3 text-danger">XÁC NHẬN THÔI VIỆC</h6>
+        <div class="row g-3">
+            <div class="col-md-4">
+                <label class="form-label">Ngày chính thức nghỉ</label>
+                <input type="date" class="form-control">
+            </div>
+            <div class="col-md-8">
+                <label class="form-label">Lý do thôi việc</label>
+                <input type="text" class="form-control" placeholder="Chuyển công tác, Nghỉ chế độ...">
+            </div>
+        </div>
+    </div>
+
+    <!-- 3. Thông tin Lương & Phụ cấp (LUÔN HIỆN) -->
+    <div class="section-header">Thông số lương & Phụ cấp hiện thời</div>
+    <div class="row g-3 mb-4">
+        <div class="col-md-3">
+            <label class="form-label">Hệ số lương hiện tại</label>
+            <input type="number" class="form-control" value="4.550" readonly>
+        </div>
+        <div class="col-md-3">
+            <label class="form-label">Phụ cấp thu hút</label>
+            <input type="number" class="form-control" value="1.000">
+        </div>
+        <div class="col-md-3">
+            <label class="form-label">Phụ cấp độc hại</label>
+            <input type="number" class="form-control" value="0.500">
+        </div>
+        <div class="col-md-3">
+            <label class="form-label">Phụ cấp lưu động</label>
+            <input type="number" class="form-control" value="0.200">
+        </div>
+    </div>
+
+    <div class="row mb-5">
+        <div class="col-md-8">
+            <label class="form-label">Ghi chú bổ sung</label>
+            <textarea class="form-control" rows="3"></textarea>
+        </div>
+        <div class="col-md-4">
+            <label class="form-label">Tài liệu đính kèm văn bản</label>
+            <input type="file" class="form-control">
+            <small class="text-muted d-block mt-2">Dữ liệu hiện có: <i>qd_bo_nhiem_2024.pdf</i></small>
+        </div>
+    </div>
+
+    <!-- 4. Quá trình công tác -->
+    <div class="section-header">Lịch sử quá trình công tác</div>
+    <div class="table-responsive border rounded bg-white shadow-sm">
+        <table class="table history-table m-0 table-hover align-middle">
+            <thead>
+                <tr>
+                    <th class="ps-3 border-0">Ngày tạo</th>
+                    <th class="border-0">Loại biến động</th>
+                    <th class="border-0">Phòng ban</th>
+                    <th class="border-0">Vị trí</th>
+                    <th class="text-center border-0">Hệ số</th>
+                    <th class="border-0">Thời hạn</th>
+                    <th class="border-0">Ghi chú</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="ps-3 text-muted">20/04/2026</td>
+                    <td><span class="badge-pms bg-primary text-white">ĐIỀU CHUYỂN</span></td>
+                    <td class="fw-bold">Phòng Kỹ Thuật High-Tech</td>
+                    <td>Trưởng nhóm</td>
+                    <td class="text-center text-primary fw-bold">4.550</td>
+                    <td>15/01/2024 - Nay</td>
+                    <td>QĐ số 45/QĐ</td>
+                </tr>
+                <tr>
+                    <td class="ps-3 text-muted">10/05/2023</td>
+                    <td><span class="badge-pms bg-success text-white">NÂNG LƯƠNG</span></td>
+                    <td>Phòng Kỹ Thuật High-Tech</td>
+                    <td>Phó nhóm</td>
+                    <td class="text-center text-primary fw-bold">4.005</td>
+                    <td>15/05/23 - 14/01/24</td>
+                    <td>Nâng bậc niên độ</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    function toggleForm(btn) {
+        const targetId = btn.getAttribute('data-target');
+        const panels = document.querySelectorAll('.action-form-panel');
+        const buttons = document.querySelectorAll('.btn-action');
+        const targetPanel = document.getElementById(targetId);
+
+        if (targetPanel.style.display === 'block') {
+            targetPanel.style.display = 'none';
+            btn.classList.remove('active');
+            return;
+        }
+
+        panels.forEach(p => p.style.display = 'none');
+        buttons.forEach(b => b.classList.remove('active'));
+
+        targetPanel.style.display = 'block';
+        btn.classList.add('active');
+    }
+</script>
+
+</body>
+</html>
